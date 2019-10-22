@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/GameMain.dart';
+import 'package:info2051_2018/game/game_main.dart';
 
 void main() => runApp(new PewPewPew());
 

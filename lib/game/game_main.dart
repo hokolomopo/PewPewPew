@@ -10,6 +10,7 @@ class GameMain extends StatefulWidget {
   _GameMainState createState() => new _GameMainState();
 }
 
+
 class _GameMainState extends State<GameMain> {
   var position = Offset(20.0, 40.0);
   var height = 100.0;
@@ -49,7 +50,7 @@ class _GameMainState extends State<GameMain> {
 }
 
 
-//Code totalement copié/collé du cours, faudrait voir ce que ca veut dire en vrai
+//TODO Code totalement copié/collé du cours, faudrait voir ce que ca veut dire en vrai
 class CanvasRectangle extends CustomPainter {
   Rect rect;
   Paint fill;
