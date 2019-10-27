@@ -66,3 +66,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages
+
+
+  fonts:
+
+    - family: Heroes
+      fonts:
+        - asset: fonts/Heroes-Legend.ttf
+
+    - family: Birdy
+      fonts:
+          - asset: fonts/angrybirds-regular.ttf
+
+    - family: Grobold
+      fonts:
+          - asset: fonts/Grobold.ttf
