@@ -299,7 +299,7 @@ class _HomeState extends State<Home> {
         primary: false,
         itemCount: shopItem.length,
         itemBuilder: (context, index){
-          return ListTile(title: Text(shopItem[index]), onTap: () {_turorialConfirm("Buy Item?", "Do you want to buy \""+ shopItem[index] + "\" for " + shopPrices[index].toString() + "\$?\n(" + _money.toString() + "\$ remaining)", "No", "Get Poorer");},);
+          return ListTile(leading: CircleAvatar(backgroundImage: AssetImage('graphics/shop/ratchet.jpg'),),title: Text(shopItem[index]), onTap: () {_turorialConfirm("Buy Item?", "Do you want to buy \""+ shopItem[index] + "\" for " + shopPrices[index].toString() + "\$?\n(" + _money.toString() + "\$ remaining)", "No", "Get Poorer");},);
         },
       );
     }
