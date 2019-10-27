@@ -23,7 +23,7 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          height: 220,
+          height: 220.0,
           child: Stack(
             children: <Widget>[
               Positioned(
@@ -53,7 +53,7 @@ class _HomeState extends State<Home> {
                         ),),
                       ),
                     ),
-                    height: 154,
+                    height: 154.0,
                   )),
               Positioned(
                 width: MediaQuery.of(context).size.width * 0.15,
@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
               Positioned(
                 width: MediaQuery.of(context).size.width * 0.08,
                 height: MediaQuery.of(context).size.width * 0.08,
-                bottom: 0,
+                bottom: 0.0,
                 right: MediaQuery.of(context).size.width * 0.32,
                 child: Container(
                   decoration: BoxDecoration(
@@ -174,8 +174,8 @@ class _HomeState extends State<Home> {
                     child: Stack(
                       children: <Widget>[
                         Positioned(
-                          left: 10,
-                          top: 10,
+                          left: 10.0,
+                          top: 10.0,
                           child: IconButton(
                             onPressed: () {
                               Navigator.of(context).pop();
@@ -189,22 +189,22 @@ class _HomeState extends State<Home> {
                         )
                       ],
                     ),
-                    height: 50,
-                    width: 50,
+                    height: 50.0,
+                    width: 50.0,
                   ),
                   SingleChildScrollView(
                     child: Column(
                       children: <Widget>[
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          height: 140,
+                          height: 140.0,
                           child: Stack(
                             children: <Widget>[
                               Positioned(
                                 child: Align(
                                   child: Container(
-                                    width: 130,
-                                    height: 130,
+                                    width: 130.0,
+                                    height: 130.0,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Theme.of(context).primaryColor),
@@ -252,26 +252,26 @@ class _HomeState extends State<Home> {
                         ),
 
                         Padding(
-                          padding: EdgeInsets.only(bottom: 20, top: 60),
+                          padding: EdgeInsets.only(bottom: 20.0, top: 60.0),
                           child: _button("P1", Colors.white, primary, primary, Colors.white, 2.0, testFunction)
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 20.0,
                         ),
                         Padding(
                           padding: EdgeInsets.only(
-                              left: 20,
-                              right: 20,
+                              left: 20.0,
+                              right: 20.0,
                               bottom: MediaQuery.of(context).viewInsets.bottom),
                           child: Container(
                             child: _button("HELLO", Colors.white, primary,
                                 primary, Colors.white, 30.0, testFunction),
-                            height: 50,
+                            height: 50.0,
                             width: MediaQuery.of(context).size.width,
                           ),
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 20.0,
                         ),
                       ],
                     ),
@@ -290,6 +290,7 @@ class _HomeState extends State<Home> {
     Widget _shopList(BuildContext context) {
 
       final shopItem = ["Agents of Doom", "Annihilator", "Bouncer", "Disc Blade Gun", "Flux Rifle", "Holoshield Glove", "Infector","Lava Gun", "Suck Cannon", "Bla", "Bla2", "Bla3", "Bla4"];
+      final shopPrices = [200, 215, 230, 235, 240, 245, 250, 260 , 270, 280, 360, 458, 579];
 
       return ListView.builder(
         physics: NeverScrollableScrollPhysics(), // Because already in scrolable body
@@ -298,7 +299,7 @@ class _HomeState extends State<Home> {
         primary: false,
         itemCount: shopItem.length,
         itemBuilder: (context, index){
-          return ListTile(title: Text(shopItem[index]), onTap: () {_turorialConfirm("Buy Item?", "Do you want to buy "+ shopItem[index] + " for " + "247\$?", "No", "Get Poorer");},);
+          return ListTile(title: Text(shopItem[index]), onTap: () {_turorialConfirm("Buy Item?", "Do you want to buy \""+ shopItem[index] + "\" for " + shopPrices[index].toString() + "\$?\n(" + _money.toString() + "\$ remaining)", "No", "Get Poorer");},);
         },
       );
     }
@@ -318,8 +319,8 @@ class _HomeState extends State<Home> {
                     child: Stack(
                       children: <Widget>[
                         Positioned(
-                          left: 10,
-                          top: 10,
+                          left: 10.0,
+                          top: 10.0,
                           child: IconButton(
                             onPressed: () {
                               Navigator.of(context).pop();
@@ -332,28 +333,28 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         Positioned(
-                          right: 50,
-                          top: 30,
+                          right: 50.0,
+                          top: 30.0,
                           child: new Text("$_money\$", style: new TextStyle(color: Colors.green),),
                         )
                       ],
                     ),
-                    height: 50,
-                    width: 50,
+                    height: 50.0,
+                    width: 50.0,
                   ),
                   SingleChildScrollView(
                     child: Column(
                       children: <Widget>[
                         Container(
                           width: MediaQuery.of(context).size.width,
-                          height: 140,
+                          height: 140.0,
                           child: Stack(
                             children: <Widget>[
                               Positioned(
                                 child: Align(
                                   child: Container(
-                                    width: 130,
-                                    height: 130,
+                                    width: 130.0,
+                                    height: 130.0,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Theme.of(context).primaryColor),
@@ -366,7 +367,7 @@ class _HomeState extends State<Home> {
                                   child: FittedBox(fit: BoxFit.contain, child: Text(
                                       "SHOP",
                                       style: TextStyle(
-                                      fontSize: 25,
+                                      fontSize: 25.0,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                       ),
@@ -381,7 +382,7 @@ class _HomeState extends State<Home> {
                           child: _shopList(context),
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 20.0,
                         ),
                       ],
                     ),
@@ -408,30 +409,30 @@ class _HomeState extends State<Home> {
               child: Container(
                 child: _button("Quick Play", primary, Colors.white, Colors.white,
                     primary, 30.0, _parameters),
-                height: 50,
+                height: 50.0,
               ),
-              padding: EdgeInsets.only(top: 80, left: 20, right: 20),
+              padding: EdgeInsets.only(top: 80.0, left: 20.0, right: 20.0),
             ),
             Padding(
               child: Container(
                 child: _buttonOutline("Tutorial", Colors.white, Colors.white, Theme.of(context).primaryColor, Theme.of(context).primaryColor, Colors.white, 30.0, () {_turorialConfirm("Start tutorial?", "The tutorial is recommanded for new players", "Cancel", "Start");}),
-                height: 50,
+                height: 50.0,
               ),
-              padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+              padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
             ),
             Padding(
               child: Container(
                 child: _button("Shop", primary, Colors.white, Colors.white, primary, 30.0, _shopSheet),
-                height: 50,
+                height: 50.0,
               ),
-              padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+              padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
             ),
             Expanded(
               child: Align(
                 child: ClipPath(
                   child: Container(
                     color: Colors.white,
-                    height: 300,
+                    height: 300.0,
                   ),
                   clipper: BottomWaveClipper(),
                 ),
