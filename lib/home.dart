@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/quick_play.dart';
 import 'clipper.dart';
+import 'shop.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,7 +10,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  int _money = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -233,46 +234,7 @@ class _HomeState extends State<Home> {
 //                          child: _input(Icon(Icons.email), "EMAIL",
 //                              _emailController, false),
 //                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 20, top: 60),
-                          child: Row(children: <Widget>[
-                            Expanded(
-                              child: _button("P1", Colors.white, primary, Colors.red, Colors.white, 2.0, testFunction),
-                            ),
-                            Expanded(
-                                child: _button("P2", Colors.white, primary, Colors.blue, Colors.white, 2.0, testFunction)
-                            ),
-                            Expanded(
-                                child: _button("P3", Colors.white, primary, Colors.green, Colors.white, 2.0, testFunction)
-                            ),
-                            Expanded(
-                                child: _button("P4", Colors.white, primary, Colors.purpleAccent, Colors.white, 2.0, testFunction)
-                            ),
-                          ],),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 20.0, top: 60.0),
-                          child: _button("P1", Colors.white, primary, primary, Colors.white, 2.0, testFunction)
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 20.0,
-                              right: 20.0,
-                              bottom: MediaQuery.of(context).viewInsets.bottom),
-                          child: Container(
-                            child: _button("HELLO", Colors.white, primary,
-                                primary, Colors.white, 30.0, testFunction),
-                            height: 50.0,
-                            width: MediaQuery.of(context).size.width,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        ),
+                        Parameters()
                       ],
                     ),
                   ),
@@ -285,23 +247,6 @@ class _HomeState extends State<Home> {
           ),
         );
       });
-    }
-
-    Widget _shopList(BuildContext context) {
-
-      final shopItem = ["Agents of Doom", "Annihilator", "Bouncer", "Disc Blade Gun", "Flux Rifle", "Holoshield Glove", "Infector","Lava Gun", "Suck Cannon", "Bla", "Bla2", "Bla3", "Bla4"];
-      final shopPrices = [200, 215, 230, 235, 240, 245, 250, 260 , 270, 280, 360, 458, 579];
-
-      return ListView.builder(
-        physics: NeverScrollableScrollPhysics(), // Because already in scrolable body
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true, // Because of column
-        primary: false,
-        itemCount: shopItem.length,
-        itemBuilder: (context, index){
-          return ListTile(leading: CircleAvatar(backgroundImage: AssetImage('graphics/shop/ratchet.jpg'),),title: Text(shopItem[index]), onTap: () {_turorialConfirm("Buy Item?", "Do you want to buy \""+ shopItem[index] + "\" for " + shopPrices[index].toString() + "\$?\n(" + _money.toString() + "\$ remaining)", "No", "Get Poorer");},);
-        },
-      );
     }
 
     void _shopSheet() {
@@ -332,11 +277,6 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                         ),
-                        Positioned(
-                          right: 50.0,
-                          top: 30.0,
-                          child: new Text("$_money\$", style: new TextStyle(color: Colors.green),),
-                        )
                       ],
                     ),
                     height: 50.0,
@@ -378,9 +318,7 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                         ),
-                        Container(
-                          child: _shopList(context),
-                        ),
+                        BodyLayout(),
                         SizedBox(
                           height: 20.0,
                         ),
