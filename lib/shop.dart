@@ -23,7 +23,7 @@ class BodyLayoutState extends State<BodyLayout> {
 
     return Column(
       children: <Widget>[
-        Padding(padding: EdgeInsets.only(bottom: 20, top: 20), child: Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[Text("Avalable Cash Asset: "+_money.toString() + "\$", style: TextStyle(color: Colors.green),)],),),
+        Padding(padding: EdgeInsets.only(bottom: 20.0, top: 20.0), child: Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[Text("Avalable Cash Asset: "+_money.toString() + "\$", style: TextStyle(color: Colors.green),)],),),
         Row(children: <Widget>[FittedBox(fit: BoxFit.contain,child: Text("TODO (all/weapon/utility)"))],),
         Container(child: ListView.builder(
           physics: NeverScrollableScrollPhysics(), // Because already in scrollable body

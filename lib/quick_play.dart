@@ -33,7 +33,7 @@ class ParametersState extends State<Parameters>{
   Widget _parameter(BuildContext context){
     return Column(children: <Widget>[
       Padding(
-        padding: EdgeInsets.only(bottom: 10, top: 20),
+        padding: EdgeInsets.only(bottom: 10.0, top: 20.0),
         child: Row(children: <Widget>[
           Expanded(child: FittedBox(fit: BoxFit.contain, child: Text("Number\nPlayers"))),
           Expanded(child: Column(children: <Widget>[Text("1P"), Radio(activeColor: Colors.redAccent, value: 1, groupValue: _nbPlayer, onChanged: _handleNbPlayersRadio,)])),
@@ -44,7 +44,7 @@ class ParametersState extends State<Parameters>{
       ),
 
       Padding(
-          padding: EdgeInsets.only(bottom: 10, top: 10),
+          padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
           child: Row(children: <Widget>[
             Expanded(child: FittedBox(fit: BoxFit.contain, child: Text("Number\nWorms"))),
             Expanded(child: Column(children: <Widget>[Text("1"), Radio(activeColor: Colors.redAccent, value: 1, groupValue: _nbWorms, onChanged: _handleNbWorms,)])),
@@ -69,14 +69,14 @@ class ParametersState extends State<Parameters>{
             elevation: 0.0,
             color: Theme.of(context).primaryColor,
             shape: RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(30)),
+                borderRadius: new BorderRadius.circular(30.0)),
             child: FittedBox(
               fit: BoxFit.contain,
               child: Text(
                   "GO !",
                   style: TextStyle(
                       height: 1.7,
-                      fontWeight: FontWeight.normal, color: Colors.white, fontSize: 20)
+                      fontWeight: FontWeight.normal, color: Colors.white, fontSize: 20.0)
               ),),
             onPressed: () {
               () {};
