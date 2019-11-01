@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
                         decoration: BoxDecoration(
                             borderRadius: new BorderRadius.circular(20.0),
                             color: Color(0xFF8B0000),
-                            border: new Border.all(color: Colors.white70, width: 5),
+                            border: new Border.all(color: Colors.white70, width: 5.0),
                             boxShadow: [
                             new BoxShadow(
                                 color: Colors.red,
@@ -99,7 +99,7 @@ class _HomeState extends State<Home> {
           text,
           style: TextStyle(
             height: 1.7,
-              fontWeight: FontWeight.normal, color: textColor, fontSize: 20)
+              fontWeight: FontWeight.normal, color: textColor, fontSize: 20.0)
         ),),
         onPressed: () {
           function();
@@ -125,7 +125,7 @@ class _HomeState extends State<Home> {
             height: 1.7,
               fontWeight: FontWeight.bold,
               color: textColor,
-              fontSize: 20),
+              fontSize: 20.0),
         ),
         onPressed: () {
           function();
@@ -218,7 +218,7 @@ class _HomeState extends State<Home> {
                                   child: Text(
                                     "PLAY",
                                     style: TextStyle(
-                                      fontSize: 25,
+                                      fontSize: 25.0,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
