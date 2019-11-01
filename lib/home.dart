@@ -138,7 +138,7 @@ class _HomeState extends State<Home> {
 
     void testFunction() {;}
     
-    void _turorialConfirm(String title, String mess, String neg, String pos){
+    void _tutorialConfirm(String title, String mess, String neg, String pos){
       showDialog(context: context, builder: (BuildContext context){
         return AlertDialog(
           title: new Text(title),
@@ -240,7 +240,7 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              height: MediaQuery.of(context).size.height / 1.1,
+              height: MediaQuery.of(context).size.height / 1.05, // / 1.1
               width: MediaQuery.of(context).size.width,
               color: Colors.white,
             ),
@@ -258,7 +258,7 @@ class _HomeState extends State<Home> {
                 topLeft: Radius.circular(40.0),
                 topRight: Radius.circular(40.0)),
             child: Container(
-              child: ListView(
+              child: Column(
                 children: <Widget>[
                   Container(
                     child: Stack(
@@ -282,48 +282,13 @@ class _HomeState extends State<Home> {
                     height: 50.0,
                     width: 50.0,
                   ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 140.0,
-                          child: Stack(
-                            children: <Widget>[
-                              Positioned(
-                                child: Align(
-                                  child: Container(
-                                    width: 130.0,
-                                    height: 130.0,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Theme.of(context).primaryColor),
-                                  ),
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                              Positioned(
-                                child: Container(
-                                  child: FittedBox(fit: BoxFit.contain, child: Text(
-                                      "SHOP",
-                                      style: TextStyle(
-                                      fontSize: 25.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      ),
-                                      ),),
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        BodyLayout(),
-                        SizedBox(
-                          height: 20.0,
-                        ),
-                      ],
-                    ),
+                  Expanded(
+                    child: new FutureBuilder(
+                        future: DefaultAssetBundle.of(context).loadString('assets/data/shop/items.json'),
+                        builder: (context, snapshot) {
+                          List<Item> items = parseJson(snapshot.data.toString());
+                          return items.isNotEmpty ? new ShopList(items: items) : new Center(child: new CircularProgressIndicator(),);
+                        } ),
                   ),
                 ],
               ),
@@ -353,7 +318,7 @@ class _HomeState extends State<Home> {
             ),
             Padding(
               child: Container(
-                child: _buttonOutline("Tutorial", Colors.white, Colors.white, Theme.of(context).primaryColor, Theme.of(context).primaryColor, Colors.white, 30.0, () {_turorialConfirm("Start tutorial?", "The tutorial is recommanded for new players", "Cancel", "Start");}),
+                child: _buttonOutline("Tutorial", Colors.white, Colors.white, Theme.of(context).primaryColor, Theme.of(context).primaryColor, Colors.white, 30.0, () {_tutorialConfirm("Start tutorial?", "The tutorial is recommanded for new players", "Cancel", "Start");}),
                 height: 50.0,
               ),
               padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "1",
+    "price": 250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "2",
+    "price": 2550,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "4",
+    "price": 32500,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "5",
+    "price": 30250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "6",
+    "price": 32950,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "3",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  }
+]

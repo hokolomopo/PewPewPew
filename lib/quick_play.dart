@@ -31,7 +31,9 @@ class ParametersState extends State<Parameters>{
   }
 
   Widget _parameter(BuildContext context){
-    return Column(children: <Widget>[
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
       Padding(
         padding: EdgeInsets.only(bottom: 10, top: 20),
         child: Row(children: <Widget>[
@@ -56,6 +58,7 @@ class ParametersState extends State<Parameters>{
       SizedBox(
         height: 20.0,
       ),
+      Row(children: <Widget>[Expanded(child: Text("hello", style: TextStyle(fontSize: 125),))],),
       Padding(
         padding: EdgeInsets.only(
             left: 20.0,
@@ -64,7 +67,7 @@ class ParametersState extends State<Parameters>{
         child: Container(
           child: RaisedButton(
             highlightElevation: 10.0,
-            splashColor: Theme.of(context).primaryColor,
+            splashColor: Colors.white,
             highlightColor: Theme.of(context).primaryColor,
             elevation: 0.0,
             color: Theme.of(context).primaryColor,

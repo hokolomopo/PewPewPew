@@ -20,6 +20,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
+  # Package for storing non-critical data in an asynchronous way
+  shared_preferences: ^0.5.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -72,15 +75,16 @@ flutter:
 
     - family: Heroes
       fonts:
-        - asset: fonts/Heroes-Legend.ttf
+        - asset: assets/fonts/Heroes-Legend.ttf
 
     - family: Birdy
       fonts:
-          - asset: fonts/angrybirds-regular.ttf
+          - asset: assets/fonts/angrybirds-regular.ttf
 
     - family: Grobold
       fonts:
-          - asset: fonts/Grobold.ttf
+          - asset: assets/fonts/Grobold.ttf
 
   assets:
-    - graphics/shop/
+    - assets/graphics/shop/
+    - assets/data/shop/items.json
