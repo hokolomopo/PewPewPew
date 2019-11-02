@@ -12,7 +12,6 @@ class Character extends MovingEntity {
   int hp;
   Arsenal currentArsenal;
 
-
-  Character(Offset position) : super(position, new Rectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy));
+  Character(Offset position) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy));
 
 }

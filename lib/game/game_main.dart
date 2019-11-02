@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:info2051_2018/game/game_state.dart';
+
 
 class GameMain extends StatefulWidget {
   GameMain({Key key, this.title}) : super(key: key);
@@ -8,29 +11,39 @@ class GameMain extends StatefulWidget {
 
   @override
   _GameMainState createState() => new _GameMainState();
+
 }
 
 
 class _GameMainState extends State<GameMain> {
-  var position = Offset(20.0, 40.0);
-  var height = 100.0;
-  var width = 100.0;
+  GameState state = new GameState(1, 1);
 
+  int _callbackId;
+
+  var position = Offset(20.0, 40.0);
+  var height = 10.0;
+  var width = 10.0;
 
   _GameMainState(){
     _scheduleFrame();
   }
 
   void _scheduleFrame() {
-    SchedulerBinding.instance.scheduleFrameCallback(_update);
+    _callbackId = SchedulerBinding.instance.scheduleFrameCallback(_update);
+  }
+
+  void _unscheduleFrame() {
+    SchedulerBinding.instance.cancelFrameCallbackWithId(_callbackId);
   }
 
   void _update(Duration timestamp) {
     _scheduleFrame();
+
+    state.update();
     if(!mounted)
       return;
     setState(() {
-      position += new Offset(0.0, 1.0);
+      position = state.getCurrentCharacter().position;
     });
   }
 
@@ -47,6 +60,31 @@ class _GameMainState extends State<GameMain> {
       ),
     );
   }
+
+
+  @override
+  void initState(){
+    super.initState();
+
+    //Set orientation to landscape mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+  }
+
+  @override
+  dispose(){
+    //Set orientation to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    _unscheduleFrame();
+    super.dispose();
+  }
+
 }
 
 

@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+import 'game/game_main.dart';
+
 class Parameters extends StatefulWidget {
   @override
   ParametersState createState() {
@@ -77,9 +79,13 @@ class ParametersState extends State<Parameters>{
                   style: TextStyle(
                       height: 1.7,
                       fontWeight: FontWeight.normal, color: Colors.white, fontSize: 20.0)
-              ),),
+              ),
+            ),
             onPressed: () {
-              () {};
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GameMain()),
+              );
             },
           ),
           height: 50.0,
