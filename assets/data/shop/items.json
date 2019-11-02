@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Agents of Doom",
+    "price": 250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Annihilator",
+    "price": 2550,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Bouncer",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Disc Blade Gun",
+    "price": 32500,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Flux Rifle",
+    "price": 30250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Holoshield Glove",
+    "price": 32950,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Infector",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Lava Gun",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  },
+  {
+    "name": "Suck Cannon",
+    "price": 3250,
+    "imgName": "ratchet.jpg"
+  }
+]
