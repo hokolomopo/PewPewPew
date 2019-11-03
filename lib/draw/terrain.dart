@@ -86,7 +86,9 @@ class TerrainDrawer extends CustomDrawer {
   /// of the blocks will be reduced instead of the blocks completely erased.
   @Deprecated("The behaviour of this function will change soon, see doc")
   removeBlocksInRange(Offset center, double range) {
+    // Never modifies a [Set] while iterating through it.
     Set<_TerrainBlock> toRemove = Set();
+
     for (_TerrainBlock block in blocks) {
       if (distanceRectToPoint(block, center) <= range) {
         toRemove.add(block);
@@ -125,46 +127,6 @@ class TerrainDrawer extends CustomDrawer {
     }
   }
 }
-
-/// Private painter for the terrain. See [CustomPainter].
-/*class _TerrainPainter extends CustomPainter {
-  Set<_TerrainBlock> blocks;
-
-  _TerrainPainter(this.blocks);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (_TerrainBlock block in blocks) {
-      // Remember the block sizes are taken in percentage of the screen size,
-      // for more robustness.
-      double left = block.left * size.width;
-      double top = block.top * size.height;
-      double width = block.width * size.width;
-      double height = block.height * size.height;
-
-      Rect toDraw = Rect.fromLTWH(
-          left,
-          top,
-          // [canvas.drawRect] does not like [double.infinity] while stroking.
-          // As we don't know the size before painting, we can only truncate those
-          // infinities here.
-          min(width, size.width - left + terrainStrokePaint.strokeWidth),
-          min(height, size.height - top + terrainStrokePaint.strokeWidth));
-
-      canvas.drawRect(toDraw, terrainFillPaint);
-      if (block.withStroke) {
-        canvas.drawRect(toDraw, terrainStrokePaint);
-      } else {
-        // We never paint no strokes at all : we at least paint the top one.
-        canvas.drawLine(
-            Offset(left, top), Offset(left + width, top), terrainStrokePaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_TerrainPainter oldDelegate) => true;
-}*/
 
 // Simple wrapper around the Rect class
 // used to maintain information about stroke.

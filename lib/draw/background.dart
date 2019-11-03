@@ -1,11 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:info2051_2018/draw/Cst.dart';
 import 'dart:ui' as ui;
+import 'dart:typed_data';
 
 import 'level.dart';
+import 'Cst.dart';
 
 class BackgroundDrawer extends CustomDrawer {
   Uint8List backgroundImgBytes;

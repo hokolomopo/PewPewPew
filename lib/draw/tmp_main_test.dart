@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:info2051_2018/draw/background.dart';
-import 'package:info2051_2018/draw/level.dart';
-import 'package:info2051_2018/draw/terrain.dart';
-
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
+
+import 'background.dart';
+import 'level.dart';
+import 'terrain.dart';
 
 void main() {
   WidgetsFlutterBinding

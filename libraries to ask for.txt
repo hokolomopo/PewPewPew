@@ -1,2 +1,5 @@
 dart:math (power, sinus, ..., just for making things better looking)
-dart:ui and dart:async for loading an image easily 
+dart:ui and dart:typed_data for loading an image
+dart:collection for efficiency (ordered map instead of list)
+
+flutter services for assets (rootBundle)
