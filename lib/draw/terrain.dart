@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'Cst.dart';
 import 'math.dart';
+import 'level.dart';
 
 /// Represents the terrain (the ground) of the game.
 ///
@@ -18,7 +19,7 @@ import 'math.dart';
 /// be expressed in proportion of the screen size, meaning that the valid
 /// range is [0;1]. Providing values outside this range to the functions may
 /// lead to unexpected behaviour.
-class TerrainDrawer {
+class TerrainDrawer extends CustomDrawer {
   Set<_TerrainBlock> blocks = Set();
 
   /// Creates a new terrain block.
@@ -94,20 +95,39 @@ class TerrainDrawer {
     blocks = blocks.difference(toRemove);
   }
 
-  /// Getter for the previously built terrain.
-  ///
-  /// Use this method to get the widget (painter) representing the terrain, it
-  /// will then automatically paints the blocks that have been created.
-  Widget get terrain {
-    return CustomPaint(
-        size: Size.infinite,
-        painter: _TerrainPainter(blocks),
-    );
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (_TerrainBlock block in blocks) {
+      // Remember the block sizes are taken in percentage of the screen size,
+      // for more robustness.
+      double left = block.left * size.width;
+      double top = block.top * size.height;
+      double width = block.width * size.width;
+      double height = block.height * size.height;
+
+      Rect toDraw = Rect.fromLTWH(
+          left,
+          top,
+          // [canvas.drawRect] does not like [double.infinity] while stroking.
+          // As we don't know the size before painting, we can only truncate those
+          // infinities here.
+          min(width, size.width - left),
+          min(height, size.height - top));
+
+      canvas.drawRect(toDraw, terrainFillPaint);
+      if (block.withStroke) {
+        canvas.drawRect(toDraw, terrainStrokePaint);
+      } else {
+        // We never paint no strokes at all : we at least paint the top one.
+        canvas.drawLine(
+            Offset(left, top), Offset(left + width, top), terrainStrokePaint);
+      }
+    }
   }
 }
 
 /// Private painter for the terrain. See [CustomPainter].
-class _TerrainPainter extends CustomPainter {
+/*class _TerrainPainter extends CustomPainter {
   Set<_TerrainBlock> blocks;
 
   _TerrainPainter(this.blocks);
@@ -144,7 +164,7 @@ class _TerrainPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_TerrainPainter oldDelegate) => true;
-}
+}*/
 
 // Simple wrapper around the Rect class
 // used to maintain information about stroke.

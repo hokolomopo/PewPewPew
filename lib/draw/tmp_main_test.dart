@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:info2051_2018/draw/background.dart';
+import 'package:info2051_2018/draw/level.dart';
 import 'package:info2051_2018/draw/terrain.dart';
+
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 void main() {
   WidgetsFlutterBinding
@@ -38,11 +44,19 @@ class DrawTest extends StatefulWidget {
 }
 
 class _DrawTestState extends State<DrawTest> {
+  LevelPainter levelPainter = LevelPainter();
+
   TerrainDrawer terrainDrawer = TerrainDrawer();
+  BackgroundDrawer backgroundDrawer = BackgroundDrawer();
+
+  ui.Image backgroundImg;
 
   @override
   void initState() {
     super.initState();
+    levelPainter.addElement(backgroundDrawer);
+
+    levelPainter.addElement(terrainDrawer);
     terrainDrawer.createTerrainFromFunction(
         (left) => ((sin(left * 4 * pi) + 2) / 10),
         nbBlocks: 1000);
@@ -53,17 +67,22 @@ class _DrawTestState extends State<DrawTest> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child: GestureDetector(onTap: _testTap, child: terrainDrawer.terrain),
+        child: GestureDetector(
+          onTapDown: (details) {_testTap(details, context);},
+          child: levelPainter.level,
+        ),
       ),
     );
   }
 
-  _testTap() {
+  _testTap(TapDownDetails details, BuildContext context) {
+    Size screenSize = MediaQuery.of(context).size;
+    double dxProp = details.localPosition.dx / screenSize.width;
+    double dyProp = details.localPosition.dy / screenSize.height;
     Set<Offset> set = Set();
     set.add(Offset(0.3, 0.5));
     setState(() {
-      terrainDrawer.removeBlocksByPositions(set);
-      terrainDrawer.removeBlocksInRange(Offset(0.5, 0.8), 0.05);
+      terrainDrawer.removeBlocksInRange(Offset(dxProp, dyProp), 0.05);
     });
   }
 }

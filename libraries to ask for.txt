@@ -1,1 +1,2 @@
-dart:math (juste pour pas encombrer mon code avec une fonction "minimum")
+dart:math (power, sinus, ..., just for making things better looking)
+dart:ui and dart:async for loading an image easily 
