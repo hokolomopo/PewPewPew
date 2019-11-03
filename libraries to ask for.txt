@@ -1,0 +1,1 @@
+dart:math (juste pour pas encombrer mon code avec une fonction "minimum")
