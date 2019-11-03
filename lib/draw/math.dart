@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+/// Computes the euclidean distance between a point and a rectangle.
+///
+/// The distance is simply computed as the distance between the given [point]
+/// and the nearest point that is in [rect].
 double distanceRectToPoint(Rect rect, Offset point) {
   double horizontalDist = point.dx - rect.left;
   if (horizontalDist > 0) {
