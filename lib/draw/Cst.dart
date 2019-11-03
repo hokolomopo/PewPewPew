@@ -10,3 +10,9 @@ Paint terrainStrokePaint = Paint()
 
 const defaultBackgroundPath =
     "assets/graphics/backgrounds/default_background.png";
+
+Paint lifeBarStrokePaint = Paint()
+  ..color = Colors.black
+  ..strokeWidth = 3
+  ..style = PaintingStyle.stroke;
+const distanceLifeBarCharacter = 0.05;

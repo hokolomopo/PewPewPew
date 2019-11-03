@@ -16,24 +16,24 @@ class BackgroundDrawer extends CustomDrawer {
   }
 
   setBackgroundImg(String imgPath) async {
-    ByteData bytes = await rootBundle
-        .load(imgPath);
+    ByteData bytes = await rootBundle.load(imgPath);
     backgroundImgBytes = bytes.buffer.asUint8List();
   }
 
-  _reloadBackground() async {
+  _reloadBackground(Size screenSize) async {
     ui.Codec codec = await ui.instantiateImageCodec(backgroundImgBytes,
         targetWidth: screenSize.width.toInt(),
         targetHeight: screenSize.height.toInt());
     toPaint = (await codec.getNextFrame()).image;
+
+    this.screenSize = screenSize;
     repaint.notifyListeners();
   }
 
   @override
   bool isReady(Size screenSize) {
     if (this.screenSize != screenSize) {
-      this.screenSize = screenSize;
-      _reloadBackground();
+      _reloadBackground(screenSize);
       return false;
     }
     return true;

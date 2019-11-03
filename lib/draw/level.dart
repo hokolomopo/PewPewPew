@@ -63,7 +63,7 @@ class _LevelPainterAux extends CustomPainter {
   void paint(ui.Canvas canvas, Size size) {
     bool everyDrawerReady = true;
     for (CustomDrawer drawer in toBePainted.values) {
-      if (!drawer.isReady(size)) {
+      if (!drawer.isReady(size) && everyDrawerReady) {
         // TODO real loading screen
         ui.ParagraphBuilder textBuilder = ui.ParagraphBuilder(
             ui.ParagraphStyle(textAlign: TextAlign.left, fontSize: 50.0))

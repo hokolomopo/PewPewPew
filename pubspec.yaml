@@ -89,3 +89,4 @@ flutter:
     - assets/graphics/shop/
     - assets/data/shop/items.json
     - assets/graphics/backgrounds/
+    - assets/graphics/characters/

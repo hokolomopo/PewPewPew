@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 import 'background.dart';
 import 'level.dart';
 import 'terrain.dart';
+import 'Character.dart';
 
 void main() {
   WidgetsFlutterBinding
@@ -48,6 +49,8 @@ class _DrawTestState extends State<DrawTest> {
   TerrainDrawer terrainDrawer = TerrainDrawer();
   BackgroundDrawer backgroundDrawer = BackgroundDrawer();
 
+  List<CharacterDrawer> characters = List();
+
   ui.Image backgroundImg;
 
   @override
@@ -60,6 +63,15 @@ class _DrawTestState extends State<DrawTest> {
         (left) => ((sin(left * 4 * pi) + 2) / 10),
         nbBlocks: 1000);
     terrainDrawer.addTerrainBlock(Offset(0.3, 0.5), width: 0.2, height: 0.1);
+
+    characters.add(CharacterDrawer(
+        "assets/graphics/characters/rotated_worm.png", Offset(0.2, 0.6)));
+    characters.add(CharacterDrawer(
+        "assets/graphics/characters/worm.png", Offset(0.8, 0.6)));
+
+    characters.forEach((character) {
+      levelPainter.addElement(character);
+    });
   }
 
   @override
@@ -67,7 +79,9 @@ class _DrawTestState extends State<DrawTest> {
     return Scaffold(
       body: Container(
         child: GestureDetector(
-          onTapDown: (details) {_testTap(details, context);},
+          onTapDown: (details) {
+            _testTap(details, context);
+          },
           child: levelPainter.level,
         ),
       ),
@@ -78,10 +92,11 @@ class _DrawTestState extends State<DrawTest> {
     Size screenSize = MediaQuery.of(context).size;
     double dxProp = details.localPosition.dx / screenSize.width;
     double dyProp = details.localPosition.dy / screenSize.height;
-    Set<Offset> set = Set();
-    set.add(Offset(0.3, 0.5));
     setState(() {
-      terrainDrawer.removeBlocksInRange(Offset(dxProp, dyProp), 0.05);
+      characters[0].decreaseLife(0.05);
+      characters[0].move(Offset(0.05, -0.01));
+      characters[1].decreaseLife(0.1);
+      characters[1].move(Offset(-0.05, 0.002));
     });
   }
 }
