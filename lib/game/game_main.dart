@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
 
 
@@ -17,12 +18,13 @@ class GameMain extends StatefulWidget {
 
 class _GameMainState extends State<GameMain> {
   GameState state = new GameState(1, 1);
+  GestureDetector gestureDetector;
 
   int _callbackId;
 
   var position = Offset(20.0, 40.0);
-  var height = 10.0;
-  var width = 10.0;
+  var height = Character.hitboxSize.dy;
+  var width = Character.hitboxSize.dx;
 
   _GameMainState(){
     _scheduleFrame();
@@ -47,16 +49,43 @@ class _GameMainState extends State<GameMain> {
     });
   }
 
+  void buildGestureDetector(){
+    var rect = Rect.fromLTWH(position.dx, position.dy, width, height);
+
+    this.gestureDetector =  new GestureDetector(
+        onTapDown: (details) {
+          state.onTap(details);
+        },
+      onPanStart: (details){
+          state.onPanStart(details);
+      },
+      onPanUpdate: (details){
+        state.onPanUpdate(details);
+      },
+      onPanEnd: (details){
+        state.onPanEnd(details);
+      },
+      onLongPressStart: (details){
+        state.onLongPress(details);
+      },
+      child: CustomPaint(
+          size: Size.infinite,
+          painter: CanvasRectangle(
+              rect,
+              fill: Colors.blue,
+              stroke: null),
+        ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var rect = Rect.fromLTWH(position.dx, position.dy, width, height);
+    //if(this.gestureDetector == null)
+      buildGestureDetector();
+
     return new Scaffold(
-      body: CustomPaint(
-        size: Size.infinite,
-        painter: CanvasRectangle(
-            rect,
-            fill: Colors.blue,
-            stroke: null),
+      body: Container(
+        child: this.gestureDetector
       ),
     );
   }

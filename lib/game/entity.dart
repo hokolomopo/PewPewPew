@@ -53,6 +53,33 @@ abstract class MovingEntity extends Entity{
     this.velocity += acceleration;
   }
 
+  void addVelocity(Offset v){
+    this.velocity += v;
+  }
+
+  void setXSpeed(double x){
+    this.velocity = new Offset(x, this.velocity.dy);
+  }
+
+  void setYSpeed(double y){
+    this.velocity = new Offset(this.velocity.dx, y);
+  }
+
+  void stopY(){
+    this.setYSpeed(0);
+    this.setYAcceleration(0);
+  }
+
+  void stopX(){
+    this.setXSpeed(0);
+    this.setXAcceleration(0);
+  }
+
+  void stop(){
+    this.stopX();
+    this.stopY();
+  }
+
   bool isMoving(){
     if(this.velocity.dx == 0.0 && this.velocity.dy == 0.0)
       return false;
@@ -63,9 +90,12 @@ abstract class MovingEntity extends Entity{
     this.acceleration += (acc * weight);
   }
 
-  void stop(){
-    this.velocity = new Offset(0.0, 0.0);
-    this.acceleration = new Offset(0.0, 0.0);
+  void setXAcceleration(double x){
+    this.acceleration = new Offset(x, this.acceleration.dy);
+  }
+
+  void setYAcceleration(double y){
+    this.acceleration = new Offset(this.acceleration.dx, y);
   }
 
 }

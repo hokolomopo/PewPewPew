@@ -8,7 +8,7 @@ import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class World{
-  static final double gravityForce = 0.0001;
+  static final double gravityForce = 0.0005;
 
   static final double epsilon = 0.1;
   
@@ -37,7 +37,7 @@ class World{
     for(Terrain t in terrains){
       if(entity.hitbox.intersects(t.hitbox)){
         backTrackX(entity, t.hitbox, vector.dx);
-        entity.velocity = new Offset(0, entity.velocity.dy);
+        entity.stopX();
       }
     }
 
@@ -48,9 +48,11 @@ class World{
     for(Terrain t in terrains){
       if(entity.hitbox.intersects(t.hitbox)){
         backTrackY(entity, t.hitbox, vector.dy);
-        entity.velocity = new Offset(entity.velocity.dx, 0);
-        var plz = entity.hitbox.intersects(t.hitbox);
-        print(plz);
+        entity.stopY();
+
+        if(entity is Character)
+          entity.land();
+
       }
     }
   }

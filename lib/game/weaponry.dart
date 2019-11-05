@@ -20,7 +20,6 @@ abstract class Weapon{
   int knockbackStrength = 0;
 
   Projectile fireProjectile(Offset position);
-
 }
 
 class Projectile extends MovingEntity{

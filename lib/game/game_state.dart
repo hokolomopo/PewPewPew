@@ -1,19 +1,27 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/terrain.dart';
+import 'package:info2051_2018/game/utils.dart';
 import 'package:info2051_2018/game/world.dart';
 
 enum GameStateMode{char_selection, moving, attacking, cinematic}
 
 class GameState{
-  GameStateMode state = GameStateMode.char_selection;
+  GameStateMode currentState = GameStateMode.moving;
 
   List<List<Character>> players = new List();
+  World world = new World();
+
   int currentPlayer = 0;
   int currentCharacter = 0;
 
-  World world = new World();
+  //Moving state variables
+  bool characterJumping = false;
+  Offset jumpDragStartPosition;
+  Offset jumpDragEndPosition;
+
 
   GameState(int numberOfPlayers, int numberOfCharacters){
     //TODO load level
@@ -34,7 +42,6 @@ class GameState{
 
         //TODO delete dis
         c.velocity = new Offset(1, 1);
-
       }
     }
 
@@ -46,5 +53,160 @@ class GameState{
 
   Character getCurrentCharacter(){
     return players[currentPlayer][currentCharacter];
+  }
+
+  void onTap(TapDownDetails details){
+    Offset tapPosition = details.globalPosition;
+
+    switch(currentState){
+      case GameStateMode.char_selection:
+        // TODO: Handle this case.
+        break;
+
+      case GameStateMode.moving:
+        Character currentChar = getCurrentCharacter();
+
+        //Touch event on the current character
+        if(GameUtils.rectContains(currentChar.hitbox, tapPosition)){
+          if(!currentChar.isAirborne())
+            currentChar.stopX();
+        }
+
+        //Touch event left of the current character
+        else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPosition)){
+          currentChar.beginWalking(Character.LEFT);
+        }
+
+        //Touch event right of the current character
+        else if(GameUtils.rectRightOf(currentChar.hitbox, tapPosition)){
+          currentChar.beginWalking(Character.RIGHT);
+        }
+        break;
+
+      case GameStateMode.attacking:
+        // TODO: Handle this case.
+        break;
+
+      case GameStateMode.cinematic:
+        break;
+    }
+
+  }
+
+  void onPanStart(DragStartDetails details){
+    Character currentChar = getCurrentCharacter();
+    Offset dragPosition = details.globalPosition;
+
+    print("PanStart : " + dragPosition.toString() + "char hitbox : " + currentChar.hitbox.toString());
+
+    switch(currentState){
+
+      case GameStateMode.char_selection:
+        //TODO move camera
+        break;
+
+      case GameStateMode.moving:
+
+        //Drag on character. We extend the size of the hitbox due to imprecision
+        //for coordinates in drag events
+        if(GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 50), dragPosition)){
+          print("PAnOnChar");
+
+          if(currentChar.isAirborne())
+            return;
+          currentChar.stop();
+
+          characterJumping = true;
+          jumpDragStartPosition = dragPosition;
+        }
+
+        //TODO drag move camera
+        break;
+
+      case GameStateMode.attacking:
+        // TODO: Handle this case.
+        break;
+
+      case GameStateMode.cinematic:
+        break;
+    }
+  }
+
+  void onPanUpdate(DragUpdateDetails details) {
+    Offset dragPosition = details.globalPosition;
+
+    switch (currentState) {
+      case GameStateMode.char_selection:
+      //TODO Move camera.
+        break;
+
+      case GameStateMode.moving:
+        if (characterJumping) {
+          // TODO: Draw directional arrow
+          jumpDragEndPosition = dragPosition;
+        }
+
+        //TODO : Move camera
+        break;
+
+      case GameStateMode.attacking:
+      // TODO: Handle this case.
+        break;
+
+      case GameStateMode.cinematic:
+        break;
+    }
+  }
+
+  void onPanEnd(DragEndDetails details){
+    Character currentChar = getCurrentCharacter();
+
+    switch(currentState){
+      case GameStateMode.char_selection:
+        break;
+
+      case GameStateMode.moving:
+        if(characterJumping){
+          currentChar.jump(jumpDragStartPosition - jumpDragEndPosition);
+          characterJumping = false;
+        }
+        break;
+
+      case GameStateMode.attacking:
+        // TODO: Handle this case.
+        break;
+
+      case GameStateMode.cinematic:
+        break;
+    }
+  }
+
+  void onLongPress(LongPressStartDetails details){
+    Character currentChar = getCurrentCharacter();
+    Offset dragPosition = details.globalPosition;
+
+    switch(currentState){
+
+      case GameStateMode.char_selection:
+        // TODO: select character.
+        break;
+
+      case GameStateMode.moving:
+        if(GameUtils.rectContains(currentChar.hitbox, dragPosition)){
+          if(currentChar.isAirborne())
+            return;
+          currentChar.stop();
+
+          //TODO : display armory
+          print("Armory is here");
+        }
+
+        break;
+
+      case GameStateMode.attacking:
+        break;
+      case GameStateMode.cinematic:
+        break;
+    }
   }
 }
