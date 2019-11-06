@@ -138,7 +138,7 @@ class ParametersState extends State<Parameters> {
             Expanded(
                 child: Text(
               "hello",
-              style: TextStyle(fontSize: 125),
+              style: TextStyle(fontSize: 60),
             ))
           ],
         ),

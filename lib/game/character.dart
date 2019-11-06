@@ -14,7 +14,7 @@ class Character extends MovingEntity {
   static const double max_jump_speed = 2;
   static const double walk_speed = 0.5;
 
-  static final Offset hitboxSize = new Offset(50,50);
+  static final Offset hitboxSize = new Offset(10,10);
 
   //TODO truc propre pour les assets
   static final String asset = "assets/graphics/characters/worm.png";

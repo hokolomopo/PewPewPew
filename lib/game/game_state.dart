@@ -27,8 +27,8 @@ class GameState{
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter){
     //TODO load level
-    world.addTerrain(new TerrainBlock(0, 200, 20000, 10));
-    world.addTerrain(new TerrainBlock(400, 0, 10, 20000));
+    this.addTerrainBlock(new TerrainBlock(0, 70, 20000, 10));
+    this.addTerrainBlock(new TerrainBlock(150, 0, 10, 20000));
 
     for(int i = 0;i < numberOfPlayers;i++) {
 
@@ -64,6 +64,16 @@ class GameState{
 
     world.removeCharacter(character);
     painter.removeElement(character.drawer);
+  }
+
+  void addTerrainBlock(TerrainBlock block){
+    world.addTerrain(block);
+    painter.addElement(block.drawer);
+  }
+  
+  void removeTerrainBlock(TerrainBlock block){
+    world.removeTerrain(block);
+    painter.addElement(block.drawer);
   }
 
   Character getCurrentCharacter(){
