@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/level.dart';
 import 'package:info2051_2018/game/character.dart';
+import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/utils.dart';
 import 'package:info2051_2018/game/world.dart';
@@ -42,10 +43,9 @@ class GameState{
         this.addCharacter(i, c);
 
         //TODO delete dis
-        c.velocity = new Offset(1, 1);
+        c.jump(new Offset(0,0));
       }
     }
-
   }
 
   void update(){
@@ -81,7 +81,9 @@ class GameState{
   }
 
   void onTap(TapDownDetails details){
-    Offset tapPosition = details.globalPosition;
+    Offset tapPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
+
+    print("OnTap : " + tapPosition.toString() + "char hitbox : " + getCurrentCharacter().hitbox.toString());
 
     switch(currentState){
       case GameStateMode.char_selection:
@@ -120,7 +122,7 @@ class GameState{
 
   void onPanStart(DragStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = details.globalPosition;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
 
     print("PanStart : " + dragPosition.toString() + "char hitbox : " + currentChar.hitbox.toString());
 
@@ -158,7 +160,7 @@ class GameState{
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    Offset dragPosition = details.globalPosition;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -208,7 +210,7 @@ class GameState{
 
   void onLongPress(LongPressStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = details.globalPosition;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
 
     switch(currentState){
 

@@ -2,6 +2,10 @@ import 'dart:math';
 import 'dart:ui';
 
 class GameUtils{
+  static Offset absoluteToRelativeOffset(Offset offset, double screenHeight){
+    return offset * 100 / screenHeight;
+  }
+
   static Point toPoint(Offset o){
     return new Point(o.dx, o.dy);
   }

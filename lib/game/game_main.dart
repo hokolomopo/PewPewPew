@@ -10,6 +10,7 @@ class GameMain extends StatefulWidget {
   GameMain({Key key, this.title}) : super(key: key);
 
   final String title;
+  static double screenHeight;
 
   @override
   _GameMainState createState() => new _GameMainState();
@@ -83,6 +84,9 @@ class _GameMainState extends State<GameMain> {
 
   @override
   Widget build(BuildContext context) {
+    //TODO do things better
+    GameMain.screenHeight = MediaQuery.of(context).size.height;
+
     //if(this.gestureDetector == null)
     buildGestureDetector();
 

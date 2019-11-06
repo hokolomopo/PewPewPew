@@ -11,7 +11,7 @@ class Character extends MovingEntity {
   static const int RIGHT = 1;
 
   static const int base_hp = 100;
-  static const double max_jump_speed = 2;
+  static const double max_jump_speed = 1;
   static const double walk_speed = 0.5;
 
   static final Offset hitboxSize = new Offset(10,10);
