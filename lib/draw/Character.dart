@@ -46,11 +46,16 @@ class CharacterDrawer extends CustomDrawer {
   }
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size, showHitBoxes) {
     double left = character.position.dx / 100 * size.height;
     double top = character.position.dy / 100 * size.height;
     double actualWidth = width / 100 * size.height;
     double actualHeight = height / 100 * size.height;
+
+    if (showHitBoxes) {
+      canvas.drawRect(Rect.fromLTWH(left, top, actualWidth, actualHeight),
+          debugShowHitBoxesPaint);
+    }
 
     canvas.drawImage(characterImg, Offset(left, top), Paint());
 
@@ -58,17 +63,18 @@ class CharacterDrawer extends CustomDrawer {
     Color lifeColor;
     double normalizedHp = character.hp / Character.base_hp;
     if (normalizedHp < 0.5) {
-      lifeColor = Color.fromRGBO(
-          (510 * (0.5 - normalizedHp)).toInt(), (510 * normalizedHp).toInt(), 0, 1.0);
+      lifeColor = Color.fromRGBO((510 * (0.5 - normalizedHp)).toInt(),
+          (510 * normalizedHp).toInt(), 0, 1.0);
     } else {
-      lifeColor = Color.fromRGBO(
-          0, (510 * (1 - normalizedHp)).toInt(), (510 * (normalizedHp - 0.5)).toInt(), 1.0);
+      lifeColor = Color.fromRGBO(0, (510 * (1 - normalizedHp)).toInt(),
+          (510 * (normalizedHp - 0.5)).toInt(), 1.0);
     }
     Paint lifeBarPaint = Paint()
       ..color = lifeColor
       ..style = PaintingStyle.fill;
     canvas.drawRect(
-        Rect.fromLTWH(left, lifeBarTop, actualWidth * normalizedHp, actualHeight / 3),
+        Rect.fromLTWH(
+            left, lifeBarTop, actualWidth * normalizedHp, actualHeight / 3),
         lifeBarPaint);
     canvas.drawRect(
         Rect.fromLTWH(left, lifeBarTop, actualWidth, actualHeight / 3),

@@ -40,7 +40,7 @@ class BackgroundDrawer extends CustomDrawer {
   }
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size, showHitBoxes) {
     canvas.drawImage(toPaint, Offset.zero, Paint());
   }
 }

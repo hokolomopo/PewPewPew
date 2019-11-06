@@ -16,3 +16,7 @@ Paint lifeBarStrokePaint = Paint()
   ..strokeWidth = 3
   ..style = PaintingStyle.stroke;
 const distanceLifeBarCharacter = 0.05;
+
+Paint debugShowHitBoxesPaint = Paint()
+  ..color = Colors.white
+  ..style = PaintingStyle.fill;

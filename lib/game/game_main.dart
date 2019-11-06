@@ -29,12 +29,12 @@ class _GameMainState extends State<GameMain> {
   LevelPainter levelPainter;
 
   _GameMainState() {
-    levelPainter = new LevelPainter();
+    levelPainter = LevelPainter(showHitBoxes: true);
 
     //TODO delete dis
-    levelPainter.addElement(new BackgroundDrawer());
+    levelPainter.addElement(BackgroundDrawer());
 
-    state = new GameState(1, 1, levelPainter);
+    state = GameState(1, 1, levelPainter);
 
     _scheduleFrame();
   }

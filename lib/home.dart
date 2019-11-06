@@ -21,7 +21,8 @@ class _HomeState extends State<Home> {
     // logo widget
     Widget logo() {
       return Padding(
-        padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+        padding:
+            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: 220.0,
@@ -29,33 +30,36 @@ class _HomeState extends State<Home> {
             children: <Widget>[
               Positioned(
                   child: Container(
-                    child: Align(
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: new BorderRadius.circular(20.0),
-                            color: Color(0xFF8B0000),
-                            border: new Border.all(color: Colors.white70, width: 5.0),
-                            boxShadow: [
-                            new BoxShadow(
-                                color: Colors.red,
-                                blurRadius: 3.0,
-                            )
-                          ],
+                child: Align(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: new BorderRadius.circular(20.0),
+                      color: Color(0xFF8B0000),
+                      border: new Border.all(color: Colors.white70, width: 5.0),
+                      boxShadow: [
+                        new BoxShadow(
+                          color: Colors.red,
+                          blurRadius: 3.0,
+                        )
+                      ],
+                    ),
+                    width: MediaQuery.of(context).size.width * 0.80,
+                    height: MediaQuery.of(context).size.width * 0.2,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        "Pew Pew Pew !!!",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontFamily: 'Birdy',
                         ),
-                        width: MediaQuery.of(context).size.width * 0.80,
-                        height: MediaQuery.of(context).size.width * 0.2,
-                        child: FittedBox(fit: BoxFit.contain, child: Text(
-                          "Pew Pew Pew !!!",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: 'Birdy',
-                          ),
-                        ),),
                       ),
                     ),
-                    height: 154.0,
-                  )),
+                  ),
+                ),
+                height: 154.0,
+              )),
               Positioned(
                 width: MediaQuery.of(context).size.width * 0.15,
                 height: MediaQuery.of(context).size.width * 0.15,
@@ -95,20 +99,28 @@ class _HomeState extends State<Home> {
             borderRadius: new BorderRadius.circular(borderRadius)),
         child: FittedBox(
           fit: BoxFit.contain,
-          child: Text(
-          text,
-          style: TextStyle(
-            height: 1.7,
-              fontWeight: FontWeight.normal, color: textColor, fontSize: 20.0)
-        ),),
+          child: Text(text,
+              style: TextStyle(
+                  height: 1.7,
+                  fontWeight: FontWeight.normal,
+                  color: textColor,
+                  fontSize: 20.0)),
+        ),
         onPressed: () {
           function();
         },
       );
     }
 
-    Widget _buttonOutline(String text, Color textColor, Color bordersColor, Color highlightColor,
-        Color fillColor, Color splashColor, num borderRadius, void function()){
+    Widget _buttonOutline(
+        String text,
+        Color textColor,
+        Color bordersColor,
+        Color highlightColor,
+        Color fillColor,
+        Color splashColor,
+        num borderRadius,
+        void function()) {
       return OutlineButton(
         highlightedBorderColor: Colors.white,
         borderSide: BorderSide(color: bordersColor, width: 2.0),
@@ -122,7 +134,7 @@ class _HomeState extends State<Home> {
         child: Text(
           text,
           style: TextStyle(
-            height: 1.7,
+              height: 1.7,
               fontWeight: FontWeight.bold,
               color: textColor,
               fontSize: 20.0),
@@ -133,30 +145,43 @@ class _HomeState extends State<Home> {
       );
     }
 
-
     //login and register fuctions
 
-    void testFunction() {;}
-    
-    void _tutorialConfirm(String title, String mess, String neg, String pos){
-      showDialog(context: context, builder: (BuildContext context){
-        return AlertDialog(
-          title: new Text(title),
-          content: new Text(mess),
-          actions: <Widget>[
-            new FlatButton( // Negative choice button
-               child: new Text(neg, style: new TextStyle(fontWeight: FontWeight.normal),),
-                onPressed: () {Navigator.of(context).pop();
-                },
+    void testFunction() {
+      ;
+    }
+
+    void _tutorialConfirm(String title, String mess, String neg, String pos) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text(title),
+            content: new Text(mess),
+            actions: <Widget>[
+              new FlatButton(
+                // Negative choice button
+                child: new Text(
+                  neg,
+                  style: new TextStyle(fontWeight: FontWeight.normal),
                 ),
-            new FlatButton(// Positive choice button
-              child: new Text(pos, style: new TextStyle(fontWeight: FontWeight.bold),),
-              onPressed: () {Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                // Positive choice button
+                child: new Text(
+                  pos,
+                  style: new TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
     }
 
@@ -284,11 +309,17 @@ class _HomeState extends State<Home> {
                   ),
                   Expanded(
                     child: new FutureBuilder(
-                        future: DefaultAssetBundle.of(context).loadString('assets/data/shop/items.json'),
+                        future: DefaultAssetBundle.of(context)
+                            .loadString('assets/data/shop/items.json'),
                         builder: (context, snapshot) {
-                          List<Item> items = parseJson(snapshot.data.toString());
-                          return items.isNotEmpty ? new ShopList(items: items) : new Center(child: new CircularProgressIndicator(),);
-                        } ),
+                          List<Item> items =
+                              parseJson(snapshot.data.toString());
+                          return items.isNotEmpty
+                              ? new ShopList(items: items)
+                              : new Center(
+                                  child: new CircularProgressIndicator(),
+                                );
+                        }),
                   ),
                 ],
               ),
@@ -310,22 +341,36 @@ class _HomeState extends State<Home> {
             logo(),
             Padding(
               child: Container(
-                child: _button("Quick Play", primary, Colors.white, Colors.white,
-                    primary, 30.0, _parameters),
+                child: _button("Quick Play", primary, Colors.white,
+                    Colors.white, primary, 30.0, _parameters),
                 height: 50.0,
               ),
               padding: EdgeInsets.only(top: 80.0, left: 20.0, right: 20.0),
             ),
             Padding(
               child: Container(
-                child: _buttonOutline("Tutorial", Colors.white, Colors.white, Theme.of(context).primaryColor, Theme.of(context).primaryColor, Colors.white, 30.0, () {_tutorialConfirm("Start tutorial?", "The tutorial is recommanded for new players", "Cancel", "Start");}),
+                child: _buttonOutline(
+                    "Tutorial",
+                    Colors.white,
+                    Colors.white,
+                    Theme.of(context).primaryColor,
+                    Theme.of(context).primaryColor,
+                    Colors.white,
+                    30.0, () {
+                  _tutorialConfirm(
+                      "Start tutorial?",
+                      "The tutorial is recommanded for new players",
+                      "Cancel",
+                      "Start");
+                }),
                 height: 50.0,
               ),
               padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
             ),
             Padding(
               child: Container(
-                child: _button("Shop", primary, Colors.white, Colors.white, primary, 30.0, _shopSheet),
+                child: _button("Shop", primary, Colors.white, Colors.white,
+                    primary, 30.0, _shopSheet),
                 height: 50.0,
               ),
               padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
