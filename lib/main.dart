@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info2051_2018/home.dart';
-import 'package:info2051_2018/game/game_main.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // To counter Flutter update inconvenient

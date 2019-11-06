@@ -15,10 +15,6 @@ class ShopList extends StatefulWidget {
 }
 
 class ShopListState extends State<ShopList> {
-  final example = [
-    [1, 2],
-    ["Hello", 3, 4]
-  ];
   var _money = 50000;
 
   List<Item> items;
@@ -59,7 +55,7 @@ class ShopListState extends State<ShopList> {
         Row(
           children: <Widget>[
             FittedBox(
-                fit: BoxFit.contain, child: Text("TODO (all/weapon/utility)"))
+                fit: BoxFit.contain, child: Text(" ")) // Place for sorting buttons for list
           ],
         ),
         Expanded(

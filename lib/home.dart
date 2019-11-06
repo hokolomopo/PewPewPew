@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/quick_play.dart';
-import 'clipper.dart';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
@@ -14,9 +13,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
-    void initState() {
-      super.initState();
-    }
 
     // logo widget
     Widget logo() {
@@ -60,26 +56,6 @@ class _HomeState extends State<Home> {
                 ),
                 height: 154.0,
               )),
-              Positioned(
-                width: MediaQuery.of(context).size.width * 0.15,
-                height: MediaQuery.of(context).size.width * 0.15,
-                bottom: MediaQuery.of(context).size.height * 0.046,
-                right: MediaQuery.of(context).size.width * 0.22,
-                child: Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.white),
-                ),
-              ),
-              Positioned(
-                width: MediaQuery.of(context).size.width * 0.08,
-                height: MediaQuery.of(context).size.width * 0.08,
-                bottom: 0.0,
-                right: MediaQuery.of(context).size.width * 0.32,
-                child: Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.white),
-                ),
-              ),
             ],
           ),
         ),
@@ -254,11 +230,6 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                         ),
-//                        Padding(
-//                          padding: EdgeInsets.only(bottom: 20, top: 60),
-//                          child: _input(Icon(Icons.email), "EMAIL",
-//                              _emailController, false),
-//                        ),
                         Parameters()
                       ],
                     ),
@@ -375,18 +346,6 @@ class _HomeState extends State<Home> {
               ),
               padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
             ),
-            Expanded(
-              child: Align(
-                child: ClipPath(
-                  child: Container(
-                    color: Colors.white,
-                    height: 300.0,
-                  ),
-                  clipper: BottomWaveClipper(),
-                ),
-                alignment: Alignment.bottomCenter,
-              ),
-            )
           ],
           crossAxisAlignment: CrossAxisAlignment.stretch,
         ));

@@ -136,8 +136,8 @@ class ParametersState extends State<Parameters> {
         Row(
           children: <Widget>[
             Expanded(
-                child: Text(
-              "hello",
+                child: Text( // Place for horizontal list for stage template
+              " ",
               style: TextStyle(fontSize: 60),
             ))
           ],
