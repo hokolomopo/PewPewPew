@@ -103,7 +103,7 @@ class TerrainBlockDrawer extends CustomDrawer {
   }*/
 
   @override
-  void paint(Canvas canvas, Size size) {
+  void paint(Canvas canvas, Size size, showHitBoxes) {
     // Remember the block sizes are taken in percentage of the screen size,
     // for more robustness.
     double left = terrainBlock.hitBox.left * size.height / 100;

@@ -8,7 +8,7 @@ abstract class CustomDrawer {
   bool isReady(Size screenSize) => true;
   TestListenable repaint;
 
-  void paint(Canvas canvas, Size size);
+  void paint(Canvas canvas, Size size, showHitBoxes);
 }
 
 class TestListenable extends ChangeNotifier {
@@ -21,6 +21,9 @@ class TestListenable extends ChangeNotifier {
 class LevelPainter {
   SplayTreeMap<int, CustomDrawer> elements = SplayTreeMap();
   TestListenable repaint = TestListenable();
+  bool showHitBoxes;
+
+  LevelPainter({this.showHitBoxes = false});
 
   addElement(CustomDrawer customDrawer, {index}) {
     // Did not find a simple addElement method in the SplayTreeMap, but this
@@ -48,21 +51,21 @@ class LevelPainter {
   Widget get level {
     return CustomPaint(
       size: Size.infinite,
-      painter: _LevelPainterAux(elements, repaint),
+      painter: _LevelPainterAux(this),
     );
   }
 }
 
 class _LevelPainterAux extends CustomPainter {
-  SplayTreeMap<int, CustomDrawer> toBePainted;
+  LevelPainter levelPainter;
 
-  _LevelPainterAux(this.toBePainted, Listenable repaint) :
-    super(repaint: repaint);
+  _LevelPainterAux(this.levelPainter) :
+    super(repaint: levelPainter.repaint);
 
   @override
   void paint(ui.Canvas canvas, Size size) {
     bool everyDrawerReady = true;
-    for (CustomDrawer drawer in toBePainted.values) {
+    for (CustomDrawer drawer in levelPainter.elements.values) {
       if (!drawer.isReady(size) && everyDrawerReady) {
         // TODO real loading screen
         ui.ParagraphBuilder textBuilder = ui.ParagraphBuilder(
@@ -86,8 +89,8 @@ class _LevelPainterAux extends CustomPainter {
       return;
     }
 
-    for (CustomDrawer drawer in toBePainted.values) {
-      drawer.paint(canvas, size);
+    for (CustomDrawer drawer in levelPainter.elements.values) {
+      drawer.paint(canvas, size, levelPainter.showHitBoxes);
     }
   }
 
