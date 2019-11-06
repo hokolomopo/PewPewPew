@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/utils.dart';
 import 'dart:math';
 
 import 'Cst.dart';
@@ -22,6 +23,7 @@ import 'package:info2051_2018/game/terrain.dart';
 /// lead to unexpected behaviour.
 class TerrainBlockDrawer extends CustomDrawer {
   TerrainBlock terrainBlock;
+
   //Set<TerrainBlock> blocks = Set();
 
   TerrainBlockDrawer(this.terrainBlock);
@@ -106,10 +108,14 @@ class TerrainBlockDrawer extends CustomDrawer {
   void paint(Canvas canvas, Size size, showHitBoxes) {
     // Remember the block sizes are taken in percentage of the screen size,
     // for more robustness.
-    double left = terrainBlock.hitBox.left * size.height / 100;
-    double top = terrainBlock.hitBox.top * size.height / 100;
-    double width = terrainBlock.hitBox.width * size.height / 100;
-    double height = terrainBlock.hitBox.height * size.height / 100;
+    double left =
+        GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.left, size.height);
+    double top =
+        GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.top, size.height);
+    double width = GameUtils.relativeToAbsoluteDist(
+        terrainBlock.hitBox.width, size.height);
+    double height = GameUtils.relativeToAbsoluteDist(
+        terrainBlock.hitBox.height, size.height);
 
     Rect toDraw = Rect.fromLTWH(
         left,

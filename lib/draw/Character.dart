@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:info2051_2018/draw/Cst.dart';
-import 'package:info2051_2018/game/character.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
+import 'Cst.dart';
+import 'package:info2051_2018/game/character.dart';
+import 'package:info2051_2018/game/utils.dart';
 import 'level.dart';
 
 class CharacterDrawer extends CustomDrawer {
@@ -28,8 +29,12 @@ class CharacterDrawer extends CustomDrawer {
 
   _reloadImg(Size screenSize) async {
     ui.Codec codec = await ui.instantiateImageCodec(characterImgBytes,
-        targetWidth: (width / 100 * screenSize.height).toInt(),
-        targetHeight: (height / 100 * screenSize.height).toInt());
+        targetWidth:
+            (GameUtils.relativeToAbsoluteDist(width, screenSize.height))
+                .toInt(),
+        targetHeight:
+            (GameUtils.relativeToAbsoluteDist(height, screenSize.height))
+                .toInt());
     characterImg = (await codec.getNextFrame()).image;
 
     this.screenSize = screenSize;
@@ -47,10 +52,12 @@ class CharacterDrawer extends CustomDrawer {
 
   @override
   void paint(Canvas canvas, Size size, showHitBoxes) {
-    double left = character.position.dx / 100 * size.height;
-    double top = character.position.dy / 100 * size.height;
-    double actualWidth = width / 100 * size.height;
-    double actualHeight = height / 100 * size.height;
+    double left =
+        GameUtils.relativeToAbsoluteDist(character.position.dx, size.height);
+    double top =
+        GameUtils.relativeToAbsoluteDist(character.position.dy, size.height);
+    double actualWidth = GameUtils.relativeToAbsoluteDist(width, size.height);
+    double actualHeight = GameUtils.relativeToAbsoluteDist(height, size.height);
 
     if (showHitBoxes) {
       canvas.drawRect(Rect.fromLTWH(left, top, actualWidth, actualHeight),

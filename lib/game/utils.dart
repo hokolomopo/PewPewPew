@@ -6,6 +6,10 @@ class GameUtils{
     return offset * 100 / screenHeight;
   }
 
+  static double relativeToAbsoluteDist(double dist, double screenHeight) {
+    return dist / 100 * screenHeight;
+  }
+
   static Point toPoint(Offset o){
     return new Point(o.dx, o.dy);
   }

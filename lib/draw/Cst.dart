@@ -18,5 +18,5 @@ Paint lifeBarStrokePaint = Paint()
 const distanceLifeBarCharacter = 0.05;
 
 Paint debugShowHitBoxesPaint = Paint()
-  ..color = Colors.white
+  ..color = Colors.red
   ..style = PaintingStyle.fill;
