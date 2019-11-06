@@ -76,7 +76,7 @@ class World{
   }
 
 
-  void addPlayer(Character c){
+  void addCharacter(Character c){
     players.add(c);
   }
 
@@ -86,6 +86,18 @@ class World{
 
   void addTerrain(TerrainBlock t){
     terrain.add(t);
+  }
+
+  void removeCharacter(Character c){
+    players.remove(c);
+  }
+
+  void removeProjectile(Projectile p){
+    projectiles.remove(p);
+  }
+
+  void removeTerrain(TerrainBlock t){
+    terrain.remove(t);
   }
 
 }

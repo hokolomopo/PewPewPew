@@ -31,11 +31,11 @@ class LevelPainter {
     customDrawer.repaint = repaint;
   }
 
-  removeElement(index) {
+  removeElementByIndex(index) {
     elements.remove(index);
   }
 
-  removeElementByValue(customDrawer) {
+  removeElement(customDrawer) {
     // The equality operator should compare pointers, this is done on purpose
     elements.removeWhere((key, value) => (value == customDrawer));
   }

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/level.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/utils.dart';
@@ -13,6 +14,7 @@ class GameState{
 
   List<List<Character>> players = new List();
   World world = new World();
+  LevelPainter painter;
 
   int currentPlayer = 0;
   int currentCharacter = 0;
@@ -23,7 +25,7 @@ class GameState{
   Offset jumpDragEndPosition;
 
 
-  GameState(int numberOfPlayers, int numberOfCharacters){
+  GameState(int numberOfPlayers, int numberOfCharacters, this.painter){
     //TODO load level
     world.addTerrain(new TerrainBlock(0, 200, 20000, 10));
     world.addTerrain(new TerrainBlock(400, 0, 10, 20000));
@@ -35,10 +37,9 @@ class GameState{
 
       for (int j = 0; j < numberOfCharacters; j++) {
 
-        //TODO how to place characters
-        Character c = new Character(new Offset(10, 10));
-        chars.add(c);
-        world.addPlayer(c);
+        //TODO how to position characters
+        Character c = new Character(new Offset(10.0, 10.0));
+        this.addCharacter(i, c);
 
         //TODO delete dis
         c.velocity = new Offset(1, 1);
@@ -49,6 +50,20 @@ class GameState{
 
   void update(){
     world.updateWorld();
+  }
+
+  void addCharacter(int playerId, Character character){
+    players[playerId].add(character);
+
+    world.addCharacter(character);
+    painter.addElement(character.drawer);
+  }
+
+  void removeCharacter(int playerId, Character character){
+    players[playerId].remove(character);
+
+    world.removeCharacter(character);
+    painter.removeElement(character.drawer);
   }
 
   Character getCurrentCharacter(){

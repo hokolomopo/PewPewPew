@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:info2051_2018/draw/background.dart';
+import 'package:info2051_2018/draw/level.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
 
@@ -14,7 +16,7 @@ class GameMain extends StatefulWidget {
 }
 
 class _GameMainState extends State<GameMain> {
-  GameState state = new GameState(1, 1);
+  GameState state;
   GestureDetector gestureDetector;
 
   int _callbackId;
@@ -23,7 +25,16 @@ class _GameMainState extends State<GameMain> {
   var height = Character.hitboxSize.dy;
   var width = Character.hitboxSize.dx;
 
+  LevelPainter levelPainter;
+
   _GameMainState() {
+    levelPainter = new LevelPainter();
+
+    //TODO delete dis
+    levelPainter.addElement(new BackgroundDrawer());
+
+    state = new GameState(1, 1, levelPainter);
+
     _scheduleFrame();
   }
 
@@ -39,7 +50,9 @@ class _GameMainState extends State<GameMain> {
     _scheduleFrame();
 
     state.update();
-    if (!mounted) return;
+    if (!mounted)
+      return;
+
     setState(() {
       position = state.getCurrentCharacter().position;
     });
@@ -64,10 +77,7 @@ class _GameMainState extends State<GameMain> {
       onLongPressStart: (details) {
         state.onLongPress(details);
       },
-      child: CustomPaint(
-        size: Size.infinite,
-        painter: CanvasRectangle(rect, fill: Colors.blue, stroke: null),
-      ),
+      child: levelPainter.level
     );
   }
 

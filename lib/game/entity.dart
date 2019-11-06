@@ -1,10 +1,12 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:info2051_2018/draw/level.dart';
+
 abstract class Entity{
   Offset position;
   MutableRectangle hitbox;
-  //TODO sprite
+  CustomDrawer drawer;
 
   Entity(this.position, this.hitbox);
 

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'dart:ui';
 
+import 'package:info2051_2018/draw/Character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
@@ -13,15 +14,20 @@ class Character extends MovingEntity {
   static const double max_jump_speed = 2;
   static const double walk_speed = 0.5;
 
-
   static final Offset hitboxSize = new Offset(50,50);
 
-  int hp;
+  //TODO truc propre pour les assets
+  static final String asset = "assets/graphics/characters/worm.png";
+
+  int hp = base_hp;
   Arsenal currentArsenal;
 
   bool _isAirborne = false;
 
-  Character(Offset position) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy));
+  Character(Offset position) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
+    this.drawer = new CharacterDrawer(asset, this);
+
+  }
 
   void jump(Offset direction){
     //Do nothing if character is in the air
