@@ -8,7 +8,7 @@ abstract class CustomDrawer {
   bool isReady(Size screenSize) => true;
   TestListenable repaint;
 
-  void paint(Canvas canvas, Size size, showHitBoxes);
+  void paint(Canvas canvas, Size size, bool showHitBoxes);
 }
 
 class TestListenable extends ChangeNotifier {
