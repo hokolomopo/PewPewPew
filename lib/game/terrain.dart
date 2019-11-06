@@ -1,9 +1,14 @@
 import 'dart:math';
 
-class Terrain{
-  Rectangle hitbox;
+import 'package:info2051_2018/draw/level.dart';
 
-  Terrain(double x, double y, double w, double h){
-    hitbox = new Rectangle(x, y, w, h);
+class TerrainBlock {
+  Rectangle hitBox;
+  // Note that even if [withStroke] is [false], the top stroke will still
+  // be painted.
+  bool withStroke;
+
+  TerrainBlock(double x, double y, double w, double h, {this.withStroke = true}){
+    hitBox = new Rectangle(x, y, w, h);
   }
 }

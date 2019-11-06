@@ -25,8 +25,8 @@ class GameState{
 
   GameState(int numberOfPlayers, int numberOfCharacters){
     //TODO load level
-    world.addTerrain(new Terrain(0, 200, 20000, 10));
-    world.addTerrain(new Terrain(400, 0, 10, 20000));
+    world.addTerrain(new TerrainBlock(0, 200, 20000, 10));
+    world.addTerrain(new TerrainBlock(400, 0, 10, 20000));
 
     for(int i = 0;i < numberOfPlayers;i++) {
 

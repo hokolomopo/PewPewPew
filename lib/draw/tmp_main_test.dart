@@ -60,14 +60,14 @@ class _DrawTestState extends State<DrawTest> {
 
     levelPainter.addElement(terrainDrawer);
     terrainDrawer.createTerrainFromFunction(
-        (left) => ((sin(left * 4 * pi) + 2) / 10),
+        (left) => ((sin(left / 25 * pi) + 2) * 10),
         nbBlocks: 1000);
-    terrainDrawer.addTerrainBlock(Offset(0.3, 0.5), width: 0.2, height: 0.1);
+    terrainDrawer.addTerrainBlock(Offset(20.0, 50.0), width: 20.0, height: 10.0);
 
     characters.add(CharacterDrawer(
-        "assets/graphics/characters/rotated_worm.png", Offset(0.2, 0.6)));
+        "assets/graphics/characters/rotated_worm.png", Offset(20.0, 60.0)));
     characters.add(CharacterDrawer(
-        "assets/graphics/characters/worm.png", Offset(0.8, 0.6)));
+        "assets/graphics/characters/worm.png", Offset(80.0, 60.0)));
 
     characters.forEach((character) {
       levelPainter.addElement(character);
@@ -94,9 +94,9 @@ class _DrawTestState extends State<DrawTest> {
     double dyProp = details.localPosition.dy / screenSize.height;
     setState(() {
       characters[0].decreaseLife(0.05);
-      characters[0].move(Offset(0.05, -0.01));
+      characters[0].move(Offset(5, -1));
       characters[1].decreaseLife(0.1);
-      characters[1].move(Offset(-0.05, 0.002));
+      characters[1].move(Offset(-5, 0.2));
     });
   }
 }

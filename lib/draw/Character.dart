@@ -16,7 +16,7 @@ class CharacterDrawer extends CustomDrawer {
   double life = 1.0;
 
   CharacterDrawer(String imgPath, this.position,
-      {this.width = 0.1, this.height = 0.1}) {
+      {this.width = 10, this.height = 10}) {
     setImg(imgPath);
   }
 
@@ -35,8 +35,8 @@ class CharacterDrawer extends CustomDrawer {
 
   _reloadImg(Size screenSize) async {
     ui.Codec codec = await ui.instantiateImageCodec(characterImgBytes,
-        targetWidth: (width * screenSize.width).toInt(),
-        targetHeight: (height * screenSize.height).toInt());
+        targetWidth: (width / 100 * screenSize.height).toInt(),
+        targetHeight: (height / 100 * screenSize.height).toInt());
     characterImg = (await codec.getNextFrame()).image;
 
     this.screenSize = screenSize;
@@ -54,10 +54,10 @@ class CharacterDrawer extends CustomDrawer {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double left = position.dx * size.width;
+    double left = position.dx * size.height;
     double top = position.dy * size.height;
-    double actualWidth = width * size.width;
-    double actualHeight = height * size.height;
+    double actualWidth = width / 100 * size.height;
+    double actualHeight = height / 100 * size.height;
 
     canvas.drawImage(characterImg, Offset(left, top), Paint());
 

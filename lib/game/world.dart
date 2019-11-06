@@ -14,7 +14,7 @@ class World{
   
   List<Character> players = new List();
   List<Projectile> projectiles = new List();
-  List<Terrain> terrains = new List();
+  Set<TerrainBlock> terrain = new Set();
 
   Offset gravity = new Offset(0, gravityForce);
 
@@ -34,9 +34,9 @@ class World{
     Offset vector = new Offset(entity.velocity.dx, 0);
     entity.move(vector);
 
-    for(Terrain t in terrains){
-      if(entity.hitbox.intersects(t.hitbox)){
-        backTrackX(entity, t.hitbox, vector.dx);
+    for(TerrainBlock t in terrain){
+      if(entity.hitbox.intersects(t.hitBox)){
+        backTrackX(entity, t.hitBox, vector.dx);
         entity.stopX();
       }
     }
@@ -45,9 +45,9 @@ class World{
     vector = new Offset(0, entity.velocity.dy);
     entity.move(vector);
 
-    for(Terrain t in terrains){
-      if(entity.hitbox.intersects(t.hitbox)){
-        backTrackY(entity, t.hitbox, vector.dy);
+    for(TerrainBlock t in terrain){
+      if(entity.hitbox.intersects(t.hitBox)){
+        backTrackY(entity, t.hitBox, vector.dy);
         entity.stopY();
 
         if(entity is Character)
@@ -84,8 +84,8 @@ class World{
     projectiles.add(p);
   }
 
-  void addTerrain(Terrain t){
-    terrains.add(t);
+  void addTerrain(TerrainBlock t){
+    terrain.add(t);
   }
 
 }

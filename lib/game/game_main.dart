@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
 
-
 class GameMain extends StatefulWidget {
   GameMain({Key key, this.title}) : super(key: key);
 
@@ -12,9 +11,7 @@ class GameMain extends StatefulWidget {
 
   @override
   _GameMainState createState() => new _GameMainState();
-
 }
-
 
 class _GameMainState extends State<GameMain> {
   GameState state = new GameState(1, 1);
@@ -26,7 +23,7 @@ class _GameMainState extends State<GameMain> {
   var height = Character.hitboxSize.dy;
   var width = Character.hitboxSize.dx;
 
-  _GameMainState(){
+  _GameMainState() {
     _scheduleFrame();
   }
 
@@ -42,57 +39,50 @@ class _GameMainState extends State<GameMain> {
     _scheduleFrame();
 
     state.update();
-    if(!mounted)
-      return;
+    if (!mounted) return;
     setState(() {
       position = state.getCurrentCharacter().position;
     });
   }
 
-  void buildGestureDetector(){
+  void buildGestureDetector() {
     var rect = Rect.fromLTWH(position.dx, position.dy, width, height);
 
-    this.gestureDetector =  new GestureDetector(
-        onTapDown: (details) {
-          state.onTap(details);
-        },
-      onPanStart: (details){
-          state.onPanStart(details);
+    this.gestureDetector = new GestureDetector(
+      onTapDown: (details) {
+        state.onTap(details);
       },
-      onPanUpdate: (details){
+      onPanStart: (details) {
+        state.onPanStart(details);
+      },
+      onPanUpdate: (details) {
         state.onPanUpdate(details);
       },
-      onPanEnd: (details){
+      onPanEnd: (details) {
         state.onPanEnd(details);
       },
-      onLongPressStart: (details){
+      onLongPressStart: (details) {
         state.onLongPress(details);
       },
       child: CustomPaint(
-          size: Size.infinite,
-          painter: CanvasRectangle(
-              rect,
-              fill: Colors.blue,
-              stroke: null),
-        ),
+        size: Size.infinite,
+        painter: CanvasRectangle(rect, fill: Colors.blue, stroke: null),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     //if(this.gestureDetector == null)
-      buildGestureDetector();
+    buildGestureDetector();
 
     return new Scaffold(
-      body: Container(
-        child: this.gestureDetector
-      ),
+      body: Container(child: this.gestureDetector),
     );
   }
 
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
 
     //Set orientation to landscape mode
@@ -103,7 +93,7 @@ class _GameMainState extends State<GameMain> {
   }
 
   @override
-  dispose(){
+  dispose() {
     //Set orientation to portrait mode
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -113,9 +103,7 @@ class _GameMainState extends State<GameMain> {
     _unscheduleFrame();
     super.dispose();
   }
-
 }
-
 
 //TODO Code totalement copié/collé du cours, faudrait voir ce que ca veut dire en vrai
 class CanvasRectangle extends CustomPainter {
@@ -146,6 +134,6 @@ class CanvasRectangle extends CustomPainter {
   @override
   bool shouldRepaint(CanvasRectangle oldDelegate) =>
       oldDelegate.rect != rect ||
-          oldDelegate.fill != fill ||
-          oldDelegate.stroke != stroke;
+      oldDelegate.fill != fill ||
+      oldDelegate.stroke != stroke;
 }

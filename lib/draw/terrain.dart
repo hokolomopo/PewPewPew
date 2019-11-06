@@ -4,6 +4,7 @@ import 'dart:math';
 import 'Cst.dart';
 import 'math.dart';
 import 'level.dart';
+import 'package:info2051_2018/game/terrain.dart';
 
 /// Represents the terrain (the ground) of the game.
 ///
@@ -20,7 +21,7 @@ import 'level.dart';
 /// range is [0;1]. Providing values outside this range to the functions may
 /// lead to unexpected behaviour.
 class TerrainDrawer extends CustomDrawer {
-  Set<_TerrainBlock> blocks = Set();
+  Set<TerrainBlock> blocks = Set();
 
   /// Creates a new terrain block.
   ///
@@ -30,7 +31,7 @@ class TerrainDrawer extends CustomDrawer {
   /// (resp. bottom) of the screen. In that case, the corresponding stroke line
   /// will not be drawn.
   addTerrainBlock(Offset position, {width, height}) {
-    blocks.add(_TerrainBlock(position.dx, position.dy, width ?? double.infinity,
+    blocks.add(TerrainBlock(position.dx, position.dy, width ?? double.infinity,
         height ?? double.infinity));
   }
 
@@ -47,13 +48,13 @@ class TerrainDrawer extends CustomDrawer {
     blocks.clear();
 
     for (double curLeft = 0;
-        curLeft < (nbBlocks - 0.5) / nbBlocks;
-        curLeft += 1 / nbBlocks) {
+        curLeft < 180*(nbBlocks - 0.5) / nbBlocks;
+        curLeft += 180 / nbBlocks) {
       // The width is increased a bit so that we don't see hairlines
       // between the blocks (otherwise at some points there is a one pixel
       // hole between blocks due to double computations inaccuracy).
-      blocks.add(_TerrainBlock(curLeft, 1 - heightFromLeft(curLeft),
-          1 / nbBlocks + 0.005, double.infinity,
+      blocks.add(TerrainBlock(curLeft, 100 - heightFromLeft(curLeft),
+          100 / nbBlocks + 0.5, double.infinity,
           withStroke: false));
     }
   }
@@ -66,10 +67,10 @@ class TerrainDrawer extends CustomDrawer {
   /// for the nearest block.
   removeBlocksByPositions(Set<Offset> positions) {
     // Never modifies a [Set] while iterating through it.
-    Set<_TerrainBlock> toRemove = Set();
+    Set<TerrainBlock> toRemove = Set();
 
-    for (_TerrainBlock block in blocks) {
-      if (positions.contains(Offset(block.left, block.top))) {
+    for (TerrainBlock block in blocks) {
+      if (positions.contains(Offset(block.hitBox.left, block.hitBox.top))) {
         toRemove.add(block);
       }
     }
@@ -78,7 +79,7 @@ class TerrainDrawer extends CustomDrawer {
 
   /// Removes a set of blocks in a given circle.
   ///
-  /// [removeBlocksInRange] removes the blocks whose [distanceRectToPoint] from
+  /// [removeBlocksInRange] removes the blocks whose [distanceTerrainBlockToPoint] from
   /// [center] is smaller than [range]. It means that, currently, a block that
   /// has at least one pixel inside the circle is completely removed.
   ///
@@ -87,10 +88,10 @@ class TerrainDrawer extends CustomDrawer {
   @Deprecated("The behaviour of this function will change soon, see doc")
   removeBlocksInRange(Offset center, double range) {
     // Never modifies a [Set] while iterating through it.
-    Set<_TerrainBlock> toRemove = Set();
+    Set<TerrainBlock> toRemove = Set();
 
-    for (_TerrainBlock block in blocks) {
-      if (distanceRectToPoint(block, center) <= range) {
+    for (TerrainBlock block in blocks) {
+      if (distanceTerrainBlockToPoint(block, center) <= range) {
         toRemove.add(block);
       }
     }
@@ -99,13 +100,13 @@ class TerrainDrawer extends CustomDrawer {
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (_TerrainBlock block in blocks) {
+    for (TerrainBlock block in blocks) {
       // Remember the block sizes are taken in percentage of the screen size,
       // for more robustness.
-      double left = block.left * size.width;
-      double top = block.top * size.height;
-      double width = block.width * size.width;
-      double height = block.height * size.height;
+      double left = block.hitBox.left * size.height / 100;
+      double top = block.hitBox.top * size.height / 100;
+      double width = block.hitBox.width * size.height / 100;
+      double height = block.hitBox.height * size.height / 100;
 
       Rect toDraw = Rect.fromLTWH(
           left,
@@ -130,7 +131,7 @@ class TerrainDrawer extends CustomDrawer {
 
 // Simple wrapper around the Rect class
 // used to maintain information about stroke.
-class _TerrainBlock extends Rect {
+/*class _TerrainBlock extends Rect {
   // Note that even if [withStroke] is [false], the top stroke will still
   // be painted.
   bool withStroke;
@@ -138,3 +139,4 @@ class _TerrainBlock extends Rect {
   _TerrainBlock(left, top, width, height, {this.withStroke = true})
       : super.fromLTWH(left, top, width, height);
 }
+*/
