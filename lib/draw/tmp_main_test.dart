@@ -46,7 +46,7 @@ class DrawTest extends StatefulWidget {
 class _DrawTestState extends State<DrawTest> {
   LevelPainter levelPainter = LevelPainter();
 
-  TerrainDrawer terrainDrawer = TerrainDrawer();
+  TerrainBlockDrawer terrainDrawer = TerrainBlockDrawer();
   BackgroundDrawer backgroundDrawer = BackgroundDrawer();
 
   List<CharacterDrawer> characters = List();

@@ -20,8 +20,11 @@ import 'package:info2051_2018/game/terrain.dart';
 /// be expressed in proportion of the screen size, meaning that the valid
 /// range is [0;1]. Providing values outside this range to the functions may
 /// lead to unexpected behaviour.
-class TerrainDrawer extends CustomDrawer {
-  Set<TerrainBlock> blocks = Set();
+class TerrainBlockDrawer extends CustomDrawer {
+  TerrainBlock terrainBlock;
+  //Set<TerrainBlock> blocks = Set();
+
+  TerrainBlockDrawer(this.terrainBlock);
 
   /// Creates a new terrain block.
   ///
@@ -30,10 +33,10 @@ class TerrainDrawer extends CustomDrawer {
   /// will be infinite, meaning that the block will expand to the right
   /// (resp. bottom) of the screen. In that case, the corresponding stroke line
   /// will not be drawn.
-  addTerrainBlock(Offset position, {width, height}) {
+  /*addTerrainBlock(Offset position, {width, height}) {
     blocks.add(TerrainBlock(position.dx, position.dy, width ?? double.infinity,
         height ?? double.infinity));
-  }
+  }*/
 
   /// Creates a terrain whose shape is given by a function.
   ///
@@ -44,7 +47,7 @@ class TerrainDrawer extends CustomDrawer {
   /// desired height.
   ///
   /// Remember everything should be expressed in percentage of the screen size.
-  createTerrainFromFunction(Function heightFromLeft, {nbBlocks = 10}) {
+  /*createTerrainFromFunction(Function heightFromLeft, {nbBlocks = 10}) {
     blocks.clear();
 
     for (double curLeft = 0;
@@ -58,6 +61,7 @@ class TerrainDrawer extends CustomDrawer {
           withStroke: false));
     }
   }
+*/
 
   /// Removes a set of blocks from their top-left positions.
   ///
@@ -65,7 +69,7 @@ class TerrainDrawer extends CustomDrawer {
   /// individually created (using for instance [addTerrainBlock]). This method
   /// only checks for equality between top-left positions and does not look
   /// for the nearest block.
-  removeBlocksByPositions(Set<Offset> positions) {
+  /* removeBlocksByPositions(Set<Offset> positions) {
     // Never modifies a [Set] while iterating through it.
     Set<TerrainBlock> toRemove = Set();
 
@@ -75,7 +79,7 @@ class TerrainDrawer extends CustomDrawer {
       }
     }
     blocks = blocks.difference(toRemove);
-  }
+  }*/
 
   /// Removes a set of blocks in a given circle.
   ///
@@ -85,7 +89,7 @@ class TerrainDrawer extends CustomDrawer {
   ///
   /// @Deprecated This behaviour will likely change in the future : the sizes
   /// of the blocks will be reduced instead of the blocks completely erased.
-  @Deprecated("The behaviour of this function will change soon, see doc")
+  /* @Deprecated("The behaviour of this function will change soon, see doc")
   removeBlocksInRange(Offset center, double range) {
     // Never modifies a [Set] while iterating through it.
     Set<TerrainBlock> toRemove = Set();
@@ -96,35 +100,33 @@ class TerrainDrawer extends CustomDrawer {
       }
     }
     blocks = blocks.difference(toRemove);
-  }
+  }*/
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (TerrainBlock block in blocks) {
-      // Remember the block sizes are taken in percentage of the screen size,
-      // for more robustness.
-      double left = block.hitBox.left * size.height / 100;
-      double top = block.hitBox.top * size.height / 100;
-      double width = block.hitBox.width * size.height / 100;
-      double height = block.hitBox.height * size.height / 100;
+    // Remember the block sizes are taken in percentage of the screen size,
+    // for more robustness.
+    double left = terrainBlock.hitBox.left * size.height / 100;
+    double top = terrainBlock.hitBox.top * size.height / 100;
+    double width = terrainBlock.hitBox.width * size.height / 100;
+    double height = terrainBlock.hitBox.height * size.height / 100;
 
-      Rect toDraw = Rect.fromLTWH(
-          left,
-          top,
-          // [canvas.drawRect] does not like [double.infinity] while stroking.
-          // As we don't know the size before painting, we can only truncate those
-          // infinities here.
-          min(width, size.width - left),
-          min(height, size.height - top));
+    Rect toDraw = Rect.fromLTWH(
+        left,
+        top,
+        // [canvas.drawRect] does not like [double.infinity] while stroking.
+        // As we don't know the size before painting, we can only truncate those
+        // infinities here.
+        min(width, size.width - left),
+        min(height, size.height - top));
 
-      canvas.drawRect(toDraw, terrainFillPaint);
-      if (block.withStroke) {
-        canvas.drawRect(toDraw, terrainStrokePaint);
-      } else {
-        // We never paint no strokes at all : we at least paint the top one.
-        canvas.drawLine(
-            Offset(left, top), Offset(left + width, top), terrainStrokePaint);
-      }
+    canvas.drawRect(toDraw, terrainFillPaint);
+    if (terrainBlock.withStroke) {
+      canvas.drawRect(toDraw, terrainStrokePaint);
+    } else {
+      // We never paint no strokes at all : we at least paint the top one.
+      canvas.drawLine(
+          Offset(left, top), Offset(left + width, top), terrainStrokePaint);
     }
   }
 }
