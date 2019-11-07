@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 
-import 'Cst.dart';
+import 'paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/utils.dart';
 import 'level.dart';
@@ -67,15 +67,8 @@ class CharacterDrawer extends CustomDrawer {
     canvas.drawImage(characterImg, Offset(left, top), Paint());
 
     double lifeBarTop = top - distanceLifeBarCharacter * size.height;
-    Color lifeColor;
+    Color lifeColor = character.getTeamColor();
     double normalizedHp = character.hp / Character.base_hp;
-    if (normalizedHp < 0.5) {
-      lifeColor = Color.fromRGBO((510 * (0.5 - normalizedHp)).toInt(),
-          (510 * normalizedHp).toInt(), 0, 1.0);
-    } else {
-      lifeColor = Color.fromRGBO(0, (510 * (1 - normalizedHp)).toInt(),
-          (510 * (normalizedHp - 0.5)).toInt(), 1.0);
-    }
     Paint lifeBarPaint = Paint()
       ..color = lifeColor
       ..style = PaintingStyle.fill;

@@ -1,16 +1,20 @@
 import 'dart:math';
-
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/Character.dart';
 import 'package:info2051_2018/game/entity.dart';
+import 'package:info2051_2018/game/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class Character extends MovingEntity {
+  static const List<Color> teamColors = [Colors.red, Colors.blue, Colors.green, Colors.orange];
+
   static const int LEFT = 0;
   static const int RIGHT = 1;
 
   static const int base_hp = 100;
+  static const double baseStamina = 100;
   static const double max_jump_speed = 1;
   static const double walk_speed = 0.5;
 
@@ -20,11 +24,14 @@ class Character extends MovingEntity {
   static final String asset = "assets/graphics/characters/worm.png";
 
   int hp = base_hp;
+  int team;
   Arsenal currentArsenal;
+
+  double stamina = baseStamina;
 
   bool _isAirborne = false;
 
-  Character(Offset position) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
+  Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.drawer = new CharacterDrawer(asset, this);
 
   }
@@ -40,7 +47,7 @@ class Character extends MovingEntity {
       direction += new Offset(0, 0.1);
 
     //Limit the speed of the jump to max_jump_speed
-    double jumpSpeed = sqrt(direction.dx * direction.dx + direction.dy * direction.dy);
+    double jumpSpeed = GameUtils.getNormOfOffset(direction);
     if(jumpSpeed > max_jump_speed){
       direction /= (jumpSpeed / max_jump_speed);
     }
@@ -75,4 +82,26 @@ class Character extends MovingEntity {
     //Set the velocity
     this.setXSpeed(newXSpeed);
   }
+
+  /// Override mode to update stamina when the character is moving
+  @override
+  void move(Offset o){
+    if(stamina == 0 && !_isAirborne)
+      this.stop();
+
+    super.move(o);
+
+    this.stamina -= o.dx.abs();
+    stamina < 0 ? stamina = 0 : stamina = stamina;
+  }
+
+  /// Reset the character's stamina
+  void refillStamina(){
+    this.stamina = baseStamina;
+  }
+
+  Color getTeamColor(){
+    return teamColors[team];
+  }
+
 }

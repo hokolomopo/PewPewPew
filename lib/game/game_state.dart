@@ -2,31 +2,42 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/terrain.dart';
+import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/utils.dart';
 import 'package:info2051_2018/game/world.dart';
 
+/// Enum to describe the current state of the game
 enum GameStateMode{char_selection, moving, attacking, cinematic}
 
 class GameState{
-  GameStateMode currentState = GameStateMode.moving;
+  static const List<String> teamNames = ["Red", "Blue", "Green", "Orange"];
+
+  /// Ratio between the size of a drag event and the length of the resulting jump
+  static const double JumpVectorNormalizer = 0.1;
+
+  GameStateMode currentState = GameStateMode.char_selection;
 
   List<List<Character>> players = new List();
   World world = new World();
   LevelPainter painter;
+  UiManager uiManager;
 
   int currentPlayer = 0;
   int currentCharacter = 0;
 
-  //Moving state variables
-  bool characterJumping = false;
+  /// GameStateMode.moving variables
+  bool characterJumping;
   Offset jumpDragStartPosition;
   Offset jumpDragEndPosition;
 
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter){
+    uiManager = UiManager(painter);
+
     //TODO load level
     this.addTerrainBlock(new TerrainBlock(0, 70, 20000, 10));
     this.addTerrainBlock(new TerrainBlock(150, 0, 10, 20000));
@@ -39,17 +50,35 @@ class GameState{
       for (int j = 0; j < numberOfCharacters; j++) {
 
         //TODO how to position characters
-        Character c = new Character(new Offset(10.0, 10.0));
+        Character c = new Character(new Offset(30 * (j +0.5*i), 10.0), i);
         this.addCharacter(i, c);
 
-        //TODO delete dis
+        //Make character jump to apply gravity to them
         c.jump(new Offset(0,0));
       }
     }
+
+    switchState(GameStateMode.char_selection);
   }
 
   void update(){
     world.updateWorld();
+
+    switch(currentState){
+
+      case GameStateMode.char_selection:
+        break;
+      case GameStateMode.moving:
+        if(getCurrentCharacter().stamina == 0 && !getCurrentCharacter().isAirborne())
+          switchState(GameStateMode.attacking);
+        break;
+      case GameStateMode.attacking:
+        // TODO: Handle this case.
+        switchState(GameStateMode.char_selection);
+        break;
+      case GameStateMode.cinematic:
+        break;
+    }
   }
 
   void addCharacter(int playerId, Character character){
@@ -87,7 +116,12 @@ class GameState{
 
     switch(currentState){
       case GameStateMode.char_selection:
-        // TODO: Handle this case.
+        for(int i = 0;i < players[currentPlayer].length;i++)
+          if(GameUtils.rectContains(players[currentPlayer][i].hitbox, tapPosition)){
+            currentCharacter = i;
+
+            switchState(GameStateMode.moving);
+          }
         break;
 
       case GameStateMode.moving:
@@ -122,7 +156,7 @@ class GameState{
 
   void onPanStart(DragStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
 
     print("PanStart : " + dragPosition.toString() + "char hitbox : " + currentChar.hitbox.toString());
 
@@ -137,7 +171,6 @@ class GameState{
         //Drag on character. We extend the size of the hitbox due to imprecision
         //for coordinates in drag events
         if(GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 50), dragPosition)){
-          print("PAnOnChar");
 
           if(currentChar.isAirborne())
             return;
@@ -160,7 +193,7 @@ class GameState{
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -194,7 +227,7 @@ class GameState{
 
       case GameStateMode.moving:
         if(characterJumping){
-          currentChar.jump(jumpDragStartPosition - jumpDragEndPosition);
+          currentChar.jump((jumpDragStartPosition - jumpDragEndPosition) * JumpVectorNormalizer);
           characterJumping = false;
         }
         break;
@@ -210,7 +243,7 @@ class GameState{
 
   void onLongPress(LongPressStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);;
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
 
     switch(currentState){
 
@@ -235,5 +268,40 @@ class GameState{
       case GameStateMode.cinematic:
         break;
     }
+  }
+
+  /// Function that is called when we change the state of the game
+  /// This is used to make sure that all the variables have the correct value at the start
+  /// of the state
+  void switchState(GameStateMode newState){
+    switch(newState){
+
+      case GameStateMode.char_selection:
+        this.currentPlayer = (currentPlayer + 1) % players.length;
+
+        uiManager.removeStaminaDrawer();
+        uiManager.addTextDrawer(teamNames[currentPlayer] + " team turn !",
+            TextPositions.center, 50);
+        break;
+      case GameStateMode.moving:
+        //TODO delete dis
+        uiManager.removeTextDrawer();
+
+
+        this.characterJumping = false;
+        this.jumpDragStartPosition = null;
+        this.jumpDragEndPosition = null;
+
+        getCurrentCharacter().refillStamina();
+        uiManager.addStaminaDrawer(getCurrentCharacter());
+        break;
+      case GameStateMode.attacking:
+        break;
+      case GameStateMode.cinematic:
+        // TODO: Handle this case.
+        break;
+    }
+
+    currentState = newState;
   }
 }

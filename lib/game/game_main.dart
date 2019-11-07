@@ -18,7 +18,6 @@ class GameMain extends StatefulWidget {
 
 class _GameMainState extends State<GameMain> {
   GameState state;
-  GestureDetector gestureDetector;
 
   int _callbackId;
 
@@ -28,58 +27,44 @@ class _GameMainState extends State<GameMain> {
 
   LevelPainter levelPainter;
 
-  _GameMainState() {
-    levelPainter = LevelPainter(showHitBoxes: true);
+  Duration lastTimeStamp;
 
+  _GameMainState() {
+    this.levelPainter = LevelPainter(showHitBoxes: true);
     //TODO delete dis
     levelPainter.addElement(BackgroundDrawer());
 
-    state = GameState(1, 1, levelPainter);
+    state = GameState(2, 2, levelPainter);
 
     _scheduleFrame();
   }
 
+  /// Schedule an execution of the _update function for the next frame
   void _scheduleFrame() {
     _callbackId = SchedulerBinding.instance.scheduleFrameCallback(_update);
   }
 
+  /// Unschedule an execution of the _update function for the next frame
   void _unscheduleFrame() {
     SchedulerBinding.instance.cancelFrameCallbackWithId(_callbackId);
   }
 
+  /// Function called at each frame.
+  /// Update the GameState and re-draw the gae on the screen
   void _update(Duration timestamp) {
     _scheduleFrame();
+
+    Duration timeElapsed = lastTimeStamp == null ? timestamp : timestamp - lastTimeStamp;
+    lastTimeStamp = timestamp;
+    print(timeElapsed.inMilliseconds);
 
     state.update();
     if (!mounted)
       return;
 
     setState(() {
-      position = state.getCurrentCharacter().position;
+      position = position * 1;
     });
-  }
-
-  void buildGestureDetector() {
-    var rect = Rect.fromLTWH(position.dx, position.dy, width, height);
-
-    this.gestureDetector = new GestureDetector(
-      onTapDown: (details) {
-        state.onTap(details);
-      },
-      onPanStart: (details) {
-        state.onPanStart(details);
-      },
-      onPanUpdate: (details) {
-        state.onPanUpdate(details);
-      },
-      onPanEnd: (details) {
-        state.onPanEnd(details);
-      },
-      onLongPressStart: (details) {
-        state.onLongPress(details);
-      },
-      child: levelPainter.level
-    );
   }
 
   @override
@@ -87,11 +72,27 @@ class _GameMainState extends State<GameMain> {
     //TODO do things better
     GameMain.screenHeight = MediaQuery.of(context).size.height;
 
-    //if(this.gestureDetector == null)
-    buildGestureDetector();
-
     return new Scaffold(
-      body: Container(child: this.gestureDetector),
+      body: Container(
+          child :GestureDetector(
+              onTapDown: (details) {
+                state.onTap(details);
+              },
+              onPanStart: (details) {
+                state.onPanStart(details);
+              },
+              onPanUpdate: (details) {
+                state.onPanUpdate(details);
+              },
+              onPanEnd: (details) {
+                state.onPanEnd(details);
+              },
+              onLongPressStart: (details) {
+                state.onLongPress(details);
+              },
+              child: levelPainter.level
+          )
+      ),
     );
   }
 
@@ -104,6 +105,9 @@ class _GameMainState extends State<GameMain> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
+
+    //Disable Device status bar
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   }
 
   @override
@@ -114,40 +118,10 @@ class _GameMainState extends State<GameMain> {
       DeviceOrientation.portraitDown,
     ]);
 
+    //Enable Device status bar
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom, SystemUiOverlay.top]);
+
     _unscheduleFrame();
     super.dispose();
   }
-}
-
-//TODO Code totalement copié/collé du cours, faudrait voir ce que ca veut dire en vrai
-class CanvasRectangle extends CustomPainter {
-  Rect rect;
-  Paint fill;
-  Paint stroke;
-
-  CanvasRectangle(this.rect, {Color fill, Color stroke}) {
-    this.fill = Paint()
-      ..color = fill
-      ..style = PaintingStyle.fill;
-    if (stroke != null)
-      this.stroke = Paint()
-        ..color = stroke
-        ..strokeCap = StrokeCap.square
-        ..strokeWidth = 2.0
-        ..style = PaintingStyle.stroke;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(rect, fill);
-    if (stroke != null) {
-      canvas.drawRect(rect, stroke);
-    }
-  }
-
-  @override
-  bool shouldRepaint(CanvasRectangle oldDelegate) =>
-      oldDelegate.rect != rect ||
-      oldDelegate.fill != fill ||
-      oldDelegate.stroke != stroke;
 }

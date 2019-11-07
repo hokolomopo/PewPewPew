@@ -21,7 +21,7 @@ class TestListenable extends ChangeNotifier {
 class LevelPainter {
   SplayTreeMap<int, CustomDrawer> elements = SplayTreeMap();
   TestListenable repaint = TestListenable();
-  bool showHitBoxes;
+  bool showHitBoxes = false;
 
   LevelPainter({this.showHitBoxes = false});
 

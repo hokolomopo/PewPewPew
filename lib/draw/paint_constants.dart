@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-Paint terrainFillPaint = Paint()
+final Paint terrainFillPaint = Paint()
   ..color = Colors.green
   ..style = PaintingStyle.fill;
-Paint terrainStrokePaint = Paint()
+
+final Paint terrainStrokePaint = Paint()
   ..color = Colors.white
   ..strokeWidth = 5
   ..style = PaintingStyle.stroke;
@@ -11,12 +12,22 @@ Paint terrainStrokePaint = Paint()
 const defaultBackgroundPath =
     "assets/graphics/backgrounds/default_background.png";
 
-Paint lifeBarStrokePaint = Paint()
+final Paint lifeBarStrokePaint = Paint()
   ..color = Colors.black
   ..strokeWidth = 3
   ..style = PaintingStyle.stroke;
+
 const distanceLifeBarCharacter = 0.05;
 
-Paint debugShowHitBoxesPaint = Paint()
+final Paint debugShowHitBoxesPaint = Paint()
   ..color = Colors.red
   ..style = PaintingStyle.fill;
+
+final Paint actionBarFillPaint = Paint()
+  ..color = Colors.yellow
+  ..style = PaintingStyle.fill;
+
+final Paint actionBarStrokePaint = Paint()
+  ..color = Colors.white
+  ..strokeWidth = 5
+  ..style = PaintingStyle.stroke;

@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'dart:typed_data';
 
 import 'level.dart';
-import 'Cst.dart';
+import 'paint_constants.dart';
 
 class BackgroundDrawer extends CustomDrawer {
   Uint8List backgroundImgBytes;

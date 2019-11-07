@@ -32,4 +32,9 @@ class GameUtils{
     return extended;
   }
 
+  /// Return the norm of the offset (sqrt(x^2 + y^2))
+  static double getNormOfOffset(Offset o){
+    return sqrt(o.dx * o.dx + o.dy * o.dy);
+  }
+
 }

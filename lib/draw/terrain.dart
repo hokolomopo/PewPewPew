@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/utils.dart';
 import 'dart:math';
 
-import 'Cst.dart';
+import 'paint_constants.dart';
 import 'math.dart';
 import 'level.dart';
 import 'package:info2051_2018/game/terrain.dart';
