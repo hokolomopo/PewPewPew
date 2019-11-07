@@ -42,15 +42,18 @@ class TextDrawer extends CustomDrawer {
   Offset customPosition;
   Color color;
 
+  double opacity;
+
   TextDrawer(this.content, this.position, this.fontSize,
       {this.customPosition : const Offset(0,0),
-       this.color : Colors.white});
+       this.color : Colors.white,
+       this.opacity: 1});
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes) {
     ParagraphBuilder textBuilder = ParagraphBuilder(
         ParagraphStyle(textAlign: TextAlign.center, fontSize: fontSize))
-      ..pushStyle(ui.TextStyle(color: this.color.withOpacity(0.8)))
+      ..pushStyle(ui.TextStyle(color: this.color.withOpacity(opacity)))
       ..addText(content);
     Paragraph text = textBuilder.build()
       ..layout(ParagraphConstraints(width: size.width));

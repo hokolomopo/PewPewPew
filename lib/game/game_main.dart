@@ -54,11 +54,10 @@ class _GameMainState extends State<GameMain> {
   void _update(Duration timestamp) {
     _scheduleFrame();
 
-    Duration timeElapsed = lastTimeStamp == null ? timestamp : timestamp - lastTimeStamp;
+    int timeElapsed = lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;
-    print(timeElapsed.inMilliseconds);
 
-    state.update();
+    state.update(timeElapsed.toDouble() / 1000);
     if (!mounted)
       return;
 

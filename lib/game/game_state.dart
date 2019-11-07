@@ -17,7 +17,7 @@ class GameState{
   static const List<String> teamNames = ["Red", "Blue", "Green", "Orange"];
 
   /// Ratio between the size of a drag event and the length of the resulting jump
-  static const double JumpVectorNormalizer = 0.1;
+  static const double JumpVectorNormalizer = 2;
 
   GameStateMode currentState = GameStateMode.char_selection;
 
@@ -39,7 +39,7 @@ class GameState{
     uiManager = UiManager(painter);
 
     //TODO load level
-    this.addTerrainBlock(new TerrainBlock(0, 70, 20000, 10));
+    this.addTerrainBlock(new TerrainBlock(15, 70, 20000, 10));
     this.addTerrainBlock(new TerrainBlock(150, 0, 10, 20000));
 
     for(int i = 0;i < numberOfPlayers;i++) {
@@ -61,8 +61,9 @@ class GameState{
     switchState(GameStateMode.char_selection);
   }
 
-  void update(){
-    world.updateWorld();
+  void update(double timeElapsed){
+    world.updateWorld(timeElapsed);
+    uiManager.updateUi(timeElapsed);
 
     switch(currentState){
 
@@ -280,13 +281,10 @@ class GameState{
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
         uiManager.removeStaminaDrawer();
-        uiManager.addTextDrawer(teamNames[currentPlayer] + " team turn !",
-            TextPositions.center, 50);
+        uiManager.addText(teamNames[currentPlayer] + " team turn !",
+            TextPositions.center, 50, duration: 3, fadeDuration: 3);
         break;
       case GameStateMode.moving:
-        //TODO delete dis
-        uiManager.removeTextDrawer();
-
 
         this.characterJumping = false;
         this.jumpDragStartPosition = null;

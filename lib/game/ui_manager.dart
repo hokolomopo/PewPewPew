@@ -9,10 +9,20 @@ class UiManager{
 
   StaminaDrawer staminaDrawer;
 
-  //TODO list & timer
-  TextDrawer textDrawer;
+  List<TextFader> textFaders = new List();
 
   UiManager(this.painter);
+
+  void updateUi(double elapsedTime){
+    for(int i = 0;i < textFaders.length;i++){
+      if(textFaders[i].isDead){
+        removeText(textFaders[i]);
+        i--;
+        continue;
+      }
+      textFaders[i].update(elapsedTime);
+    }
+  }
 
   void addStaminaDrawer(Character c){
     staminaDrawer = StaminaDrawer(c);
@@ -23,13 +33,55 @@ class UiManager{
     painter.removeElement(staminaDrawer);
   }
 
-  void addTextDrawer(String s, TextPositions position, double fontSize, {Offset customPosition : const Offset(0, 0)}){
-    textDrawer = new TextDrawer(s, position, fontSize);
+  TextFader addText(String s, TextPositions position, double fontSize,
+      {Offset customPosition : const Offset(0, 0),
+        double duration,
+        double fadeDuration = 0}){
+    TextDrawer textDrawer = new TextDrawer(s, position, fontSize);
     painter.addElement(textDrawer);
+
+    TextFader fader = TextFader(textDrawer, lifetime: duration, fadeTime: fadeDuration);
+    textFaders.add(fader);
+
+    return fader;
   }
 
-  void removeTextDrawer(){
-    painter.removeElement(textDrawer);
+  void removeText(TextFader fader){
+    painter.removeElement(fader.drawer);
+    textFaders.remove(fader);
   }
 
+}
+
+class TextFader{
+  double lifetime;
+  double fadeTime;
+  double elapsedTime = 0;
+
+  TextDrawer drawer;
+
+  bool isDead = false;
+
+  ///  Arguments :
+  ///  drawer   : The TextDrawer to draw
+  ///  lifetime : Duration when the text is not fading (in seconds). Null is infinite.
+  ///  fadeTime : Duration of the fading of the text (in seconds)
+  TextFader(this.drawer,{this.lifetime, this.fadeTime : 0});
+
+  void update(double elapsed){
+    if(lifetime == null)
+      return;
+
+    this.elapsedTime += elapsed;
+
+    if(elapsedTime < lifetime)
+      return;
+
+    else if(elapsedTime < lifetime + fadeTime)
+      drawer.opacity = 1 - ((elapsedTime - lifetime) / fadeTime);
+
+    else
+      isDead = true;
+
+  }
 }

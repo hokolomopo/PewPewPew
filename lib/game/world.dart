@@ -8,7 +8,7 @@ import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class World{
-  static final double gravityForce = 0.0005;
+  static final double gravityForce = 0.02;
 
   static final double epsilon = 0.1;
   
@@ -18,21 +18,21 @@ class World{
 
   Offset gravity = new Offset(0, gravityForce);
 
-  void updateWorld(){
+  void updateWorld(double timeElapsed){
     for(Character c in players){
       if(c.isMoving()){
         c.addAcceleration(gravity);
         c.accelerate();
-        moveEntity(c);
+        moveEntity(c, timeElapsed);
       }
     }
   }
 
-  void moveEntity(MovingEntity entity){
+  void moveEntity(MovingEntity entity, double timeElapsed){
 
     //Move in X axis
     Offset vector = new Offset(entity.velocity.dx, 0);
-    entity.move(vector);
+    entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){
       if(entity.hitbox.intersects(t.hitBox)){
@@ -43,7 +43,7 @@ class World{
 
     //Move on Y axis
     vector = new Offset(0, entity.velocity.dy);
-    entity.move(vector);
+    entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){
       if(entity.hitbox.intersects(t.hitBox)){

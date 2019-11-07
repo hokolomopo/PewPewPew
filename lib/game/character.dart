@@ -15,8 +15,8 @@ class Character extends MovingEntity {
 
   static const int base_hp = 100;
   static const double baseStamina = 100;
-  static const double max_jump_speed = 1;
-  static const double walk_speed = 0.5;
+  static const double max_jump_speed = 50;
+  static const double walk_speed = 20;
 
   static final Offset hitboxSize = new Offset(10,10);
 
@@ -48,6 +48,7 @@ class Character extends MovingEntity {
 
     //Limit the speed of the jump to max_jump_speed
     double jumpSpeed = GameUtils.getNormOfOffset(direction);
+    print("Jumpspeed : " + jumpSpeed.toString());
     if(jumpSpeed > max_jump_speed){
       direction /= (jumpSpeed / max_jump_speed);
     }
