@@ -84,9 +84,6 @@ class Character extends MovingEntity {
   /// Override mode to update stamina when the character is moving
   @override
   void move(Offset o){
-    if(stamina == 0 && !_isAirborne)
-      this.stop();
-
     super.move(o);
 
     this.stamina -= o.dx.abs();

@@ -97,8 +97,9 @@ class GameState{
         }
 
         //Stop the phase if the character has no stamina left
-        if(currentChar.stamina == 0 && !currentChar.isAirborne())
+        if(currentChar.stamina == 0 && !currentChar.isAirborne()) {
           switchState(GameStateMode.attacking);
+        }
         break;
       case GameStateMode.attacking:
         // TODO: Handle this case.
