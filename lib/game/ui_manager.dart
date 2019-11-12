@@ -1,6 +1,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 
@@ -12,6 +13,8 @@ class UiManager{
   List<TextFader> textFaders = new List();
 
   UiManager(this.painter);
+
+  MarkerDrawer marker;
 
   void updateUi(double elapsedTime){
     for(int i = 0;i < textFaders.length;i++){
@@ -31,6 +34,7 @@ class UiManager{
 
   void removeStaminaDrawer(){
     painter.removeElement(staminaDrawer);
+    staminaDrawer = null;
   }
 
   TextFader addText(String s, TextPositions position, double fontSize,
@@ -47,8 +51,22 @@ class UiManager{
   }
 
   void removeText(TextFader fader){
+    if(fader == null)
+      return;
     painter.removeElement(fader.drawer);
     textFaders.remove(fader);
+  }
+
+  void addMarker(Offset position){
+    if(this.marker != null)
+      removeMarker();
+    this.marker = MarkerDrawer(position);
+    painter.addElement(marker);
+  }
+
+  void removeMarker(){
+    painter.removeElement(marker);
+    this.marker = null;
   }
 
 }

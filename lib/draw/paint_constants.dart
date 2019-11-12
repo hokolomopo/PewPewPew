@@ -31,3 +31,9 @@ final Paint actionBarStrokePaint = Paint()
   ..color = Colors.white
   ..strokeWidth = 5
   ..style = PaintingStyle.stroke;
+
+
+//TODO remove dis when no used in PositionDrawer anymore
+final Paint blackPaint = Paint()
+  ..color = Colors.black
+  ..style = PaintingStyle.fill;

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/level.dart';
-import 'package:info2051_2018/draw/ui_drawer.dart';
+import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/terrain.dart';
@@ -29,18 +29,23 @@ class GameState{
   int currentPlayer = 0;
   int currentCharacter = 0;
 
+  ///GameStateMode.char_selection variables
+  TextFader teamTurnText;
+
   /// GameStateMode.moving variables
   bool characterJumping;
   Offset jumpDragStartPosition;
   Offset jumpDragEndPosition;
+  Offset moveDestination;
 
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter){
     uiManager = UiManager(painter);
 
     //TODO load level
-    this.addTerrainBlock(new TerrainBlock(15, 70, 20000, 10));
+    this.addTerrainBlock(new TerrainBlock(0, 70, 20000, 10));
     this.addTerrainBlock(new TerrainBlock(150, 0, 10, 20000));
+    this.addTerrainBlock(new TerrainBlock(50, 40, 50, 10));
 
     for(int i = 0;i < numberOfPlayers;i++) {
 
@@ -65,12 +70,34 @@ class GameState{
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
 
+    Character currentChar = getCurrentCharacter();
+
     switch(currentState){
 
       case GameStateMode.char_selection:
         break;
       case GameStateMode.moving:
-        if(getCurrentCharacter().stamina == 0 && !getCurrentCharacter().isAirborne())
+
+        //Check if we need to remove the marker because the character has jumped
+        if(currentChar.isAirborne() && moveDestination != null){
+          uiManager.removeMarker();
+          moveDestination = null;
+        }
+
+        //Check if the destination of a displacement has been reached
+        if(moveDestination != null && !currentChar.isAirborne()){
+
+          //We stop only if the destination is within the centric third of the hitbox
+          if(moveDestination.dx >= currentChar.hitbox.left + currentChar.hitbox.width / 3 &&
+              moveDestination.dx <= currentChar.hitbox.left + currentChar.hitbox.width * 2 / 3){
+            currentChar.stop();
+            uiManager.removeMarker();
+            moveDestination = null;
+          }
+        }
+
+        //Stop the phase if the character has no stamina left
+        if(currentChar.stamina == 0 && !currentChar.isAirborne())
           switchState(GameStateMode.attacking);
         break;
       case GameStateMode.attacking:
@@ -130,18 +157,27 @@ class GameState{
 
         //Touch event on the current character
         if(GameUtils.rectContains(currentChar.hitbox, tapPosition)){
-          if(!currentChar.isAirborne())
+          if(!currentChar.isAirborne()) {
             currentChar.stopX();
+            moveDestination = null;
+            uiManager.removeMarker();
+          }
         }
 
         //Touch event left of the current character
         else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPosition)){
-          currentChar.beginWalking(Character.LEFT);
+          if(!currentChar.isAirborne()) {
+            currentChar.beginWalking(Character.LEFT);
+            this.startMoving(tapPosition);
+          }
         }
 
         //Touch event right of the current character
         else if(GameUtils.rectRightOf(currentChar.hitbox, tapPosition)){
-          currentChar.beginWalking(Character.RIGHT);
+          if(!currentChar.isAirborne()) {
+            currentChar.beginWalking(Character.RIGHT);
+            this.startMoving(tapPosition);
+          }
         }
         break;
 
@@ -271,21 +307,41 @@ class GameState{
     }
   }
 
+  /// Function used when starting the movement of a character. It place a marker
+  /// on top of the terrain the closest to the destination
+  void startMoving(Offset destination){
+    Offset markerPosition = destination;
+
+    TerrainBlock closest = world.getClosestTerrainUnder(destination);
+    if(closest != null)
+      markerPosition = Offset(destination.dx, closest.hitBox.top);
+
+
+    this.moveDestination = markerPosition;
+    this.uiManager.addMarker(markerPosition);
+  }
+
   /// Function that is called when we change the state of the game
   /// This is used to make sure that all the variables have the correct value at the start
-  /// of the state
+  /// and end of the state
   void switchState(GameStateMode newState){
+    this.endState(currentState);
+    this.startState(newState);
+
+    currentState = newState;
+  }
+
+  void startState(GameStateMode newState){
     switch(newState){
 
       case GameStateMode.char_selection:
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
         uiManager.removeStaminaDrawer();
-        uiManager.addText(teamNames[currentPlayer] + " team turn !",
+        this.teamTurnText = uiManager.addText(teamNames[currentPlayer] + " team turn !",
             TextPositions.center, 50, duration: 3, fadeDuration: 3);
         break;
       case GameStateMode.moving:
-
         this.characterJumping = false;
         this.jumpDragStartPosition = null;
         this.jumpDragEndPosition = null;
@@ -296,10 +352,23 @@ class GameState{
       case GameStateMode.attacking:
         break;
       case GameStateMode.cinematic:
-        // TODO: Handle this case.
         break;
     }
+  }
 
-    currentState = newState;
+  void endState(GameStateMode oldState){
+    switch(oldState){
+
+      case GameStateMode.char_selection:
+        uiManager.removeText(this.teamTurnText);
+        break;
+      case GameStateMode.moving:
+        uiManager.removeMarker();
+        break;
+      case GameStateMode.attacking:
+        break;
+      case GameStateMode.cinematic:
+        break;
+    }
   }
 }

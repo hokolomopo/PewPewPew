@@ -57,15 +57,12 @@ class Character extends MovingEntity {
   }
 
   void land(){
-    if(!_isAirborne)
-      return;
-
     _isAirborne = false;
     this.stopX();
   }
 
   bool isAirborne(){
-    return _isAirborne;
+    return _isAirborne || velocity.dy != 0;
   }
 
   void beginWalking(int direction){

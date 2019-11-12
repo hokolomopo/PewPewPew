@@ -5,12 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/terrain.dart';
+import 'package:info2051_2018/game/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class World{
   static final double gravityForce = 0.02;
 
-  static final double epsilon = 0.1;
+  static final double epsilon = 0.00000000001;
   
   List<Character> players = new List();
   List<Projectile> projectiles = new List();
@@ -50,9 +51,11 @@ class World{
         backTrackY(entity, t.hitBox, vector.dy);
         entity.stopY();
 
-        if(entity is Character)
+        //If vector.dy == gravity, it means that there was only 1 frame of falling.
+        //This will happens because the character is always slightly above the ground,
+        //not on it. This is nto a real landing, it is due to the physics engine.
+        if(vector.dy > gravity.dy && entity is Character)
           entity.land();
-
       }
     }
   }
@@ -100,4 +103,30 @@ class World{
     terrain.remove(t);
   }
 
+  /// Return the closest terrain that is under or that contains the given point
+  TerrainBlock getClosestTerrainUnder(Offset o){
+    List<double> distances = List();
+    TerrainBlock minBlock;
+    double minDist;
+
+    for(TerrainBlock block in terrain){
+      if(block.hitBox.left > o.dx || block.hitBox.left + block.hitBox.width < o.dx)
+        continue;
+
+      else if(block.hitBox.containsPoint(GameUtils.toPoint(o)))
+        return block;
+
+      else if(block.hitBox.top < o.dy)
+        continue;
+
+      else{
+        double dist = (block.hitBox.top - o.dy).abs();
+        if(minDist == null || dist < minDist)
+          minBlock = block;
+      }
+
+    }
+
+    return minBlock;
+  }
 }

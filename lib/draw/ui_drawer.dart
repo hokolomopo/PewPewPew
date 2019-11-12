@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/paint_constants.dart';
@@ -33,43 +32,22 @@ class StaminaDrawer extends CustomDrawer {
 
 }
 
-enum TextPositions{center, custom}
+class MarkerDrawer extends CustomDrawer{
 
-class TextDrawer extends CustomDrawer {
-  String content;
-  double fontSize;
-  TextPositions position;
-  Offset customPosition;
-  Color color;
+  Offset position;
 
-  double opacity;
-
-  TextDrawer(this.content, this.position, this.fontSize,
-      {this.customPosition : const Offset(0,0),
-       this.color : Colors.white,
-       this.opacity: 1});
+  MarkerDrawer(this.position);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes) {
-    ParagraphBuilder textBuilder = ParagraphBuilder(
-        ParagraphStyle(textAlign: TextAlign.center, fontSize: fontSize))
-      ..pushStyle(ui.TextStyle(color: this.color.withOpacity(opacity)))
-      ..addText(content);
-    Paragraph text = textBuilder.build()
-      ..layout(ParagraphConstraints(width: size.width));
+    double x = GameUtils.relativeToAbsoluteDist(position.dx, size.height);
+    double y = GameUtils.relativeToAbsoluteDist(position.dy, size.height);
 
-    canvas.drawParagraph(text, getPosition(size, text));
+    double width = 10;
+    double height = 10;
+
+    //TODO draw arrow instead of random rectangle
+    canvas.drawRect(Rect.fromLTWH(x - width /2, y - height, 10, 10), blackPaint);
   }
 
-  Offset getPosition(Size size, Paragraph text){
-    switch(position){
-      case TextPositions.center:
-        return Offset((size.width - text.width) / 2,
-            (size.height - text.height) / 2);
-      case TextPositions.custom:
-        return this.customPosition;
-    }
-
-    return this.customPosition;
-  }
 }
