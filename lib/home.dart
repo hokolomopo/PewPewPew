@@ -1,5 +1,7 @@
+//import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/quick_play.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
@@ -10,9 +12,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  //final audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
+
+    //audioPlayer.setReleaseMode(ReleaseMode.LOOP);
+    //audioPlayer.play("assets/sounds/menu/sample.mp3", isLocal: true, );
 
     // logo widget
     Widget logo() {
@@ -30,11 +37,11 @@ class _HomeState extends State<Home> {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: new BorderRadius.circular(20.0),
-                      color: Color(0xFF8B0000),
+                      color: Colors.blueAccent,
                       border: new Border.all(color: Colors.white70, width: 5.0),
                       boxShadow: [
                         new BoxShadow(
-                          color: Colors.red,
+                          color: Colors.black,
                           blurRadius: 3.0,
                         )
                       ],
@@ -245,6 +252,23 @@ class _HomeState extends State<Home> {
       });
     }
 
+    // Function to be pass to a future builder in order
+    // to pass variables to the shop list builder
+    Future<Set> getShopInfo() async {
+      Set ret = Set();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      //await prefs.clear(); // Debug line to reset the entire app preference
+
+      var tmp = await DefaultAssetBundle.of(context)
+          .loadString('assets/data/shop/items.json');
+
+      List<Item> items = parseJson(tmp.toString());
+      ret.add(items);
+      ret.add(prefs);
+      return ret;
+    }
+
     void _shopSheet() {
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
@@ -280,13 +304,17 @@ class _HomeState extends State<Home> {
                   ),
                   Expanded(
                     child: new FutureBuilder(
-                        future: DefaultAssetBundle.of(context)
-                            .loadString('assets/data/shop/items.json'),
+                        future: getShopInfo(),
                         builder: (context, snapshot) {
-                          List<Item> items =
-                              parseJson(snapshot.data.toString());
-                          return items.isNotEmpty
-                              ? new ShopList(items: items)
+                          List<Item> items;
+                          SharedPreferences prefs;
+                          if (snapshot.data != null) {
+                            items = snapshot.data.elementAt(0);
+                            prefs = snapshot.data.elementAt(1);
+                          }
+
+                          return (items != null && prefs != null)
+                              ? new ShopList(items: items, prefs: prefs)
                               : new Center(
                                   child: new CircularProgressIndicator(),
                                 );
@@ -303,51 +331,55 @@ class _HomeState extends State<Home> {
       });
     }
 
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        key: _scaffoldKey,
-        backgroundColor: Theme.of(context).primaryColor,
-        body: Column(
-          children: <Widget>[
-            logo(),
-            Padding(
-              child: Container(
-                child: _button("Quick Play", primary, Colors.white,
-                    Colors.white, primary, 30.0, _parameters),
-                height: 50.0,
-              ),
-              padding: EdgeInsets.only(top: 80.0, left: 20.0, right: 20.0),
-            ),
-            Padding(
-              child: Container(
-                child: _buttonOutline(
-                    "Tutorial",
-                    Colors.white,
-                    Colors.white,
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor,
-                    Colors.white,
-                    30.0, () {
-                  _tutorialConfirm(
-                      "Start tutorial?",
-                      "The tutorial is recommanded for new players",
-                      "Cancel",
-                      "Start");
-                }),
-                height: 50.0,
-              ),
-              padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
-            ),
-            Padding(
-              child: Container(
-                child: _button("Shop", primary, Colors.white, Colors.white,
-                    primary, 30.0, _shopSheet),
-                height: 50.0,
-              ),
-              padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
-            ),
-          ],
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-        ));
+    return Stack(
+      children: <Widget>[
+        Image.asset(
+          "assets/graphics/backgrounds/menu-background3.jpg",
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          fit: BoxFit.cover,
+        ),
+        Scaffold(
+            resizeToAvoidBottomPadding: false,
+            key: _scaffoldKey,
+            backgroundColor: Colors.transparent,
+            body: Column(
+              children: <Widget>[
+                logo(),
+                Padding(
+                  child: Container(
+                    child: _button("Quick Play", primary, Colors.white,
+                        Colors.white, primary, 30.0, _parameters),
+                    height: 50.0,
+                  ),
+                  padding: EdgeInsets.only(top: 80.0, left: 20.0, right: 20.0),
+                ),
+                Padding(
+                  child: Container(
+                    child: _button("Tutorial", primary, Colors.white,
+                        Colors.white, primary, 30.0, () {
+                      _tutorialConfirm(
+                          "Start tutorial?",
+                          "The tutorial is recommanded for new players",
+                          "Cancel",
+                          "Start");
+                    }),
+                    height: 50.0,
+                  ),
+                  padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
+                ),
+                Padding(
+                  child: Container(
+                    child: _button("Shop", primary, Colors.white, Colors.white,
+                        primary, 30.0, _shopSheet),
+                    height: 50.0,
+                  ),
+                  padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
+                ),
+              ],
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+            ))
+      ],
+    );
   }
 }

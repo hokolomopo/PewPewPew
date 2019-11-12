@@ -19,7 +19,7 @@ class PewPewPew extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
         hintColor: Color(0xFFC0F0E8),
-        primaryColor: Colors.red, // 0xFF80E1D1
+        primaryColor: Colors.lightBlue, // 0xFF80E1D1
         fontFamily: "Heroes",
         canvasColor: Colors.transparent,
       ),
