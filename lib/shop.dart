@@ -5,8 +5,9 @@ import 'dart:convert';
 class ShopList extends StatefulWidget {
   // For Json reading : list of item and constructor
   final List<Item> items;
+  SharedPreferences prefs;
 
-  ShopList({Key key, this.items}) : super(key: key);
+  ShopList({Key key, this.items, this.prefs}) : super(key: key);
 
   @override
   ShopListState createState() {
@@ -16,8 +17,8 @@ class ShopList extends StatefulWidget {
 
 class ShopListState extends State<ShopList> {
   var _money = 50000;
-
   List<Item> items;
+  SharedPreferences prefs;
 
   //ShopListState({this.items}) ;
 
@@ -25,6 +26,8 @@ class ShopListState extends State<ShopList> {
   void initState() {
     super.initState();
     items = widget.items;
+    prefs = widget.prefs;
+    if (prefs.containsKey("money")) _money = prefs.getInt("money");
   }
 
   @override
@@ -32,8 +35,13 @@ class ShopListState extends State<ShopList> {
     return _shopList(context);
   }
 
-  void _reducePortofolio(int price) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  void _reducePortofolio(int price, String item) async {
+    this._money -= price;
+    await this.prefs.setInt("money", this._money);
+    // Mark the item as SOLD
+    await this.prefs.setInt(item, 0);
+    // Set state applied here to be sure that changes were done before rebuilding the list
+    setState(() {});
   }
 
   Widget _shopList(BuildContext context) {
@@ -54,8 +62,8 @@ class ShopListState extends State<ShopList> {
         ),
         Row(
           children: <Widget>[
-            FittedBox(
-                fit: BoxFit.contain, child: Text(" ")) // Place for sorting buttons for list
+            FittedBox(fit: BoxFit.contain, child: Text(" "))
+            // Place for sorting buttons for list
           ],
         ),
         Expanded(
@@ -70,7 +78,7 @@ class ShopListState extends State<ShopList> {
                     primary: false,
                     itemCount: items == null ? 0 : items.length,
                     itemBuilder: (context, index) {
-                      if (items[index].price == 0) {
+                      if (prefs.containsKey(items[index].name)) {
                         return Card(
                           color: Colors.blue,
                           child: ListTile(
@@ -92,7 +100,8 @@ class ShopListState extends State<ShopList> {
                                     'assets/graphics/shop/' +
                                         items[index].imgName),
                               ),
-                              subtitle: Text(items[index].price.toString() + "\$"),
+                              subtitle:
+                                  Text(items[index].price.toString() + "\$"),
                               title: Text(items[index].name)),
                         );
                       }
@@ -119,10 +128,8 @@ class ShopListState extends State<ShopList> {
                                   "Get Poorer",
                                   context,
                                   () {
-                                    setState(() {
-                                      _money -= items[index].price;
-                                      items[index].price = 0;
-                                    });
+                                    _reducePortofolio(
+                                        items[index].price, items[index].name);
                                     Navigator.of(context).pop();
                                   },
                                 );
