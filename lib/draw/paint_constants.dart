@@ -33,6 +33,11 @@ final Paint actionBarStrokePaint = Paint()
   ..style = PaintingStyle.stroke;
 
 
+final Paint jumpLinePaint = Paint()
+  ..color = Colors.white.withAlpha(100)
+  ..strokeWidth = 5;
+
+
 //TODO remove dis when no used in PositionDrawer anymore
 final Paint blackPaint = Paint()
   ..color = Colors.black

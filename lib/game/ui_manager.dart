@@ -8,13 +8,14 @@ import 'package:info2051_2018/game/character.dart';
 class UiManager{
   LevelPainter painter;
 
-  StaminaDrawer staminaDrawer;
-
   List<TextFader> textFaders = new List();
+
+  StaminaDrawer staminaDrawer;
+  MarkerDrawer marker;
+  JumpArrowDrawer jumpArrowDrawer;
 
   UiManager(this.painter);
 
-  MarkerDrawer marker;
 
   void updateUi(double elapsedTime){
     for(int i = 0;i < textFaders.length;i++){
@@ -67,6 +68,20 @@ class UiManager{
   void removeMarker(){
     painter.removeElement(marker);
     this.marker = null;
+  }
+
+  void beginJump(Offset origin){
+    jumpArrowDrawer = JumpArrowDrawer(origin, origin);
+    painter.addElement(jumpArrowDrawer);
+  }
+
+  void updateJump(Offset offset){
+    jumpArrowDrawer.end = jumpArrowDrawer.origin - offset;
+  }
+
+  void endJump(){
+    painter.removeElement(jumpArrowDrawer);
+    jumpArrowDrawer = null;
   }
 
 }

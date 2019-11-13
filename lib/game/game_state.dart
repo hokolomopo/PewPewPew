@@ -216,6 +216,8 @@ class GameState{
 
           characterJumping = true;
           jumpDragStartPosition = dragPosition;
+          
+          uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         }
 
         //TODO drag move camera
@@ -242,6 +244,7 @@ class GameState{
         if (characterJumping) {
           // TODO: Draw directional arrow
           jumpDragEndPosition = dragPosition;
+          uiManager.updateJump(Character.getJumpSpeed((dragPosition - jumpDragStartPosition ) * JumpVectorNormalizer));
         }
 
         //TODO : Move camera
@@ -267,6 +270,7 @@ class GameState{
         if(characterJumping){
           currentChar.jump((jumpDragStartPosition - jumpDragEndPosition) * JumpVectorNormalizer);
           characterJumping = false;
+          uiManager.endJump();
         }
         break;
 
@@ -365,6 +369,7 @@ class GameState{
         break;
       case GameStateMode.moving:
         uiManager.removeMarker();
+        getCurrentCharacter().stop();
         break;
       case GameStateMode.attacking:
         break;

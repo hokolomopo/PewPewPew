@@ -46,14 +46,19 @@ class Character extends MovingEntity {
     if(direction.dy == 0)
       direction += new Offset(0, 0.1);
 
+    direction = getJumpSpeed(direction);
     //Limit the speed of the jump to max_jump_speed
+
+    this.velocity += direction;
+  }
+
+  ///Function that limit the speed of a jump based on max_jump_speed
+  static Offset getJumpSpeed(Offset direction){
     double jumpSpeed = GameUtils.getNormOfOffset(direction);
-    print("Jumpspeed : " + jumpSpeed.toString());
     if(jumpSpeed > max_jump_speed){
       direction /= (jumpSpeed / max_jump_speed);
     }
-
-    this.velocity += direction;
+    return direction;
   }
 
   void land(){

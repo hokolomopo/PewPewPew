@@ -6,6 +6,10 @@ class GameUtils{
     return offset * 100 / screenHeight;
   }
 
+  static Offset relativeToAbsoluteOffset(Offset offset, double screenHeight) {
+    return offset / 100 * screenHeight;
+  }
+
   static double relativeToAbsoluteDist(double dist, double screenHeight) {
     return dist / 100 * screenHeight;
   }
@@ -35,6 +39,11 @@ class GameUtils{
   /// Return the norm of the offset (sqrt(x^2 + y^2))
   static double getNormOfOffset(Offset o){
     return sqrt(o.dx * o.dx + o.dy * o.dy);
+  }
+
+  ///Return the center of the rectangle
+  static Offset getRectangleCenter(Rectangle r){
+    return Offset(r.left + r.width / 2, r.top + r.height / 2);
   }
 
 }

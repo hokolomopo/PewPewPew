@@ -51,3 +51,27 @@ class MarkerDrawer extends CustomDrawer{
   }
 
 }
+
+class JumpArrowDrawer extends CustomDrawer{
+  static double normalizingFactor = 0.5;
+
+  Offset origin;
+  Offset end;
+
+  JumpArrowDrawer(this.origin, this.end);
+
+  @override
+  void paint(Canvas canvas, Size size, bool showHitBoxes) {
+    Offset originAbs = GameUtils.relativeToAbsoluteOffset(origin, size.height);
+    Offset endAbs = GameUtils.relativeToAbsoluteOffset(end, size.height);
+
+    Offset direction = endAbs - originAbs;
+    direction = direction * normalizingFactor;
+
+    endAbs = originAbs + direction;
+
+    canvas.drawLine(originAbs, endAbs, jumpLinePaint);
+
+  }
+
+}
