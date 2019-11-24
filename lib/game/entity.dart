@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/level_painter.dart';
 
 abstract class Entity{
   Offset position;

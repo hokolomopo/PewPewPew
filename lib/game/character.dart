@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/Character.dart';
 import 'package:info2051_2018/game/entity.dart';
-import 'package:info2051_2018/game/utils.dart';
+import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class Character extends MovingEntity {

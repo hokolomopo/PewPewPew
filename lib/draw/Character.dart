@@ -5,8 +5,8 @@ import 'dart:typed_data';
 
 import 'paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
-import 'package:info2051_2018/game/utils.dart';
-import 'level.dart';
+import 'package:info2051_2018/game/util/utils.dart';
+import 'level_painter.dart';
 
 class CharacterDrawer extends CustomDrawer {
   Uint8List characterImgBytes;
@@ -51,7 +51,7 @@ class CharacterDrawer extends CustomDrawer {
   }
 
   @override
-  void paint(Canvas canvas, Size size, showHitBoxes) {
+  void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
     double left =
         GameUtils.relativeToAbsoluteDist(character.position.dx, size.height);
     double top =

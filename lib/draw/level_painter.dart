@@ -3,12 +3,19 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/camera.dart';
+import 'package:info2051_2018/game/util/utils.dart';
 
 abstract class CustomDrawer {
   bool isReady(Size screenSize) => true;
   TestListenable repaint;
 
-  void paint(Canvas canvas, Size size, bool showHitBoxes);
+  void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition);
+
+  ///Modify position to ignore the camera
+  Offset cancelCamera(Offset position, Offset cameraPosition){
+    return position + cameraPosition;
+  }
 }
 
 class TestListenable extends ChangeNotifier {
@@ -22,8 +29,10 @@ class LevelPainter {
   SplayTreeMap<int, CustomDrawer> elements = SplayTreeMap();
   TestListenable repaint = TestListenable();
   bool showHitBoxes = false;
+  Camera camera;
+  Size levelSize;
 
-  LevelPainter({this.showHitBoxes = false});
+  LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false});
 
   addElement(CustomDrawer customDrawer, {index}) {
     // Did not find a simple addElement method in the SplayTreeMap, but this
@@ -51,15 +60,17 @@ class LevelPainter {
   Widget get level {
     return CustomPaint(
       size: Size.infinite,
-      painter: _LevelPainterAux(this),
+      painter: _LevelPainterAux(this, this.camera, this.levelSize),
     );
   }
 }
 
 class _LevelPainterAux extends CustomPainter {
   LevelPainter levelPainter;
+  Camera camera;
+  Size levelSize;
 
-  _LevelPainterAux(this.levelPainter) :
+  _LevelPainterAux(this.levelPainter, this.camera, this.levelSize) :
     super(repaint: levelPainter.repaint);
 
   @override
@@ -89,9 +100,40 @@ class _LevelPainterAux extends CustomPainter {
       return;
     }
 
+    //Apply camera transforms
+    Offset absoluteCameraPosition = applyCamera(camera, canvas, size);
+
     for (CustomDrawer drawer in levelPainter.elements.values) {
-      drawer.paint(canvas, size, levelPainter.showHitBoxes);
+      drawer.paint(canvas, size, levelPainter.showHitBoxes, absoluteCameraPosition);
     }
+  }
+
+  ///Apply camera offset to the canvas and return its absolute position for the drawing
+  Offset applyCamera(Camera camera, Canvas canvas, Size screenSize){
+    Offset absoluteCameraPosition = GameUtils.relativeToAbsoluteOffset(camera.position, screenSize.height);
+    Offset absoluteLevelSize = GameUtils.relativeToAbsoluteOffset(GameUtils.getDimFromSize(levelSize), screenSize.height);
+
+    //Fix camera position to stay inside level limits
+    double fixedX = absoluteCameraPosition.dx;
+    double fixedY = absoluteCameraPosition.dy;
+    if(fixedX < 0)
+      fixedX = 0;
+    else if(fixedX + screenSize.width > absoluteLevelSize.dx)
+      fixedX = absoluteLevelSize.dx - screenSize.width;
+
+    if(fixedY < 0)
+      fixedY = 0;
+    else if(fixedY + screenSize.height > absoluteLevelSize.dy)
+      fixedY = absoluteLevelSize.dy - screenSize.height;
+
+    absoluteCameraPosition = Offset(fixedX, fixedY);
+
+    canvas.translate(- absoluteCameraPosition.dx, - absoluteCameraPosition.dy);
+    canvas.scale(camera.zoom.dx, camera.zoom.dy);
+
+    camera.position = GameUtils.absoluteToRelativeOffset(absoluteCameraPosition, screenSize.height);
+
+    return absoluteCameraPosition;
   }
 
   @override

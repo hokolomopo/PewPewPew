@@ -18,6 +18,11 @@ class GameUtils{
     return new Point(o.dx, o.dy);
   }
 
+  static Offset getDimFromSize(Size s){
+    return new Offset(s.width, s.height);
+  }
+
+
   static bool rectContains(Rectangle rectangle, Offset offset){
     return rectangle.containsPoint(toPoint(offset));
   }

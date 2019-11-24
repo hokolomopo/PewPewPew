@@ -1,14 +1,18 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/background.dart';
+import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
-import 'package:info2051_2018/game/utils.dart';
+import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/world.dart';
+
+import 'camera.dart';
+import 'level.dart';
 
 /// Enum to describe the current state of the game
 enum GameStateMode{char_selection, moving, attacking, cinematic}
@@ -19,18 +23,24 @@ class GameState{
   /// Ratio between the size of a drag event and the length of the resulting jump
   static const double JumpVectorNormalizer = 2;
 
+  ///Speed of the camera when dragging
+  static const double CameraSpeed = 1;
+
   GameStateMode currentState = GameStateMode.char_selection;
 
   List<List<Character>> players = new List();
   World world = new World();
   LevelPainter painter;
   UiManager uiManager;
+  Level level;
+  Camera camera;
 
   int currentPlayer = 0;
   int currentCharacter = 0;
 
   ///GameStateMode.char_selection variables
   TextFader teamTurnText;
+  Offset cameraDragStartLocation;
 
   /// GameStateMode.moving variables
   bool characterJumping;
@@ -39,27 +49,26 @@ class GameState{
   Offset moveDestination;
 
 
-  GameState(int numberOfPlayers, int numberOfCharacters, this.painter){
+  GameState(int numberOfPlayers, int numberOfCharacters, this.painter, this.level, this.camera){
     uiManager = UiManager(painter);
 
-    //TODO load level
-    this.addTerrainBlock(new TerrainBlock(0, 70, 20000, 10));
-    this.addTerrainBlock(new TerrainBlock(150, 0, 10, 20000));
-    this.addTerrainBlock(new TerrainBlock(50, 40, 50, 10));
+
+    level.spawnPoints.shuffle();
+
+    for(TerrainBlock block in level.terrain)
+      this.addTerrainBlock(block);
 
     for(int i = 0;i < numberOfPlayers;i++) {
 
-      List<Character> chars = new List();
+      List<Character> chars = List();
       players.add(chars);
 
       for (int j = 0; j < numberOfCharacters; j++) {
-
-        //TODO how to position characters
-        Character c = new Character(new Offset(30 * (j +0.5*i), 10.0), i);
+        Character c = Character(level.spawnPoints[i * numberOfCharacters + j], i);
         this.addCharacter(i, c);
 
         //Make character jump to apply gravity to them
-        c.jump(new Offset(0,0));
+        c.jump(Offset(0,0));
       }
     }
 
@@ -100,6 +109,10 @@ class GameState{
         if(currentChar.stamina == 0 && !currentChar.isAirborne()) {
           switchState(GameStateMode.attacking);
         }
+
+        //Center the camera on the character
+        this.camera.centerOn(getCurrentCharacter().position);
+
         break;
       case GameStateMode.attacking:
         // TODO: Handle this case.
@@ -139,14 +152,17 @@ class GameState{
   }
 
   void onTap(TapDownDetails details){
-    Offset tapPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
+    Offset tapPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+
+    //Take camera into account
+    Offset tapPositionCamera = tapPosition + camera.position;
 
     print("OnTap : " + tapPosition.toString() + "char hitbox : " + getCurrentCharacter().hitbox.toString());
 
     switch(currentState){
       case GameStateMode.char_selection:
         for(int i = 0;i < players[currentPlayer].length;i++)
-          if(GameUtils.rectContains(players[currentPlayer][i].hitbox, tapPosition)){
+          if(GameUtils.rectContains(players[currentPlayer][i].hitbox, tapPositionCamera)){
             currentCharacter = i;
 
             switchState(GameStateMode.moving);
@@ -157,7 +173,7 @@ class GameState{
         Character currentChar = getCurrentCharacter();
 
         //Touch event on the current character
-        if(GameUtils.rectContains(currentChar.hitbox, tapPosition)){
+        if(GameUtils.rectContains(currentChar.hitbox, tapPositionCamera)){
           if(!currentChar.isAirborne()) {
             currentChar.stopX();
             moveDestination = null;
@@ -166,18 +182,18 @@ class GameState{
         }
 
         //Touch event left of the current character
-        else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPosition)){
+        else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPositionCamera)){
           if(!currentChar.isAirborne()) {
             currentChar.beginWalking(Character.LEFT);
-            this.startMoving(tapPosition);
+            this.startMoving(tapPositionCamera);
           }
         }
 
         //Touch event right of the current character
-        else if(GameUtils.rectRightOf(currentChar.hitbox, tapPosition)){
+        else if(GameUtils.rectRightOf(currentChar.hitbox, tapPositionCamera)){
           if(!currentChar.isAirborne()) {
             currentChar.beginWalking(Character.RIGHT);
-            this.startMoving(tapPosition);
+            this.startMoving(tapPositionCamera);
           }
         }
         break;
@@ -194,33 +210,32 @@ class GameState{
 
   void onPanStart(DragStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+    Offset dragPositionCamera = dragPosition + camera.position;
 
     print("PanStart : " + dragPosition.toString() + "char hitbox : " + currentChar.hitbox.toString());
 
     switch(currentState){
 
       case GameStateMode.char_selection:
-        //TODO move camera
+        this.cameraDragStartLocation = dragPosition;
         break;
 
       case GameStateMode.moving:
 
         //Drag on character. We extend the size of the hitbox due to imprecision
         //for coordinates in drag events
-        if(GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 50), dragPosition)){
+        if(GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 50), dragPositionCamera)){
 
           if(currentChar.isAirborne())
             return;
           currentChar.stop();
 
           characterJumping = true;
-          jumpDragStartPosition = dragPosition;
+          jumpDragStartPosition = dragPositionCamera;
           
           uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         }
-
-        //TODO drag move camera
         break;
 
       case GameStateMode.attacking:
@@ -233,21 +248,20 @@ class GameState{
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+    Offset dragPositionCamera = dragPosition + camera.position;
 
     switch (currentState) {
       case GameStateMode.char_selection:
-      //TODO Move camera.
+        camera.position += (this.cameraDragStartLocation - dragPosition) * CameraSpeed;
+        this.cameraDragStartLocation = dragPosition;
         break;
 
       case GameStateMode.moving:
         if (characterJumping) {
-          // TODO: Draw directional arrow
-          jumpDragEndPosition = dragPosition;
-          uiManager.updateJump(Character.getJumpSpeed((dragPosition - jumpDragStartPosition ) * JumpVectorNormalizer));
+          jumpDragEndPosition = dragPositionCamera;
+          uiManager.updateJump(Character.getJumpSpeed((dragPositionCamera - jumpDragStartPosition ) * JumpVectorNormalizer));
         }
-
-        //TODO : Move camera
         break;
 
       case GameStateMode.attacking:
@@ -285,12 +299,11 @@ class GameState{
 
   void onLongPress(LongPressStartDetails details){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.screenHeight);
+    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
 
     switch(currentState){
 
       case GameStateMode.char_selection:
-        // TODO: select character.
         break;
 
       case GameStateMode.moving:
@@ -344,7 +357,7 @@ class GameState{
 
         uiManager.removeStaminaDrawer();
         this.teamTurnText = uiManager.addText(teamNames[currentPlayer] + " team turn !",
-            TextPositions.center, 50, duration: 3, fadeDuration: 3);
+            TextPositions.center, 50, duration: 3, fadeDuration: 3, ignoreCamera: true);
         break;
       case GameStateMode.moving:
         this.characterJumping = false;

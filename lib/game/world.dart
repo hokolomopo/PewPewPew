@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/terrain.dart';
-import 'package:info2051_2018/game/utils.dart';
+import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
 class World{

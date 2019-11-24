@@ -2,21 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:info2051_2018/draw/background.dart';
-import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/level_painter.dart';
+import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
 
-class GameMain extends StatefulWidget {
-  GameMain({Key key, this.title}) : super(key: key);
+import 'level.dart';
 
-  final String title;
-  static double screenHeight;
+
+class GameMain extends StatefulWidget {
+  GameMain({Key key, this.level}) : super(key: key);
+
+  final String level;
+  static Size size;
 
   @override
-  _GameMainState createState() => new _GameMainState();
+  _GameMainState createState() => new _GameMainState(level);
 }
 
 class _GameMainState extends State<GameMain> {
+
   GameState state;
 
   int _callbackId;
@@ -29,12 +34,16 @@ class _GameMainState extends State<GameMain> {
 
   Duration lastTimeStamp;
 
-  _GameMainState() {
-    this.levelPainter = LevelPainter(showHitBoxes: true);
-    //TODO delete dis
-    levelPainter.addElement(BackgroundDrawer());
+  _GameMainState(String levelName) {
+    //TODO load level
+    Level level = Level();
 
-    state = GameState(2, 2, levelPainter);
+    Camera camera = Camera(Offset(0,0));
+
+    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
+    levelPainter.addElement(BackgroundDrawer(level.size));
+
+    state = GameState(2, 2, levelPainter, level, camera);
 
     _scheduleFrame();
   }
@@ -68,8 +77,7 @@ class _GameMainState extends State<GameMain> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO do things better
-    GameMain.screenHeight = MediaQuery.of(context).size.height;
+    GameMain.size = MediaQuery.of(context).size;
 
     return new Scaffold(
       body: Container(

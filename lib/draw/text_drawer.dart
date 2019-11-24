@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'level.dart';
+import 'level_painter.dart';
 
 enum TextPositions{center, custom}
 
@@ -13,16 +13,18 @@ class TextDrawer extends CustomDrawer {
   TextPositions position;
   Offset customPosition;
   Color color;
+  bool ignoreCamera;
 
   double opacity;
 
   TextDrawer(this.content, this.position, this.fontSize,
       {this.customPosition : const Offset(0,0),
         this.color : Colors.white,
-        this.opacity: 1});
+        this.opacity: 1,
+        this.ignoreCamera = false});
 
   @override
-  void paint(Canvas canvas, Size size, bool showHitBoxes) {
+  void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
     ParagraphBuilder textBuilder = ParagraphBuilder(
         ParagraphStyle(textAlign: TextAlign.center, fontSize: fontSize))
       ..pushStyle(ui.TextStyle(color: this.color.withOpacity(opacity)))
@@ -30,18 +32,25 @@ class TextDrawer extends CustomDrawer {
     Paragraph text = textBuilder.build()
       ..layout(ParagraphConstraints(width: size.width));
 
-    canvas.drawParagraph(text, getPosition(size, text));
+    canvas.drawParagraph(text, getPosition(size, text, cameraPosition));
   }
 
-  Offset getPosition(Size size, Paragraph text){
+  Offset getPosition(Size size, Paragraph text, Offset cameraPosition){
+    Offset ret;
+
     switch(position){
       case TextPositions.center:
-        return Offset((size.width - text.width) / 2,
+        ret =  Offset((size.width - text.width) / 2,
             (size.height - text.height) / 2);
+        break;
       case TextPositions.custom:
-        return this.customPosition;
+        ret =  this.customPosition;
+        break;
     }
 
-    return this.customPosition;
+    if(ignoreCamera)
+      ret = this.cancelCamera(ret, cameraPosition);
+
+    return ret;
   }
 }

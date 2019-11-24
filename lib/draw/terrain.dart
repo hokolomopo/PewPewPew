@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/game/utils.dart';
+import 'package:info2051_2018/game/util/utils.dart';
 import 'dart:math';
 
 import 'paint_constants.dart';
 import 'math.dart';
-import 'level.dart';
+import 'level_painter.dart';
 import 'package:info2051_2018/game/terrain.dart';
 
 /// Represents the terrain (the ground) of the game.
@@ -105,7 +105,7 @@ class TerrainBlockDrawer extends CustomDrawer {
   }*/
 
   @override
-  void paint(Canvas canvas, Size size, showHitBoxes) {
+  void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
     // Remember the block sizes are taken in percentage of the screen size,
     // for more robustness.
     double left =

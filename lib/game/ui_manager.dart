@@ -1,6 +1,6 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:info2051_2018/draw/level.dart';
+import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
@@ -41,8 +41,9 @@ class UiManager{
   TextFader addText(String s, TextPositions position, double fontSize,
       {Offset customPosition : const Offset(0, 0),
         double duration,
-        double fadeDuration = 0}){
-    TextDrawer textDrawer = new TextDrawer(s, position, fontSize);
+        double fadeDuration = 0,
+        bool ignoreCamera: false}){
+    TextDrawer textDrawer = new TextDrawer(s, position, fontSize, ignoreCamera: ignoreCamera);
     painter.addElement(textDrawer);
 
     TextFader fader = TextFader(textDrawer, lifetime: duration, fadeTime: fadeDuration);
