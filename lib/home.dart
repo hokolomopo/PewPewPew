@@ -1,5 +1,5 @@
-//import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'shop.dart';
@@ -12,14 +12,38 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  //final audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
+  SoundPlayer soundPlayer = SoundPlayer();
+
+  // Boolean because context build when initiating game and call previous audio track
+  var ifMenuContext = true;
+
+// Function for child to stop menu music
+  void _stopMusic() {
+    //soundPlayer.release();
+    soundPlayer.playLocalMusic("assets/sounds/menu/sample2.mp3", 'sample2.mp3');
+    ifMenuContext = false;
+//    setState(() {
+//
+//    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this
+        .soundPlayer
+        .playLocalMusic("assets/sounds/menu/sample.mp3", 'sample.mp3');
+  }
 
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
 
-    //audioPlayer.setReleaseMode(ReleaseMode.LOOP);
-    //audioPlayer.play("assets/sounds/menu/sample.mp3", isLocal: true, );
+    // Play music in background (loop)
+//    if (ifMenuContext)
+//    this.soundPlayer.playLocalMusic("assets/sounds/menu/sample.mp3", 'sample.mp3');
+//    else
+//      ifMenuContext = true;
 
     // logo widget
     Widget logo() {
@@ -93,45 +117,6 @@ class _HomeState extends State<Home> {
           function();
         },
       );
-    }
-
-    Widget _buttonOutline(
-        String text,
-        Color textColor,
-        Color bordersColor,
-        Color highlightColor,
-        Color fillColor,
-        Color splashColor,
-        num borderRadius,
-        void function()) {
-      return OutlineButton(
-        highlightedBorderColor: Colors.white,
-        borderSide: BorderSide(color: bordersColor, width: 2.0),
-        highlightElevation: 10.0,
-        splashColor: splashColor,
-        highlightColor: highlightColor,
-        color: fillColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(borderRadius),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-              height: 1.7,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-              fontSize: 20.0),
-        ),
-        onPressed: () {
-          function();
-        },
-      );
-    }
-
-    //login and register fuctions
-
-    void testFunction() {
-      ;
     }
 
     void _tutorialConfirm(String title, String mess, String neg, String pos) {
@@ -237,7 +222,9 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                         ),
-                        Parameters()
+                        Parameters(
+                          parentAction: _stopMusic,
+                        )
                       ],
                     ),
                   ),
@@ -273,10 +260,7 @@ class _HomeState extends State<Home> {
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
           decoration: BoxDecoration(color: Theme.of(context).canvasColor),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(40.0),
-                topRight: Radius.circular(40.0)),
+          child: ClipRect(
             child: Container(
               child: Column(
                 children: <Widget>[
@@ -322,7 +306,7 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              height: MediaQuery.of(context).size.height / 1.1,
+              height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               color: Colors.white,
             ),
