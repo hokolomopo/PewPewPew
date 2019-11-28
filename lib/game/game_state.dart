@@ -52,7 +52,6 @@ class GameState{
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter, this.level, this.camera){
     uiManager = UiManager(painter);
 
-
     level.spawnPoints.shuffle();
 
     for(TerrainBlock block in level.terrain)

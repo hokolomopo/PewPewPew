@@ -6,6 +6,7 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
+import 'package:info2051_2018/game/terrain.dart';
 
 import 'level.dart';
 
@@ -35,8 +36,14 @@ class _GameMainState extends State<GameMain> {
   Duration lastTimeStamp;
 
   _GameMainState(String levelName) {
-    //TODO load level
+    //TODO delete dis and load level
     Level level = Level();
+    level.size = Size(400, 150);
+    level.addTerrain(new TerrainBlock(-100, 70, 20000, 10));
+    level.addTerrain(new TerrainBlock(150, 0, 10, 20000));
+    level.addTerrain(new TerrainBlock(50, 40, 50, 10));
+    for(int i = 0;i < 16;i++)
+      level.spawnPoints.add(Offset(15.0*i, 10));
 
     Camera camera = Camera(Offset(0,0));
 
