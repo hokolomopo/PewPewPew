@@ -1,8 +1,28 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // json codec
+import 'package:info2051_2018/game/sound_player.dart';
 
 import 'game/game_main.dart';
 
+class Terrain {
+  final String name;
+  final String imgName;
+
+  Terrain({this.name, this.imgName});
+
+  factory Terrain.fromJson(Map<String, dynamic> json) {
+    return new Terrain(
+      name: json['name'] as String,
+      imgName: json['imgName'] as String,
+    );
+  }
+}
+
 class Parameters extends StatefulWidget {
+  final void Function() parentAction;
+
+  const Parameters({Key key, this.parentAction}) : super(key: key);
+
   @override
   ParametersState createState() {
     return new ParametersState();
@@ -10,9 +30,9 @@ class Parameters extends StatefulWidget {
 }
 
 class ParametersState extends State<Parameters> {
-  var _nbPlayer = 0; // nb of player in game
-  var _nbWorms = 0; // nb of Worms per team
-  var _map = 0; // identification of the selected map to instantiate
+  int _nbPlayer = 0; // nb of player in game
+  int _nbWorms = 0; // nb of Worms per team
+  String _terrain = ""; // identification of the selected map to instantiate
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +49,82 @@ class ParametersState extends State<Parameters> {
     setState(() {
       _nbWorms = value;
     });
+  }
+
+  void _handleTerrain(String value) {
+    setState(() {
+      _terrain = value;
+    });
+  }
+
+  List<Terrain> parseJson(String response) {
+    if (response == "null") {
+      // If the future reading operation is not done yet (connection waiting with initial data)
+      return [];
+    }
+    final parsed =
+        json.decode(response.toString()).cast<Map<String, dynamic>>();
+    return parsed.map<Terrain>((json) => new Terrain.fromJson(json)).toList();
+  }
+
+  // Function to retrieve info on terrain in order
+  // to pass it to the future builder
+  Future<List<Terrain>> getTerrainInfo() async {
+    var tmp = await DefaultAssetBundle.of(context)
+        .loadString('assets/data/quickplay/terrains.json');
+
+    return parseJson(tmp.toString());
+  }
+
+  Widget customTerrainRadioList(List<Terrain> terrains) {
+    return SingleChildScrollView(
+      physics: AlwaysScrollableScrollPhysics(),
+      child: Container(
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          itemCount: terrains == null ? 0 : terrains.length,
+          itemBuilder: (context, index) {
+            return customTerrainRadio(terrains[index]);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget customTerrainRadio(Terrain terrain) {
+    if (terrain.name == _terrain)
+      return Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.red, width: 3.0),
+            image: DecorationImage(
+              image:
+                  AssetImage('assets/graphics/backgrounds/' + terrain.imgName),
+              fit: BoxFit.fill,
+            )),
+        child: InkWell(
+          onTap: () {
+            _handleTerrain(terrain.name);
+          },
+        ),
+      );
+    else
+      return Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+          image: AssetImage('assets/graphics/backgrounds/' + terrain.imgName),
+          fit: BoxFit.fill,
+        )),
+        child: InkWell(
+          onTap: () {
+            _handleTerrain(terrain.name);
+          },
+        ),
+      );
   }
 
   Widget _parameter(BuildContext context) {
@@ -133,14 +229,19 @@ class ParametersState extends State<Parameters> {
         SizedBox(
           height: 20.0,
         ),
-        Row(
-          children: <Widget>[
-            Expanded(
-                child: Text( // Place for horizontal list for stage template
-              " ",
-              style: TextStyle(fontSize: 60),
-            ))
-          ],
+        Container(
+          height: 200,
+          width: MediaQuery.of(context).size.width,
+          child: FutureBuilder(
+            future: getTerrainInfo(),
+            builder: (context, snapshot) {
+              return (snapshot.data != null)
+                  ? customTerrainRadioList(snapshot.data)
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    );
+            },
+          ),
         ),
         Padding(
           padding: EdgeInsets.only(
@@ -166,6 +267,10 @@ class ParametersState extends State<Parameters> {
                         fontSize: 20.0)),
               ),
               onPressed: () {
+                widget.parentAction();
+                //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
+                //ap.pause();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => GameMain()),

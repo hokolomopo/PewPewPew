@@ -23,6 +23,12 @@ dependencies:
   # Package for storing non-critical data in an asynchronous way
   shared_preferences: ^0.5.4
 
+  # Package to play audio files
+  audioplayers: ^0.13.2
+
+  # Package changing text size to fit parent bounds
+  auto_size_text: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -88,5 +94,7 @@ flutter:
   assets:
     - assets/graphics/shop/
     - assets/data/shop/items.json
+    - assets/data/quickplay/terrains.json
     - assets/graphics/backgrounds/
     - assets/graphics/characters/
+    - assets/sounds/menu/
