@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/game/sound_player.dart';
@@ -110,6 +111,24 @@ class ParametersState extends State<Parameters> {
           onTap: () {
             _handleTerrain(terrain.name);
           },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: AutoSizeText(
+                      terrain.name,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       );
     else
@@ -125,6 +144,24 @@ class ParametersState extends State<Parameters> {
           onTap: () {
             _handleTerrain(terrain.name);
           },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: AutoSizeText(
+                      terrain.name,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       );
   }
@@ -249,6 +286,7 @@ class ParametersState extends State<Parameters> {
           padding: EdgeInsets.only(
               left: 20.0,
               right: 20.0,
+              top: 10.0,
               bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
             child: RaisedButton(
