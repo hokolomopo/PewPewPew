@@ -27,6 +27,13 @@ class World{
         moveEntity(c, timeElapsed);
       }
     }
+
+    for(Projectile p in projectiles){
+      // TODO different behavior for each projectile
+      p.addAcceleration(gravity);
+      p.accelerate();
+      moveEntity(p, timeElapsed);
+    }
   }
 
   void moveEntity(MovingEntity entity, double timeElapsed){

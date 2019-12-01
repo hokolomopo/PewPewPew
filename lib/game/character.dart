@@ -33,6 +33,8 @@ class Character extends MovingEntity {
 
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.drawer = new CharacterDrawer(asset, this);
+    // TODO Initiate "correctly" arsenal
+    this.currentArsenal = new Arsenal([Fist(), Colt()]);
 
   }
 

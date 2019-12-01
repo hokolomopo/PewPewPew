@@ -88,7 +88,7 @@ class _GameMainState extends State<GameMain> {
     return new Scaffold(
       body: Container(
           child :GestureDetector(
-              onTapDown: (details) {
+              onTapUp: (details) {
                 state.onTap(details);
               },
               onPanStart: (details) {
@@ -100,8 +100,10 @@ class _GameMainState extends State<GameMain> {
               onPanEnd: (details) {
                 state.onPanEnd(details);
               },
-              onLongPressStart: (details) {
-                state.onLongPress(details);
+              // Do not need details
+              // onLongPressStart isn't triggered
+              onLongPress: () {
+                state.onLongPress();
               },
               child: levelPainter.level
           )

@@ -97,4 +97,6 @@ flutter:
     - assets/data/quickplay/terrains.json
     - assets/graphics/backgrounds/
     - assets/graphics/characters/
+    - assets/graphics/arsenal/projectiles/
+    - assets/graphics/arsenal/weapons/
     - assets/sounds/menu/
