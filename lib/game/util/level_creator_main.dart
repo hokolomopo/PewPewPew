@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
-import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
+import 'dart:convert';
 
 import '../level.dart';
 import '../terrain.dart';
@@ -65,15 +67,15 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
   Level level;
   Camera camera;
 
-  List<TerrainBlock> blocks = List();
+  //List<TerrainBlock> blocks = List();
 
   _LevelCreatorState(){
     level = Level();
-    level.size = Size(400, 150);
+    level.size = Size(600, 200);
 
     camera = Camera(Offset(0,0));
     //camera.zoom = Offset(100 / level.size.width, 100 / level.size.height / (16 / 9));
-    camera.zoom = Offset(0.4,0.4);
+    camera.zoom = Offset(0.3,0.3);
 
     this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: false);
     levelPainter.addElement(BackgroundDrawer(level.size));
@@ -84,28 +86,42 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
   }
 
   Widget initThings(){
-    for(TerrainBlock block in blocks)
+    for(TerrainBlock block in level.terrain)
       levelPainter.removeElement(block.drawer);
 
-    blocks.removeRange(0, blocks.length);
+    level.terrain.removeRange(0, level.terrain.length);
 
     createLevel();
 
-    for(TerrainBlock block in blocks)
+    for(TerrainBlock block in level.terrain)
       levelPainter.addElement(block.drawer);
 
     return levelPainter.level;
   }
 
   void createLevel(){
-    blocks.add(new TerrainBlock(-100, 70, 20000, 10));
-    blocks.add(new TerrainBlock(150, 0, 10, 20000));
-    blocks.add(new TerrainBlock(50, 40, 50, 10));
+    // Create terrain in cartesian coordinates (y from bot to top)
+    level.terrain.add(new TerrainBlock(100, 90, 50, 90));
+    level.terrain.add(new TerrainBlock(150, 65, 100, 65));
+    level.terrain.add(new TerrainBlock(250, 50, 100, 50));
+    level.terrain.add(new TerrainBlock(350, 65, 100, 65));
+    level.terrain.add(new TerrainBlock(450, 90, 50, 90));
+
+    level.terrain.add(new TerrainBlock(175, 115, 60, 10));
+    level.terrain.add(new TerrainBlock(250, 135, 100, 10));
+    level.terrain.add(new TerrainBlock(365, 115, 60, 10));
+    level.terrain.add(new TerrainBlock(270, 90, 60, 10));
+
+
+    // Invert Y axis
+    for(TerrainBlock block in level.terrain)
+      block.hitBox = Rectangle(block.hitBox.left, level.size.height - block.hitBox.top,
+          block.hitBox.width, block.hitBox.height);
   }
 
   void createSpawns(){
     for(int i = 0;i < 16;i++)
-      level.spawnPoints.add(Offset(15.0*i, 10));
+      level.spawnPoints.add(Offset(15.0*i + 100, 10));
   }
 
   @override
@@ -114,7 +130,15 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
       body: Container(
           child :GestureDetector(
               onLongPress: () {
-                print("LongPress");
+                JsonEncoder encoder = new JsonEncoder.withIndent('  ');
+                String prettyPrint = encoder.convert(level);
+
+                Map jsonMap = jsonDecode(prettyPrint);
+                Level plz = Level.fromJson(jsonMap);
+
+                prettyPrint = jsonEncode(plz);
+                print(prettyPrint);
+
               },
               child: initThings()
           )

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +23,12 @@ class GameMain extends StatefulWidget {
   _GameMainState createState() => new _GameMainState(level);
 }
 
-class _GameMainState extends State<GameMain> {
 
+
+class _GameMainState extends State<GameMain> {
+  //TODO delete dis, put it in a file and read it
+  String levelJson =
+  '{"terrain":[{"hitBox":{"x":100.0,"y":110.0,"h":90.0,"w":50.0}},{"hitBox":{"x":150.0,"y":135.0,"h":65.0,"w":100.0}},{"hitBox":{"x":250.0,"y":150.0,"h":50.0,"w":100.0}},{"hitBox":{"x":350.0,"y":135.0,"h":65.0,"w":100.0}},{"hitBox":{"x":450.0,"y":110.0,"h":90.0,"w":50.0}},{"hitBox":{"x":175.0,"y":85.0,"h":10.0,"w":60.0}},{"hitBox":{"x":250.0,"y":65.0,"h":10.0,"w":100.0}},{"hitBox":{"x":365.0,"y":85.0,"h":10.0,"w":60.0}},{"hitBox":{"x":270.0,"y":110.0,"h":10.0,"w":60.0}}],"sizeX":600.0,"sizeY":200.0,"spawnPoints":[{"dx":280.0,"dy":10.0},{"dx":130.0,"dy":10.0},{"dx":235.0,"dy":10.0},{"dx":265.0,"dy":10.0},{"dx":160.0,"dy":10.0},{"dx":175.0,"dy":10.0},{"dx":145.0,"dy":10.0},{"dx":250.0,"dy":10.0},{"dx":100.0,"dy":10.0},{"dx":310.0,"dy":10.0},{"dx":115.0,"dy":10.0},{"dx":220.0,"dy":10.0},{"dx":325.0,"dy":10.0},{"dx":205.0,"dy":10.0},{"dx":190.0,"dy":10.0},{"dx":295.0,"dy":10.0}]}';
   GameState state;
 
   int _callbackId;
@@ -36,14 +42,7 @@ class _GameMainState extends State<GameMain> {
   Duration lastTimeStamp;
 
   _GameMainState(String levelName) {
-    //TODO delete dis and load level
-    Level level = Level();
-    level.size = Size(400, 150);
-    level.addTerrain(new TerrainBlock(-100, 70, 20000, 10));
-    level.addTerrain(new TerrainBlock(150, 0, 10, 20000));
-    level.addTerrain(new TerrainBlock(50, 40, 50, 10));
-    for(int i = 0;i < 16;i++)
-      level.spawnPoints.add(Offset(15.0*i, 10));
+    Level level = Level.fromJson(jsonDecode(levelJson));
 
     Camera camera = Camera(Offset(0,0));
 

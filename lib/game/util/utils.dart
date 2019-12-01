@@ -50,5 +50,4 @@ class GameUtils{
   static Offset getRectangleCenter(Rectangle r){
     return Offset(r.left + r.width / 2, r.top + r.height / 2);
   }
-
 }

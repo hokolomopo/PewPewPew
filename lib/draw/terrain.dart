@@ -117,14 +117,21 @@ class TerrainBlockDrawer extends CustomDrawer {
     double height = GameUtils.relativeToAbsoluteDist(
         terrainBlock.hitBox.height, size.height);
 
+//    Rect toDraw = Rect.fromLTWH(
+//        left,
+//        top,
+//        // [canvas.drawRect] does not like [double.infinity] while stroking.
+//        // As we don't know the size before painting, we can only truncate those
+//        // infinities here.
+//        min(width, size.width - left),
+//        min(height, size.height - top));
+
     Rect toDraw = Rect.fromLTWH(
         left,
         top,
-        // [canvas.drawRect] does not like [double.infinity] while stroking.
-        // As we don't know the size before painting, we can only truncate those
-        // infinities here.
-        min(width, size.width - left),
-        min(height, size.height - top));
+        width,
+        height);
+
 
     canvas.drawRect(toDraw, terrainFillPaint);
     if (terrainBlock.withStroke) {
