@@ -80,6 +80,8 @@ class ParametersState extends State<Parameters> {
     return SingleChildScrollView(
       physics: AlwaysScrollableScrollPhysics(),
       child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 200.0,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,

@@ -1,7 +1,7 @@
 [
   {
     "name": "Tutorial",
-    "imgName": "default_backgrounds.png"
+    "imgName": "default_background.png"
   },
   {
     "name": "Map1",
@@ -9,6 +9,6 @@
   },
   {
     "name": "Map2",
-    "imgName": "default_backgrounds.png"
+    "imgName": "default_background.png"
   }
 ]
