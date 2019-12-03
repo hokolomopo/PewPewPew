@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // json codec
@@ -8,13 +10,15 @@ import 'game/game_main.dart';
 class Terrain {
   final String name;
   final String imgName;
+  String levelObject;
 
-  Terrain({this.name, this.imgName});
+  Terrain({this.name, this.imgName, this.levelObject});
 
   factory Terrain.fromJson(Map<String, dynamic> json) {
     return new Terrain(
       name: json['name'] as String,
       imgName: json['imgName'] as String,
+      levelObject: json['levelObject'] as String,
     );
   }
 }
@@ -33,7 +37,7 @@ class Parameters extends StatefulWidget {
 class ParametersState extends State<Parameters> {
   int _nbPlayer = 0; // nb of player in game
   int _nbWorms = 0; // nb of Worms per team
-  String _terrain = ""; // identification of the selected map to instantiate
+  Terrain _terrain; // identification of the selected map to instantiate
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,8 @@ class ParametersState extends State<Parameters> {
     });
   }
 
-  void _handleTerrain(String value) {
+
+  void _handleTerrain(Terrain value) {
     setState(() {
       _terrain = value;
     });
@@ -96,7 +101,7 @@ class ParametersState extends State<Parameters> {
   }
 
   Widget customTerrainRadio(Terrain terrain) {
-    if (terrain.name == _terrain)
+    if (_terrain != null && terrain.name == _terrain.name)
       return Container(
         width: 200,
         height: 200,
@@ -109,7 +114,7 @@ class ParametersState extends State<Parameters> {
             )),
         child: InkWell(
           onTap: () {
-            _handleTerrain(terrain.name);
+            _handleTerrain(terrain);
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +147,7 @@ class ParametersState extends State<Parameters> {
         )),
         child: InkWell(
           onTap: () {
-            _handleTerrain(terrain.name);
+            _handleTerrain(terrain);
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +318,7 @@ class ParametersState extends State<Parameters> {
 
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GameMain()),
+                  MaterialPageRoute(builder: (context) => GameMain(level:_terrain.levelObject)),
                 );
               },
             ),

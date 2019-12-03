@@ -105,7 +105,6 @@ class World{
 
   /// Return the closest terrain that is under or that contains the given point
   TerrainBlock getClosestTerrainUnder(Offset o){
-    List<double> distances = List();
     TerrainBlock minBlock;
     double minDist;
 
@@ -123,6 +122,7 @@ class World{
         double dist = (block.hitBox.top - o.dy).abs();
         if(minDist == null || dist < minDist)
           minBlock = block;
+          minDist = dist;
       }
 
     }

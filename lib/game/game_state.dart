@@ -330,7 +330,7 @@ class GameState{
     Offset markerPosition = destination;
 
     TerrainBlock closest = world.getClosestTerrainUnder(destination);
-    if(closest != null)
+    if(closest != null && camera.isDisplayed(closest.hitBox))
       markerPosition = Offset(destination.dx, closest.hitBox.top);
 
 
