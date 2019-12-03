@@ -7,6 +7,8 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
+// TODO Remove and Merge this with Draw Character File
+
 class ProjectileDrawer extends CustomDrawer{
   Uint8List projectileImgBytes;
   Image projectileImg;
