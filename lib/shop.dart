@@ -100,6 +100,7 @@ class CustomListItem extends StatelessWidget {
       this.damage,
       this.radius,
       this.knockback,
+        this.onTapListener,
       this.onTap,
       this.colors})
       : super(key: key);
@@ -110,11 +111,14 @@ class CustomListItem extends StatelessWidget {
   final String damage;
   final String radius;
   final String knockback;
-  final void Function() onTap;
+  final bool onTapListener;
+  void Function() onTap;
   final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
+    if(!onTapListener)
+      onTap = (){};
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -342,6 +346,7 @@ class ShopListState extends State<ShopList> {
                         itemBuilder: (context, index) {
                           String price;
                           List<Color> colors;
+                          bool onTapListener = false;
 
                           // Item already sold
                           if (prefs.containsKey(items[index].name)){
@@ -359,6 +364,7 @@ class ShopListState extends State<ShopList> {
                           else{
                             price = items[index].price.toString() + "\$";
                             colors = [Colors.green[800], Colors.green[600], Colors.green[500], Colors.green[300]];
+                            onTapListener = true;
                           }
                             return CustomListItem(
                               sprite: Image(
@@ -370,6 +376,7 @@ class ShopListState extends State<ShopList> {
                               radius: "radius",
                               knockback: "knockback",
                               colors: colors,
+                              onTapListener: onTapListener,
                               onTap: () {
                                 _confirmBox(
                                   "Buy Item?",
