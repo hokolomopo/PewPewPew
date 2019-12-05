@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/Projectile.dart';
 import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
@@ -17,7 +18,7 @@ import 'camera.dart';
 import 'level.dart';
 
 /// Enum to describe the current state of the game
-enum GameStateMode{char_selection, moving, attacking, cinematic}
+enum GameStateMode{char_selection, moving, attacking, projectile, cinematic}
 
 class GameState{
   static const List<String> teamNames = ["Red", "Blue", "Green", "Orange"];
@@ -58,6 +59,10 @@ class GameState{
   Offset launchDragStartPosition;
   Offset launchDragEndPosition;
   Weapon currentWeapon;
+
+  /// GameStateMode.projectile variables
+  Stopwatch stopWatch = Stopwatch();
+
 
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter, this.level, this.camera){
@@ -128,6 +133,36 @@ class GameState{
         // TODO: Handle this case.
         // <JL> commenter pour travailler sur la phase attack
         //switchState(GameStateMode.char_selection);
+
+        break;
+      case GameStateMode.projectile:
+
+        // center camera on projectile
+        this.camera.centerOn(currentWeapon.projectile.position);
+
+        // Stop stopWatch if non detonating projectile
+        if(currentWeapon.detonationTime == -1) {
+          if (stopWatch.isRunning) {
+            stopWatch.stop();
+            stopWatch.reset();
+          }
+
+          break;
+
+        }
+
+        // Time to detonate projectile
+        if(stopWatch.elapsedMilliseconds > currentWeapon.detonationTime){
+          stopWatch.stop();
+          stopWatch.reset();
+
+          currentWeapon.applyImpact(currentWeapon.projectile, players);
+          this.removeProjectile(currentWeapon.projectile);
+          currentWeapon=null;
+
+          switchState(GameStateMode.char_selection);
+        }
+
 
         break;
       case GameStateMode.cinematic:
@@ -226,6 +261,8 @@ class GameState{
       switchState(GameStateMode.moving);
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -269,6 +306,8 @@ class GameState{
           uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -294,9 +333,12 @@ class GameState{
       case GameStateMode.attacking:
       // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        uiManager.updateJump(currentWeapon.projectile.getLaunchSpeed((dragPositionCamera - launchDragStartPosition ) * LaunchVectorNormalizer));
+        Offset tmp = currentWeapon.projectile.getLaunchSpeed((dragPositionCamera - launchDragStartPosition ) * LaunchVectorNormalizer);
+        uiManager.updateJump(tmp);
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -321,10 +363,16 @@ class GameState{
         // TODO: Handle this case.
         // J.L
 
+        this.addProjectile(currentWeapon.projectile);
         currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) * LaunchVectorNormalizer);
         uiManager.endJump();
+        switchState(GameStateMode.projectile);
+        stopWatch.start();
         break;
 
+
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -353,8 +401,10 @@ class GameState{
           currentWeapon = currentChar.currentArsenal.actualSelection;
           Offset pos = currentChar.position;
           Offset hit = Offset(5,5);
-          Boulet boulet = new Boulet(pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy), new Offset(0, 0), 5.0, 15);
+          Boulet boulet = new Boulet(pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy), new Offset(0, 0), 5.0, 15, 3000);
+
           currentWeapon.projectile = boulet;
+
           switchState(GameStateMode.attacking);
 
           // add weapon to be draw in a neutral position aligned with char
@@ -365,6 +415,8 @@ class GameState{
         break;
 
       case GameStateMode.attacking:
+        break;
+      case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
         break;
@@ -407,7 +459,6 @@ class GameState{
         break;
       case GameStateMode.moving:
         this.characterJumping = false;
-        this.ammoLaunching = false;
         this.jumpDragStartPosition = null;
         this.jumpDragEndPosition = null;
 
@@ -415,6 +466,8 @@ class GameState{
         uiManager.addStaminaDrawer(getCurrentCharacter());
         break;
       case GameStateMode.attacking:
+        break;
+      case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
         break;
@@ -432,6 +485,8 @@ class GameState{
         getCurrentCharacter().stop();
         break;
       case GameStateMode.attacking:
+        break;
+      case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
         break;

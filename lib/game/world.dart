@@ -63,6 +63,12 @@ class World{
         //not on it. This is nto a real landing, it is due to the physics engine.
         if(vector.dy > gravity.dy && entity is Character)
           entity.land();
+
+        // For Projectiles, simulate a friction force proportional to their
+        // friction factor. The highest it is, the highest the friction will be.
+        if(vector.dy > gravity.dy && entity is Projectile){
+          entity.applyFriction();
+        }
       }
     }
   }

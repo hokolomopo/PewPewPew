@@ -106,4 +106,12 @@ class Character extends MovingEntity {
     return teamColors[team];
   }
 
+  void removeHp(int damage){
+    this.hp -= damage;
+
+    // TODO Handle death
+    if (this.hp < 0)
+      this.hp = 0;
+  }
+
 }
