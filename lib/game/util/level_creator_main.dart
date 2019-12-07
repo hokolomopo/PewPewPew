@@ -137,6 +137,7 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
                 Level plz = Level.fromJson(jsonMap);
 
                 prettyPrint = jsonEncode(plz);
+
                 print(prettyPrint);
 
               },

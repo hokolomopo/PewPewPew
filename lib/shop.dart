@@ -100,7 +100,8 @@ class CustomListItem extends StatelessWidget {
       this.damage,
       this.radius,
       this.knockback,
-      this.fct,
+        this.onTapListener,
+      this.onTap,
       this.colors})
       : super(key: key);
 
@@ -110,52 +111,81 @@ class CustomListItem extends StatelessWidget {
   final String damage;
   final String radius;
   final String knockback;
-  final void Function() fct;
+  final bool onTapListener;
+  void Function() onTap;
   final List<Color> colors;
 
   @override
   Widget build(BuildContext context) {
+    if(!onTapListener)
+      onTap = (){};
     return InkWell(
+      onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
         child: SizedBox(
           height: 150,
-          child: Container(
-            decoration: BoxDecoration(
-                gradient: RadialGradient(
-                    center: Alignment(0.6, 0.0),
-                    radius: 3,
-                    stops: [0.0, 0.5, 0.7, 1.0],
-                    colors: colors)),
-            child: FractionallySizedBox(
-              heightFactor: 0.9,
-              widthFactor: 0.9,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1.0,
-                    child: sprite,
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  side: BorderSide(
+                    width: 9.0,
+                    color: Colors.blue[800],
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20.0, 8.0, 0.0, 0.0),
-                      child: WeaponDescription(
-                        name: name,
-                        price: price,
-                        damage: damage,
-                        radius: radius,
-                        knockback: knockback,
-                      ),
-                    ),
-                  )
-                ],
               ),
+//              gradient: RadialGradient(
+//                  center: Alignment(0.6, 0.0),
+//                  radius: 3,
+//                  stops: [0.0, 0.5, 0.7, 1.0],
+//                  colors: colors)
+              color: Colors.blue,
+              shadows:  [BoxShadow(
+                color: Colors.grey.withOpacity(0.6),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 7), // changes position of shadow
+              )],
             ),
+            child: DecoratedBox(
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  side: BorderSide(
+                    width: 7.0,
+                    color: Colors.white,
+                  ),
+                )
+              ),
+              child: FractionallySizedBox(
+                heightFactor: 0.8,
+                widthFactor: 0.9,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    AspectRatio(
+                      aspectRatio: 1.0,
+                      child: sprite,
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20.0, 8.0, 0.0, 0.0),
+                        child: WeaponDescription(
+                          name: name,
+                          price: price,
+                          damage: damage,
+                          radius: radius,
+                          knockback: knockback,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
           ),
         ),
       ),
-      onTap: fct,
     );
   }
 }
@@ -165,7 +195,7 @@ class ShopList extends StatefulWidget {
   final List<Item> items;
 
   // To track sold items
-  SharedPreferences prefs;
+  final SharedPreferences prefs;
 
   ShopList({Key key, this.items, this.prefs}) : super(key: key);
 
@@ -198,7 +228,7 @@ class ShopListState extends State<ShopList> {
     return _shopList(context);
   }
 
-  void _reducePortofolio(int price, String item) async {
+  void _reducePortfolio(int price, String item) async {
     this._money -= price;
     await this.prefs.setInt("money", this._money);
     // Mark the item as SOLD
@@ -260,169 +290,117 @@ class ShopListState extends State<ShopList> {
   }
 
   Widget _shopList(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(bottom: 20.0, top: 20.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                "Avalable Cash Asset: " + _money.toString() + "\$",
-                style: TextStyle(color: Colors.green),
-              )
-            ],
-          ),
-        ),
-        AutoSizeText(
-          "Sort by",
-          style: TextStyle(color: Colors.deepPurpleAccent),
-        ),
-        Padding(
-          padding: EdgeInsets.only(bottom: 10.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width / 1.1,
-            decoration: BoxDecoration(
-              color: Colors.deepPurpleAccent,
-              borderRadius: new BorderRadius.circular(20.0),
+    return Container(
+        color: Colors.lightBlue[100],
+        child :Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(bottom: 20.0, top: 20.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Avalable Cash Asset: " + _money.toString() + "\$",
+                    style: TextStyle(color: Colors.green),
+                  )
+                ],
+              ),
             ),
-            child: Center(
-              child: Column(children: <Widget>[
-                ButtonBar(
-                  alignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    _buttonOutline("Name", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByName),
-                    _buttonOutline("\$", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByPrice),
-                  ],
+            AutoSizeText(
+              "Sort by",
+              style: TextStyle(color: Colors.deepPurpleAccent),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 10.0),
+              child: Container(
+                width: MediaQuery.of(context).size.width / 1.1,
+                decoration: BoxDecoration(
+                  color: Colors.deepPurpleAccent,
+                  borderRadius: new BorderRadius.circular(20.0),
                 ),
-              ]),
+                child: Center(
+                  child: Column(children: <Widget>[
+                    ButtonBar(
+                      alignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        _buttonOutline("Name", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByName),
+                        _buttonOutline("\$", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByPrice),
+                      ],
+                    ),
+                  ]),
+                ),
+              ),
             ),
-          ),
-        ),
-        Expanded(
-            child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  child: ListView.builder(
-                    // Because already in scrollable body
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    // Because of column
-                    primary: false,
-                    itemCount: items == null ? 0 : items.length,
-                    itemBuilder: (context, index) {
-                      if (prefs.containsKey(items[index].name)) {
-                        return CustomListItem(
-                          sprite: Image(
-                              image: AssetImage('assets/graphics/shop/' +
-                                  items[index].imgName)),
-                          name: items[index].name,
-                          price: "SOLD",
-                          damage: "damage",
-                          radius: "radius",
-                          knockback: "knockback",
-                          colors: [
-                            Colors.blue[800],
-                            Colors.blue[600],
-                            Colors.blue[500],
-                            Colors.blue[300]
-                          ],
-                          fct: () {
-                            _confirmBox(
-                              "Buy Item?",
-                              "Do you want to buy \"" +
-                                  items[index].name +
-                                  "\" for " +
-                                  items[index].price.toString() +
-                                  "\$?",
-                              "No",
-                              "Get Poorer",
-                              context,
-                                  () {
-                                _reducePortofolio(
-                                    items[index].price, items[index].name);
-                                Navigator.of(context).pop();
+            Expanded(
+                child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Container(
+                      child: ListView.builder(
+                        // Because already in scrollable body
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        // Because of column
+                        primary: false,
+                        itemCount: items == null ? 0 : items.length,
+                        itemBuilder: (context, index) {
+                          String price;
+                          List<Color> colors;
+                          bool onTapListener = false;
+
+                          // Item already sold
+                          if (prefs.containsKey(items[index].name)){
+                            price = "SOLD";
+                            colors = [Colors.blue[800], Colors.blue[600], Colors.blue[500], Colors.blue[300]];
+                          }
+
+                          // Not enough money
+                          else if(items[index].price > _money){
+                            price = items[index].price.toString() + "\$";
+                            colors = [Colors.red[800], Colors.red[600], Colors.red[500], Colors.red[300]];
+                          }
+
+                          // Can buy
+                          else{
+                            price = items[index].price.toString() + "\$";
+                            colors = [Colors.green[800], Colors.green[600], Colors.green[500], Colors.green[300]];
+                            onTapListener = true;
+                          }
+                            return CustomListItem(
+                              sprite: Image(
+                                  image: AssetImage('assets/graphics/shop/' +
+                                      items[index].imgName)),
+                              name: items[index].name,
+                              price: price,
+                              damage: "damage",
+                              radius: "radius",
+                              knockback: "knockback",
+                              colors: colors,
+                              onTapListener: onTapListener,
+                              onTap: () {
+                                _confirmBox(
+                                  "Buy Item?",
+                                  "Do you want to buy \"" +
+                                      items[index].name +
+                                      "\" for " +
+                                      items[index].price.toString() +
+                                      "\$?",
+                                  "No",
+                                  "Get Poorer",
+                                  context,
+                                      () {
+                                    _reducePortfolio(
+                                        items[index].price, items[index].name);
+                                    Navigator.of(context).pop();
+                                  },
+                                );
                               },
                             );
-                          },
-                        );
-                      }
-                      if (items[index].price > _money) {
-                        return CustomListItem(
-                          sprite: Image(
-                              image: AssetImage('assets/graphics/shop/' +
-                                  items[index].imgName)),
-                          name: items[index].name,
-                          price: items[index].price.toString() + "\$",
-                          damage: "damage",
-                          radius: "radius",
-                          knockback: "knockback",
-                          colors: [
-                            Colors.red[800],
-                            Colors.red[600],
-                            Colors.red[500],
-                            Colors.red[300]
-                          ],
-                          fct: () {
-                            _confirmBox(
-                              "Buy Item?",
-                              "Do you want to buy \"" +
-                                  items[index].name +
-                                  "\" for " +
-                                  items[index].price.toString() +
-                                  "\$?",
-                              "No",
-                              "Get Poorer",
-                              context,
-                                  () {
-                                _reducePortofolio(
-                                    items[index].price, items[index].name);
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          },
-                        );
-                      } else {
-                        return CustomListItem(
-                          sprite: Image(
-                              image: AssetImage('assets/graphics/shop/' +
-                                  items[index].imgName)),
-                          name: items[index].name,
-                          price: items[index].price.toString() + "\$",
-                          damage: "damage",
-                          radius: "radius",
-                          knockback: "knockback",
-                          colors: [
-                            Colors.green[800],
-                            Colors.green[600],
-                            Colors.green[500],
-                            Colors.green[300]
-                          ],
-                          fct: () {
-                            _confirmBox(
-                              "Buy Item?",
-                              "Do you want to buy \"" +
-                                  items[index].name +
-                                  "\" for " +
-                                  items[index].price.toString() +
-                                  "\$?",
-                              "No",
-                              "Get Poorer",
-                              context,
-                              () {
-                                _reducePortofolio(
-                                    items[index].price, items[index].name);
-                                Navigator.of(context).pop();
-                              },
-                            );
-                          },
-                        );
-                      }
-                    },
-                  ),
-                )))
-      ],
+                        },
+                      ),
+                    )))
+          ],
+        )
     );
   }
 }

@@ -12,19 +12,12 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  SoundPlayer soundPlayer = SoundPlayer();
-
-  // Boolean because context build when initiating game and call previous audio track
-  var ifMenuContext = true;
+  SoundPlayer soundPlayer = SoundPlayer(false);
 
 // Function for child to stop menu music
   void _stopMusic() {
     //soundPlayer.release();
-    soundPlayer.playLocalMusic("assets/sounds/menu/sample2.mp3", 'sample2.mp3');
-    ifMenuContext = false;
-//    setState(() {
-//
-//    });
+    soundPlayer.playLocalAudio("assets/sounds/menu/sample2.mp3", 'sample2.mp3', false);
   }
 
   @override
@@ -32,18 +25,17 @@ class _HomeState extends State<Home> {
     super.initState();
     this
         .soundPlayer
-        .playLocalMusic("assets/sounds/menu/sample.mp3", 'sample.mp3');
+        .playLocalAudio("assets/sounds/menu/sample.mp3", 'sample.mp3', false);
   }
 
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
 
-    // Play music in background (loop)
-//    if (ifMenuContext)
-//    this.soundPlayer.playLocalMusic("assets/sounds/menu/sample.mp3", 'sample.mp3');
-//    else
-//      ifMenuContext = true;
+    // Play music in background (loop) if home page main rendered rendered
+    if (ModalRoute.of(context).isCurrent)
+      this.soundPlayer.playLocalAudio("assets/sounds/menu/sample.mp3", 'sample.mp3', false);
+
 
     // logo widget
     Widget logo() {

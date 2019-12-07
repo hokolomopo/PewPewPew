@@ -1,9 +1,11 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 class Camera{
+  /// Position of the top left corner of the camera
   Offset position;
 
   ///Offset used to define the zoom of the camera. When used, it will mess up all
@@ -20,5 +22,17 @@ class Camera{
         GameMain.size.height);
 
     position = Offset(center.dx - screenSize.dx / 2, center.dy - screenSize.dy / 2);
+  }
+
+  bool isDisplayed(Rectangle rect){
+    Offset screenSize = GameUtils.absoluteToRelativeOffset(Offset(GameMain.size.width, GameMain.size.height),
+        GameMain.size.height);
+
+    Rectangle screen = Rectangle(position.dx, position.dy, screenSize.dx, screenSize.dy);
+
+    if(screen.containsRectangle(rect) || screen.intersects(rect))
+      return true;
+
+    return false;
   }
 }
