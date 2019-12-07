@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/game/sound_player.dart';
+import 'package:info2051_2018/main.dart';
 import 'package:info2051_2018/quickplay_widgets.dart';
 
 import 'game/game_main.dart';
@@ -69,7 +70,6 @@ class ParametersState extends State<Parameters> {
 
   List<Widget> buildRadioList({String title, List<String> texts, List<Color> colors, int groupValue, Function onChanged}){
     List<Widget> list = List();
-    print("lllh");
     list.add(Expanded(
         child: FittedBox(
             fit: BoxFit.contain,
@@ -163,7 +163,6 @@ class ParametersState extends State<Parameters> {
                 widget.parentAction();
                 //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
                 //ap.pause();
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => GameMain(level:_terrain.levelObject)),

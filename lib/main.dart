@@ -9,13 +9,16 @@ void main() {
 }
 
 class PewPewPew extends StatelessWidget {
-  // This widget is the root of your application.
+  static final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+// This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
 
     return new MaterialApp(
       title: 'Pew Pew Pew !!!',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: new ThemeData(
         primarySwatch: Colors.blue,
         hintColor: Color(0xFFC0F0E8),

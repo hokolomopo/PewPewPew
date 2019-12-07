@@ -31,6 +31,8 @@ class Character extends MovingEntity {
 
   bool _isAirborne = false;
 
+  bool isDead = false;
+
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.drawer = new CharacterDrawer(asset, this);
 
@@ -68,6 +70,11 @@ class Character extends MovingEntity {
 
   bool isAirborne(){
     return _isAirborne || velocity.dy != 0;
+  }
+
+  void kill(){
+    //TODO maybe death animation
+    isDead = true;
   }
 
   void beginWalking(int direction){
