@@ -8,7 +8,6 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
-import 'package:info2051_2018/game/terrain.dart';
 
 import 'level.dart';
 
@@ -22,8 +21,6 @@ class GameMain extends StatefulWidget {
   @override
   _GameMainState createState() => new _GameMainState(level);
 }
-
-
 
 class _GameMainState extends State<GameMain> {
   //TODO delete dis, put it in a file and read it
