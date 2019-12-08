@@ -13,6 +13,15 @@ class CharacterDrawer extends CustomDrawer {
       : super(size, gifPath, screenSize: screenSize);
 
   @override
+  bool isReady2(Size screenSize) {
+    super.isReady2(screenSize);
+    return imgAndGif.containsKey(gifPath) &&
+        imgAndGif[gifPath].containsKey(relativeSize) &&
+        imgAndGif[gifPath][relativeSize] != null &&
+        imgAndGif[gifPath][relativeSize].fetchNextFrame() != null;
+  }
+
+  @override
   void paint(
       Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
     double left = GameUtils.relativeToAbsoluteDist(
@@ -26,7 +35,7 @@ class CharacterDrawer extends CustomDrawer {
           debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+    canvas.drawImage(fetchNextFrame2(), Offset(left, top), Paint());
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();

@@ -6,6 +6,16 @@ import 'dart:async';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
+  static Size _screenSize;
+  static bool sizeLocked = false;
+
+  static set screenSize(Size newSize) {
+    if (!sizeLocked) _screenSize = newSize;
+  }
+
+  static Size get screenSizeLandscape {
+    return Size(_screenSize.height, _screenSize.width);
+  }
   @override
   _HomeState createState() => _HomeState();
 }
@@ -41,6 +51,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    Home.screenSize = MediaQuery.of(context).size;
     Color primary = Theme
         .of(context)
         .primaryColor;
@@ -174,6 +185,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
 
     void _parameters() {
+      Home.sizeLocked = true;
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
           decoration: BoxDecoration(color: Theme

@@ -12,8 +12,16 @@ class BackgroundDrawer extends CustomDrawer {
       : super(size, imgPath, screenSize: screenSize);
 
   @override
+  bool isReady2(Size screenSize) {
+    super.isReady2(screenSize);
+    return imgAndGif.containsKey(gifPath) &&
+        imgAndGif[gifPath].containsKey(relativeSize) &&
+        imgAndGif[gifPath][relativeSize] != null &&
+        imgAndGif[gifPath][relativeSize].fetchNextFrame() != null;
+  }
+
+  @override
   void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
-    ui.Image toPaint = fetchNextFrame();
-    canvas.drawImage(toPaint, Offset.zero, Paint());
+    canvas.drawImage(fetchNextFrame2(), Offset.zero, Paint());
   }
 }
