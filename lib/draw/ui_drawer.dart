@@ -14,7 +14,7 @@ class StaminaDrawer extends CustomDrawer {
 
   Character character;
 
-  StaminaDrawer(this.character);
+  StaminaDrawer(this.character) : super(null, null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
@@ -38,7 +38,7 @@ class MarkerDrawer extends CustomDrawer{
 
   Offset position;
 
-  MarkerDrawer(this.position);
+  MarkerDrawer(this.position) : super(null, null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
@@ -60,7 +60,7 @@ class JumpArrowDrawer extends CustomDrawer{
   Offset origin;
   Offset end;
 
-  JumpArrowDrawer(this.origin, this.end);
+  JumpArrowDrawer(this.origin, this.end) : super(null, null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {

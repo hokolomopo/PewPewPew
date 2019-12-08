@@ -21,7 +21,7 @@ class Character extends MovingEntity {
   static final Offset hitboxSize = new Offset(10,10);
 
   //TODO truc propre pour les assets
-  static final String asset = "assets/graphics/characters/worm.png";
+  static final String asset = "assets/graphics/user_interface/animated-worm-image-0090.gif";
 
   int hp = base_hp;
   int team;
