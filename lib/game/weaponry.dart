@@ -57,6 +57,8 @@ abstract class Weapon{
         var dist = (p.position - characters[i][j].position).distance;
 
         if (dist < range) {
+
+          //TODO Damage reduce based on distance? [50%-100%]
           characters[i][j].removeHp(damage, soundPlayer);
 
           // Apply a vector field for knockback

@@ -22,10 +22,16 @@ class GifInfo {
   DateTime lastFetch;
   int curFrameIndex = 0;
 
+  // For projectile which get stuck
+  bool lockAnimation = false;
+
   GifInfo(this.gif);
 
   ui.Image fetchNextFrame() {
     if (gif.length < 1) return null;
+
+    if (lockAnimation)
+      return gif[curFrameIndex].image;
 
     DateTime curTime = DateTime.now();
     Duration curDuration = gif[curFrameIndex].duration;
@@ -40,11 +46,6 @@ class GifInfo {
     return gif[curFrameIndex].image;
   }
 
-  ui.Image fetchCurrentFrame() {
-    if (gif.length < 1) return null;
-
-    return gif[curFrameIndex].image;
-  }
 }
 
 abstract class CustomDrawer {
@@ -71,9 +72,6 @@ abstract class CustomDrawer {
     return imgAndGif[gifPath][relativeSize].fetchNextFrame();
   }
 
-  ui.Image fetchCurrentFrame() {
-    return imgAndGif[gifPath][relativeSize].fetchCurrentFrame();
-  }
 
   Map<String, Size> get imagePathsAndSizes {
     Map<String, Size> ret = Map();

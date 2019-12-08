@@ -38,8 +38,10 @@ class ProjectileDrawer extends CustomDrawer{
 
     // If frictionFactor == 1 means that we have to stay with the same frame
     if(projectile.animationStopped)
-      canvas.drawImage(fetchCurrentFrame(), Offset(left, top), Paint());
-    else
+      imgAndGif[gifPath][relativeSize].lockAnimation = true;
+
       canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+
   }
+
 }

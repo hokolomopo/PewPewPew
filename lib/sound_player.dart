@@ -23,9 +23,8 @@ class SoundPlayer {
     this.lowLatencyMode = lowLatencyMode;
 
     if (lowLatencyMode){
-      this.audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-      this.audioCache = AudioCache(prefix: "sounds/game/", fixedPlayer: this.audioPlayer);
-      this.audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
+      // New AudioPlayer instantiation each call for // calls
+      this.audioCache = AudioCache(prefix: "sounds/game/");
       this.audioCache.loadAll(noiseFileNames); // Future fct in constructor
     }
     else{

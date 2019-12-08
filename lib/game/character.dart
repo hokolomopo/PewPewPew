@@ -123,9 +123,7 @@ class Character extends MovingEntity {
     if (this.hp < 0)
       this.hp = 0;
 
-    //TODO safe way to get unique ID => prob better change function
-
-//    soundPlayer.playLocalAudio(hurtSoundName, 1.0);
+    soundPlayer.playLocalAudio(hurtSoundName, 1.0);
   }
 
 }
