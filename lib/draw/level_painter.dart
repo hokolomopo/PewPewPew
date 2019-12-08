@@ -95,15 +95,15 @@ class LevelPainter {
   LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false});
 
   addElement(CustomDrawer customDrawer, {index}) {
-    elements.update(
-        index ?? ((elements.lastKey() ?? 0) + 1), (value) => customDrawer,
+    int actualIndex = index ?? ((elements.lastKey() ?? 0) + 1);
+    elements.update(actualIndex, (value) => customDrawer,
         ifAbsent: () => customDrawer);
     customDrawer.imgAndGif = imgAndGif;
   }
 
-  removeElement(customDrawer) {
+  removeElement(CustomDrawer toRemove) {
     // The equality operator should compare pointers, this is done on purpose
-    elements.removeWhere((key, value) => (value == customDrawer));
+    elements.removeWhere((key, drawer) => (drawer == toRemove));
   }
 
   addGif(String path, Size relativeSize) async {
@@ -214,7 +214,8 @@ class _LevelPainterAux extends CustomPainter {
         drawer.paint(
             canvas, size, levelPainter.showHitBoxes, absoluteCameraPosition);
       } else {
-        for (MapEntry<String, Size> entry in drawer.imagePathsAndSizes.entries) {
+        for (MapEntry<String, Size> entry
+            in drawer.imagePathsAndSizes.entries) {
           levelPainter.addGif(entry.key, entry.value);
         }
       }

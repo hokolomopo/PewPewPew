@@ -199,7 +199,6 @@ class GameState{
     }
 
     // Check for end of the game
-    // TODO le jeu se termine quand il ne reste qu'une équipe, pas un seul joueur !
     if(players.length == 1){
         PewPewPew.navigatorKey.currentState.pop();
     }
@@ -224,7 +223,7 @@ class GameState{
     players[playerId].remove(toRemove);
 
     world.removeCharacter(toRemove);
-    painter.removeElement(toRemove);
+    painter.removeElement(toRemove.drawer);
 
     if(playerId == currentPlayer && charID == currentCharacter)
       currentCharIsDead = true;
