@@ -80,6 +80,7 @@ class _GameMainState extends State<GameMain> {
   }
 
   Future<bool> _mayExitGame() {
+    print("on will pop");
     return showDialog(
       context: context,
       builder: (context) => new AlertDialog(

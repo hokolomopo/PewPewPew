@@ -24,7 +24,7 @@ dependencies:
   shared_preferences: ^0.5.4
 
   # Package to play audio files
-  audioplayers: ^0.13.2
+  audioplayers: 0.13.2
 
   # Package changing text size to fit parent bounds
   auto_size_text: ^2.1.0
