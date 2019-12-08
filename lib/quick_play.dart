@@ -1,17 +1,16 @@
 import 'dart:async';
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // json codec
-import 'package:info2051_2018/game/sound_player.dart';
 import 'package:info2051_2018/quickplay_widgets.dart';
 
 import 'game/game_main.dart';
 
 class Parameters extends StatefulWidget {
   final void Function() parentAction;
+  final void Function() reloadHome;
 
-  const Parameters({Key key, this.parentAction}) : super(key: key);
+  const Parameters({Key key, this.parentAction, this.reloadHome}) : super(key: key);
 
   @override
   ParametersState createState() {
@@ -67,27 +66,35 @@ class ParametersState extends State<Parameters> {
     return parseJson(tmp.toString());
   }
 
-  List<Widget> buildRadioList({String title, List<String> texts, List<Color> colors, int groupValue, Function onChanged}){
+  List<Widget> buildRadioList(
+      {String title,
+      List<String> texts,
+      List<Color> colors,
+      int groupValue,
+      Function onChanged}) {
     List<Widget> list = List();
-    print("lllh");
     list.add(Expanded(
         child: FittedBox(
             fit: BoxFit.contain,
             child: Text(title))));
 
-    for(int i = 0;i < texts.length; i++){
+    for (int i = 0; i < texts.length; i++) {
       list.add(Expanded(
           child: Column(children: <Widget>[
-            Text(texts[i]),
-            Radio(
-              activeColor: colors[i],
-              value: i,
-              groupValue: groupValue,
-              onChanged: onChanged,
-            )
-          ])));
+        Text(texts[i]),
+        Radio(
+          activeColor: colors[i],
+          value: i,
+          groupValue: groupValue,
+          onChanged: onChanged,
+        )
+      ])));
     }
     return list;
+  }
+
+  _gameOver(gameReturnValue) {
+    widget.reloadHome();
   }
 
   Widget _parameter(BuildContext context) {
@@ -96,24 +103,33 @@ class ParametersState extends State<Parameters> {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(bottom: 10.0, top: 20.0),
-          child: Row(children: buildRadioList(
-            title: "Number\nPlayers",
-            texts: ["1P", "2P", "3P", "4P"],
-            colors: [Colors.redAccent, Colors.lightBlueAccent, Colors.green, Colors.deepPurpleAccent],
-            groupValue: _nbPlayer,
-            onChanged: _handleNbPlayers
-          )),
+          child: Row(
+              children: buildRadioList(
+                  title: "Number\nPlayers",
+                  texts: ["1P", "2P", "3P", "4P"],
+                  colors: [
+                    Colors.redAccent,
+                    Colors.lightBlueAccent,
+                    Colors.green,
+                    Colors.deepPurpleAccent
+                  ],
+                  groupValue: _nbPlayer,
+                  onChanged: _handleNbPlayers)),
         ),
         Padding(
             padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
-            child: Row(children: buildRadioList(
-              title: "Number\nWorms",
-              texts: ["1", "2", "3", "4"],
-              colors: [Colors.redAccent, Colors.lightBlueAccent, Colors.green, Colors.deepPurpleAccent],
-              groupValue: _nbWorms,
-              onChanged: _handleNbWorms
-          ))
-        ),
+            child: Row(
+                children: buildRadioList(
+                    title: "Number\nWorms",
+                    texts: ["1", "2", "3", "4"],
+                    colors: [
+                      Colors.redAccent,
+                      Colors.lightBlueAccent,
+                      Colors.green,
+                      Colors.deepPurpleAccent
+                    ],
+                    groupValue: _nbWorms,
+                    onChanged: _handleNbWorms))),
         SizedBox(
           height: 20.0,
         ),
@@ -125,10 +141,10 @@ class ParametersState extends State<Parameters> {
             builder: (context, snapshot) {
               return (snapshot.data != null)
                   ? TerrainScrollableList(
-                    snapshot.data,
-                    selectedTerrain: _terrain,
-                    onTap: _selectTerrain,
-                   )
+                      snapshot.data,
+                      selectedTerrain: _terrain,
+                      onTap: _selectTerrain,
+                    )
                   : Center(
                       child: CircularProgressIndicator(),
                     );
@@ -164,10 +180,13 @@ class ParametersState extends State<Parameters> {
                 //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
                 //ap.pause();
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GameMain(level:_terrain.levelObject)),
-                );
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GameMain(level: _terrain.levelObject)),
+                    )
+                    .then(_gameOver);
               },
             ),
             height: 50.0,

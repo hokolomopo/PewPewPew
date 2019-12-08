@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 class SoundPlayer {
   AudioPlayer audioPlayer;
 
-  SoundPlayer(bool lowLatencyMode) {
+  SoundPlayer([bool lowLatencyMode = false]) {
     if (lowLatencyMode)
       this.audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
     else

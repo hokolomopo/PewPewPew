@@ -14,6 +14,7 @@ import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
 
+import '../main.dart';
 import 'camera.dart';
 import 'level.dart';
 
@@ -54,6 +55,7 @@ class GameState{
   Offset jumpDragEndPosition;
   Offset moveDestination;
 
+  bool currentCharIsDead = false;
   /// GameStateMode.attacking variables
   bool ammoLaunching;
   Offset launchDragStartPosition;
@@ -94,13 +96,15 @@ class GameState{
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
 
-    Character currentChar = getCurrentCharacter();
+    bool shouldEndTurn = false;
+
 
     switch(currentState){
 
       case GameStateMode.char_selection:
         break;
       case GameStateMode.moving:
+        Character currentChar = getCurrentCharacter();
 
         //Check if we need to remove the marker because the character has jumped
         if(currentChar.isAirborne() && moveDestination != null){
@@ -168,6 +172,43 @@ class GameState{
       case GameStateMode.cinematic:
         break;
     }
+
+    // Check for dead players or dead characters and remove them
+    for(int p = 0;p < players.length;p++){
+      for(int c = 0;c < players[p].length;c++){
+        //Check if the character is out of bounds
+        if(!level.isInsideBounds(players[p][c].hitbox))
+          players[p][c].kill();
+
+        // Check if the character is dead
+        if(players[p][c].isDead) {
+          this.removeCharacter(p, c);
+
+          if(p == currentPlayer && c == currentCharacter)
+            shouldEndTurn = true;
+
+          c--;
+        }
+      }
+      if(players[p].length == 0){
+        this.removePlayer(p);
+
+        if(p == currentPlayer)
+          shouldEndTurn = true;
+
+        p--;
+      }
+    }
+
+    // Check for end of the game
+    if(players.length == 1){
+        PewPewPew.navigatorKey.currentState.pop();
+    }
+
+    if(shouldEndTurn)
+      switchState(GameStateMode.char_selection);
+
+    currentCharIsDead = false;
   }
 
   void addCharacter(int playerId, Character character){
@@ -177,11 +218,17 @@ class GameState{
     painter.addElement(character.drawer);
   }
 
-  void removeCharacter(int playerId, Character character){
-    players[playerId].remove(character);
+  void removeCharacter(int playerId, int charID){
+    print("Character of player " + currentPlayer.toString() +" is dead");
 
-    world.removeCharacter(character);
-    painter.removeElement(character.drawer);
+    Character toRemove = players[playerId][charID];
+    players[playerId].remove(toRemove);
+
+    world.removeCharacter(toRemove);
+    painter.removeElement(toRemove);
+
+    if(playerId == currentPlayer && charID == currentCharacter)
+      currentCharIsDead = true;
   }
 
   void addTerrainBlock(TerrainBlock block){
@@ -194,7 +241,17 @@ class GameState{
     painter.removeElement(block.drawer);
   }
 
+  void removePlayer(int playerID){
+    print("Player " + playerID.toString() +" is dead");
+
+    players.removeAt(playerID);
+    if(currentPlayer > playerID)
+      currentPlayer--;
+  }
+
   Character getCurrentCharacter(){
+    if(currentCharIsDead || players.length <= currentPlayer || players[currentPlayer].length <= currentCharacter)
+      return null;
     return players[currentPlayer][currentCharacter];
   }
 
@@ -214,7 +271,7 @@ class GameState{
     //Take camera into account
     Offset tapPositionCamera = tapPosition + camera.position;
 
-    print("OnTap : " + tapPosition.toString() + "char hitbox : " + getCurrentCharacter().hitbox.toString());
+    print("OnTap : " + tapPosition.toString());
 
     switch(currentState){
       case GameStateMode.char_selection:
@@ -274,7 +331,7 @@ class GameState{
     Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
     Offset dragPositionCamera = dragPosition + camera.position;
 
-    print("PanStart : " + dragPosition.toString() + "char hitbox : " + currentChar.hitbox.toString());
+    print("PanStart : " + dragPosition.toString());
 
     switch(currentState){
 
@@ -482,7 +539,8 @@ class GameState{
         break;
       case GameStateMode.moving:
         uiManager.removeMarker();
-        getCurrentCharacter().stop();
+        if(!currentCharIsDead)
+          getCurrentCharacter().stop();
         break;
       case GameStateMode.attacking:
         break;

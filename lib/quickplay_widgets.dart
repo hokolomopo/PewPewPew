@@ -37,7 +37,7 @@ class TerrainScrollableList extends StatelessWidget {
           shrinkWrap: true,
           itemCount: terrains == null ? 0 : terrains.length,
           itemBuilder: (context, index) {
-            return customTerrainRadio(terrains[index], selectedTerrain == null ? index == 0 : selectedTerrain.name == terrains[index].name);
+            return customTerrainRadio(terrains[index], selectedTerrain == null ? false : selectedTerrain.name == terrains[index].name);
           },
         ),
       ),

@@ -21,7 +21,7 @@ class Character extends MovingEntity {
   static final Offset hitboxSize = new Offset(10,10);
 
   //TODO truc propre pour les assets
-  static final String asset = "assets/graphics/characters/worm.png";
+  static final String asset = "assets/graphics/user_interface/animated-worm-image-0090.gif";
 
   int hp = base_hp;
   int team;
@@ -30,6 +30,8 @@ class Character extends MovingEntity {
   double stamina = baseStamina;
 
   bool _isAirborne = false;
+
+  bool isDead = false;
 
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.drawer = new CharacterDrawer(asset, this);
@@ -70,6 +72,11 @@ class Character extends MovingEntity {
 
   bool isAirborne(){
     return _isAirborne || velocity.dy != 0;
+  }
+
+  void kill(){
+    //TODO maybe death animation
+    isDead = true;
   }
 
   void beginWalking(int direction){

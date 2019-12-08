@@ -21,7 +21,7 @@ class TextDrawer extends CustomDrawer {
       {this.customPosition : const Offset(0,0),
         this.color : Colors.white,
         this.opacity: 1,
-        this.ignoreCamera = false});
+        this.ignoreCamera = false}) : super(null, null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:ui' as ui;
-import 'dart:typed_data';
 
 import 'paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
@@ -9,75 +6,41 @@ import 'package:info2051_2018/game/util/utils.dart';
 import 'level_painter.dart';
 
 class CharacterDrawer extends CustomDrawer {
-  Uint8List characterImgBytes;
-  ui.Image characterImg;
-  Size screenSize;
-  double width;
-  double height;
-
   Character character;
 
-  CharacterDrawer(String imgPath, this.character,
-      {this.width = 10, this.height = 10}) {
-    setImg(imgPath);
-  }
-
-  setImg(String imgPath) async {
-    ByteData bytes = await rootBundle.load(imgPath);
-    characterImgBytes = bytes.buffer.asUint8List();
-  }
-
-  _reloadImg(Size screenSize) async {
-    ui.Codec codec = await ui.instantiateImageCodec(characterImgBytes,
-        targetWidth:
-            (GameUtils.relativeToAbsoluteDist(width, screenSize.height))
-                .toInt(),
-        targetHeight:
-            (GameUtils.relativeToAbsoluteDist(height, screenSize.height))
-                .toInt());
-    characterImg = (await codec.getNextFrame()).image;
-
-    this.screenSize = screenSize;
-    repaint.notifyListeners();
-  }
+  CharacterDrawer(String gifPath, this.character,
+      {Size screenSize, Size size = const Size(10, 10)})
+      : super(size, gifPath, screenSize: screenSize);
 
   @override
-  bool isReady(Size screenSize) {
-    if (this.screenSize != screenSize) {
-      _reloadImg(screenSize);
-      return false;
-    }
-    return true;
-  }
-
-  @override
-  void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
-    double left =
-        GameUtils.relativeToAbsoluteDist(character.position.dx, size.height);
-    double top =
-        GameUtils.relativeToAbsoluteDist(character.position.dy, size.height);
-    double actualWidth = GameUtils.relativeToAbsoluteDist(width, size.height);
-    double actualHeight = GameUtils.relativeToAbsoluteDist(height, size.height);
+  void paint(
+      Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
+    double left = GameUtils.relativeToAbsoluteDist(
+        character.position.dx, screenSize.height);
+    double top = GameUtils.relativeToAbsoluteDist(
+        character.position.dy, screenSize.height);
 
     if (showHitBoxes) {
-      canvas.drawRect(Rect.fromLTWH(left, top, actualWidth, actualHeight),
+      canvas.drawRect(
+          Rect.fromLTWH(left, top, actualSize.width, actualSize.height),
           debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(characterImg, Offset(left, top), Paint());
+    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
 
-    double lifeBarTop = top - distanceLifeBarCharacter * size.height;
+    double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();
     double normalizedHp = character.hp / Character.base_hp;
     Paint lifeBarPaint = Paint()
       ..color = lifeColor
       ..style = PaintingStyle.fill;
     canvas.drawRect(
-        Rect.fromLTWH(
-            left, lifeBarTop, actualWidth * normalizedHp, actualHeight / 3),
+        Rect.fromLTWH(left, lifeBarTop, actualSize.width * normalizedHp,
+            actualSize.height / 3),
         lifeBarPaint);
     canvas.drawRect(
-        Rect.fromLTWH(left, lifeBarTop, actualWidth, actualHeight / 3),
+        Rect.fromLTWH(
+            left, lifeBarTop, actualSize.width, actualSize.height / 3),
         lifeBarStrokePaint);
   }
 }

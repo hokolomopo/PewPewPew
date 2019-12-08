@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/util/utils.dart';
-import 'dart:math';
 
 import 'paint_constants.dart';
 import 'math.dart';
@@ -26,7 +25,9 @@ class TerrainBlockDrawer extends CustomDrawer {
 
   //Set<TerrainBlock> blocks = Set();
 
-  TerrainBlockDrawer(this.terrainBlock);
+  TerrainBlockDrawer(this.terrainBlock)
+      : super(
+            Size(terrainBlock.hitBox.width, terrainBlock.hitBox.height), null);
 
   /// Creates a new terrain block.
   ///
@@ -112,10 +113,6 @@ class TerrainBlockDrawer extends CustomDrawer {
         GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.left, size.height);
     double top =
         GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.top, size.height);
-    double width = GameUtils.relativeToAbsoluteDist(
-        terrainBlock.hitBox.width, size.height);
-    double height = GameUtils.relativeToAbsoluteDist(
-        terrainBlock.hitBox.height, size.height);
 
 //    Rect toDraw = Rect.fromLTWH(
 //        left,
@@ -126,12 +123,7 @@ class TerrainBlockDrawer extends CustomDrawer {
 //        min(width, size.width - left),
 //        min(height, size.height - top));
 
-    Rect toDraw = Rect.fromLTWH(
-        left,
-        top,
-        width,
-        height);
-
+    Rect toDraw = Rect.fromLTWH(left, top, actualSize.width, actualSize.height);
 
     canvas.drawRect(toDraw, terrainFillPaint);
     if (terrainBlock.withStroke) {
@@ -139,7 +131,7 @@ class TerrainBlockDrawer extends CustomDrawer {
     } else {
       // We never paint no strokes at all : we at least paint the top one.
       canvas.drawLine(
-          Offset(left, top), Offset(left + width, top), terrainStrokePaint);
+          Offset(left, top), Offset(left + actualSize.width, top), terrainStrokePaint);
     }
   }
 }

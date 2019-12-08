@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
@@ -9,15 +10,24 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+class _HomeState extends State<Home> with WidgetsBindingObserver {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   SoundPlayer soundPlayer = SoundPlayer(false);
+  final _menuMusicPath = "assets/sounds/menu/sample.mp3";
+  final _menuMusicId = "sample.mp3";
+  final _gameMusicPath = "assets/sounds/menu/sample2.mp3";
+  final _gameMusicId = "sample2.mp3";
 
 // Function for child to stop menu music
   void _stopMusic() {
     //soundPlayer.release();
-    soundPlayer.playLocalAudio("assets/sounds/menu/sample2.mp3", 'sample2.mp3', false);
+    soundPlayer.playLocalAudio(_gameMusicPath, _gameMusicId, false);
+  }
+
+  void _reload() {
+    Navigator.of(context).pop();
+    soundPlayer.playLocalAudio(_menuMusicPath, _menuMusicId, false);
   }
 
   @override
@@ -25,60 +35,78 @@ class _HomeState extends State<Home> {
     super.initState();
     this
         .soundPlayer
-        .playLocalAudio("assets/sounds/menu/sample.mp3", 'sample.mp3', false);
+        .playLocalAudio(_menuMusicPath, _menuMusicId, false);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   Widget build(BuildContext context) {
-    Color primary = Theme.of(context).primaryColor;
+    Color primary = Theme
+        .of(context)
+        .primaryColor;
 
     // Play music in background (loop) if home page main rendered rendered
     if (ModalRoute.of(context).isCurrent)
       this.soundPlayer.playLocalAudio("assets/sounds/menu/sample.mp3", 'sample.mp3', false);
 
 
+
+
     // logo widget
     Widget logo() {
       return Padding(
         padding:
-            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+        EdgeInsets.only(top: MediaQuery
+            .of(context)
+            .size
+            .height * 0.15),
         child: Container(
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           height: 220.0,
           child: Stack(
             children: <Widget>[
               Positioned(
                   child: Container(
-                child: Align(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: new BorderRadius.circular(20.0),
-                      color: Colors.blueAccent,
-                      border: new Border.all(color: Colors.white70, width: 5.0),
-                      boxShadow: [
-                        new BoxShadow(
-                          color: Colors.black,
-                          blurRadius: 3.0,
-                        )
-                      ],
-                    ),
-                    width: MediaQuery.of(context).size.width * 0.80,
-                    height: MediaQuery.of(context).size.width * 0.2,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Text(
-                        "Pew Pew Pew !!!",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontFamily: 'Birdy',
+                    child: Align(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: new BorderRadius.circular(20.0),
+                          color: Colors.blueAccent,
+                          border: new Border.all(color: Colors.white70,
+                              width: 5.0),
+                          boxShadow: [
+                            new BoxShadow(
+                              color: Colors.black,
+                              blurRadius: 3.0,
+                            )
+                          ],
+                        ),
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.80,
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.2,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            "Pew Pew Pew !!!",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: 'Birdy',
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                height: 154.0,
-              )),
+                    height: 154.0,
+                  )),
             ],
           ),
         ),
@@ -148,7 +176,9 @@ class _HomeState extends State<Home> {
     void _parameters() {
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
-          decoration: BoxDecoration(color: Theme.of(context).canvasColor),
+          decoration: BoxDecoration(color: Theme
+              .of(context)
+              .canvasColor),
           child: ClipRRect(
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(40.0),
@@ -169,7 +199,9 @@ class _HomeState extends State<Home> {
                             icon: Icon(
                               Icons.close,
                               size: 30.0,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme
+                                  .of(context)
+                                  .primaryColor,
                             ),
                           ),
                         )
@@ -182,7 +214,10 @@ class _HomeState extends State<Home> {
                     child: Column(
                       children: <Widget>[
                         Container(
-                          width: MediaQuery.of(context).size.width,
+                          width: MediaQuery
+                              .of(context)
+                              .size
+                              .width,
                           height: 140.0,
                           child: Stack(
                             children: <Widget>[
@@ -193,7 +228,9 @@ class _HomeState extends State<Home> {
                                     height: 130.0,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: Theme.of(context).primaryColor),
+                                        color: Theme
+                                            .of(context)
+                                            .primaryColor),
                                   ),
                                   alignment: Alignment.center,
                                 ),
@@ -216,14 +253,21 @@ class _HomeState extends State<Home> {
                         ),
                         Parameters(
                           parentAction: _stopMusic,
+                          reloadHome: _reload
                         )
                       ],
                     ),
                   ),
                 ],
               ),
-              height: MediaQuery.of(context).size.height / 1.05, // / 1.1
-              width: MediaQuery.of(context).size.width,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height / 1.05, // / 1.1
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               color: Colors.white,
             ),
           ),
@@ -251,7 +295,9 @@ class _HomeState extends State<Home> {
     void _shopSheet() {
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
-          decoration: BoxDecoration(color: Theme.of(context).canvasColor),
+          decoration: BoxDecoration(color: Theme
+              .of(context)
+              .canvasColor),
           child: ClipRect(
             child: Container(
               child: Column(
@@ -269,7 +315,9 @@ class _HomeState extends State<Home> {
                             icon: Icon(
                               Icons.close,
                               size: 30.0,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme
+                                  .of(context)
+                                  .primaryColor,
                             ),
                           ),
                         ),
@@ -292,14 +340,20 @@ class _HomeState extends State<Home> {
                           return (items != null && prefs != null)
                               ? new ShopList(items: items, prefs: prefs)
                               : new Center(
-                                  child: new CircularProgressIndicator(),
-                                );
+                            child: new CircularProgressIndicator(),
+                          );
                         }),
                   ),
                 ],
               ),
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
+              height: MediaQuery
+                  .of(context)
+                  .size
+                  .height,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               color: Colors.white,
             ),
           ),
@@ -311,8 +365,14 @@ class _HomeState extends State<Home> {
       children: <Widget>[
         Image.asset(
           "assets/graphics/backgrounds/menu-background3.jpg",
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           fit: BoxFit.cover,
         ),
         Scaffold(
@@ -324,16 +384,27 @@ class _HomeState extends State<Home> {
                 logo(),
                 Padding(
                   child: Container(
-                    child: _button("Quick Play", primary, Colors.white,
-                        Colors.white, primary, 30.0, _parameters),
+                    child: _button(
+                        "Quick Play",
+                        primary,
+                        Colors.white,
+                        Colors.white,
+                        primary,
+                        30.0,
+                        _parameters),
                     height: 50.0,
                   ),
                   padding: EdgeInsets.only(top: 80.0, left: 20.0, right: 20.0),
                 ),
                 Padding(
                   child: Container(
-                    child: _button("Tutorial", primary, Colors.white,
-                        Colors.white, primary, 30.0, () {
+                    child: _button(
+                        "Tutorial",
+                        primary,
+                        Colors.white,
+                        Colors.white,
+                        primary,
+                        30.0, () {
                       _tutorialConfirm(
                           "Start tutorial?",
                           "The tutorial is recommanded for new players",
@@ -346,8 +417,14 @@ class _HomeState extends State<Home> {
                 ),
                 Padding(
                   child: Container(
-                    child: _button("Shop", primary, Colors.white, Colors.white,
-                        primary, 30.0, _shopSheet),
+                    child: _button(
+                        "Shop",
+                        primary,
+                        Colors.white,
+                        Colors.white,
+                        primary,
+                        30.0,
+                        _shopSheet),
                     height: 50.0,
                   ),
                   padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),
@@ -357,5 +434,26 @@ class _HomeState extends State<Home> {
             ))
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    soundPlayer.release();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch(state) {
+      case AppLifecycleState.resumed:
+        soundPlayer.resume();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.suspending:
+        soundPlayer.pause();
+        break;
+    }
   }
 }
