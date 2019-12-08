@@ -11,7 +11,7 @@ class ProjectileDrawer extends CustomDrawer{
   Projectile projectile;
 
   ProjectileDrawer(String gifPath, this.projectile,
-      {Size screenSize, Size size = const Size(10, 10)})
+      {Size screenSize, Size size = const Size(5, 5)})
       : super(size, gifPath, screenSize: screenSize);
 
   @override
@@ -23,22 +23,20 @@ class ProjectileDrawer extends CustomDrawer{
         imgAndGif[gifPath][relativeSize].fetchNextFrame() != null;
   }
 
-  @override
-  void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
-    double left =
-    GameUtils.relativeToAbsoluteDist(projectile.position.dx, size.height);
-    double top =
-    GameUtils.relativeToAbsoluteDist(projectile.position.dy, size.height);
-    double actualWidth = GameUtils.relativeToAbsoluteDist(actualSize.width, size.height);
-    double actualHeight = GameUtils.relativeToAbsoluteDist(actualSize.height, size.height);
+  void paint(
+      Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
+    double left = GameUtils.relativeToAbsoluteDist(
+        projectile.position.dx, screenSize.height);
+    double top = GameUtils.relativeToAbsoluteDist(
+        projectile.position.dy, screenSize.height);
 
     if (showHitBoxes) {
-      canvas.drawRect(Rect.fromLTWH(left, top, actualWidth, actualHeight),
+      canvas.drawRect(
+          Rect.fromLTWH(left, top, actualSize.width, actualSize.height),
           debugShowHitBoxesPaint);
     }
 
     canvas.drawImage(fetchNextFrame2(), Offset(left, top), Paint());
-
   }
 
 }

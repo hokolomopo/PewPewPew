@@ -261,7 +261,7 @@ class GameState{
 
   void removeProjectile(Projectile projectile){
     world.removeProjectile(projectile);
-    painter.removeElement(projectile);
+    painter.removeElement(projectile.drawer);
   }
 
   void onTap(TapUpDetails details){
@@ -425,6 +425,7 @@ class GameState{
         uiManager.endJump();
         switchState(GameStateMode.projectile);
         stopWatch.start();
+        uiManager.removeStaminaDrawer();
         break;
 
 

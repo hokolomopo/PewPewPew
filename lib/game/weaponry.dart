@@ -44,6 +44,7 @@ abstract class Weapon{
   }
 
   //TODO decide if methods better in Weapon or corresponding Projectile
+  // Should be an overdrivable function to get different behaviour for other weapon
 
   ///Function which apply Damage and knockback to charactere according to
   /// its actual position and range.
@@ -60,10 +61,14 @@ abstract class Weapon{
           // Apply a vector field for knockback
           Offset projection = characters[i][j].position - p.position;
 
+          // normilize offset
+          projection /= projection.distance;
+
           // The closest to the center of detonation the stronger the knockback
-          projection *= range - dist;
+          // Factor from 0% to 100%
+          projection *= (range - dist)/ range;
           // Applied factor for knockback strengh
-          projection *= knockbackStrength / 100;
+          projection *= knockbackStrength.toDouble();
           characters[i][j].addVelocity(projection);
         }
       }
@@ -102,7 +107,7 @@ class Projectile extends MovingEntity{
 // TODO precise value in constructor body instead of arg (useful for tests)
 // Class Test for projectile
 class Boulet extends Projectile {
-  static final String assets = 'assets/graphics/arsenal/projectiles/bullet1.png';
+  static final String assets = 'assets/graphics/arsenal/projectiles/red_arc.gif';
 
   Boulet(Offset position, Rectangle hitbox, Offset velocity, double weight,
       int damage, int maxSpeed)
@@ -129,14 +134,18 @@ class Fist extends Weapon{
 
 class Colt extends Weapon{
 
+  //TODO best way to get static info for shop and else? cannot be in abstract class as static
+  // What info should it be
+  static List<num> infos = [];
+
   Colt(){
     this.useProjectile = true;
     this.hasKnockback = true;
 
     this.ammunition = 6;
-    this.range = 10;
+    this.range = 60; // 60 seems good value
     this.damage = 30;
-    this.knockbackStrength = 5;
+    this.knockbackStrength = 50;
     this.projectileHitbox ;
     this.projectile;
 
