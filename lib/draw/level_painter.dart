@@ -39,6 +39,12 @@ class GifInfo {
 
     return gif[curFrameIndex].image;
   }
+
+  ui.Image fetchCurrentFrame() {
+    if (gif.length < 1) return null;
+
+    return gif[curFrameIndex].image;
+  }
 }
 
 abstract class CustomDrawer {
@@ -63,6 +69,10 @@ abstract class CustomDrawer {
 
   ui.Image fetchNextFrame() {
     return imgAndGif[gifPath][relativeSize].fetchNextFrame();
+  }
+
+  ui.Image fetchCurrentFrame() {
+    return imgAndGif[gifPath][relativeSize].fetchCurrentFrame();
   }
 
   Map<String, Size> get imagePathsAndSizes {

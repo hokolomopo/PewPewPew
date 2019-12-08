@@ -6,6 +6,7 @@ import 'package:info2051_2018/draw/Character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/sound_player.dart';
 
 class Character extends MovingEntity {
   static const List<Color> teamColors = [Colors.red, Colors.blue, Colors.green, Colors.orange];
@@ -22,6 +23,7 @@ class Character extends MovingEntity {
 
   //TODO truc propre pour les assets
   static final String asset = "assets/graphics/user_interface/animated-worm-image-0090.gif";
+  static final String hurtSoundName = "hurtSound.mp3";
 
   int hp = base_hp;
   int team;
@@ -113,12 +115,17 @@ class Character extends MovingEntity {
     return teamColors[team];
   }
 
-  void removeHp(int damage){
+  // Pass a sound Player ref to play hurt sound
+  void removeHp(int damage, SoundPlayer soundPlayer){
     this.hp -= damage;
 
     // TODO Handle death
     if (this.hp < 0)
       this.hp = 0;
+
+    //TODO safe way to get unique ID => prob better change function
+
+//    soundPlayer.playLocalAudio(hurtSoundName, 1.0);
   }
 
 }

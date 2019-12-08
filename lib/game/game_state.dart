@@ -11,6 +11,7 @@ import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
+import 'package:info2051_2018/sound_player.dart';
 
 import '../main.dart';
 import 'camera.dart';
@@ -39,6 +40,7 @@ class GameState{
   UiManager uiManager;
   Level level;
   Camera camera;
+  SoundPlayer soundPlayer = new SoundPlayer(true);
 
   int currentPlayer = 0;
   int currentCharacter = 0;
@@ -158,7 +160,7 @@ class GameState{
           stopWatch.stop();
           stopWatch.reset();
 
-          currentWeapon.applyImpact(currentWeapon.projectile, players);
+          currentWeapon.applyImpact(currentWeapon.projectile, players, soundPlayer);
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon=null;
 
@@ -464,7 +466,7 @@ class GameState{
           currentWeapon = currentChar.currentArsenal.actualSelection;
           Offset pos = currentChar.position;
           Offset hit = Offset(5,5);
-          Boulet boulet = new Boulet(pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy), new Offset(0, 0), 5.0, 15, 3000);
+          ProjDHS boulet = new ProjDHS(pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy), new Offset(0, 0), 5.0, 15, 3000);
 
           currentWeapon.projectile = boulet;
 

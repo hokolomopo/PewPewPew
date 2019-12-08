@@ -1,31 +1,49 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:audioplayers/audio_cache.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 
+
+// TODO all sound assets should be compress in small mp3 to keep a reasonnable size for the cache
+
 class SoundPlayer {
   AudioPlayer audioPlayer;
+  AudioCache audioCache;
+  bool lowLatencyMode; // if true, play music. Else play sound effect otherwise.
+  int increment = 0;
+
+  // Static list for the lowLatencyMode to pre load the files
+  static List<String> noiseFileNames = ['hurtSound.mp3'];
 
   SoundPlayer([bool lowLatencyMode = false]) {
-    if (lowLatencyMode)
+
+    this.lowLatencyMode = lowLatencyMode;
+
+    if (lowLatencyMode){
       this.audioPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
-    else
-      this.audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
-  }
-
-  void playLocalAudio(String assetPath, String id, bool isSoundEffect) async {
-    final file = new File('${(await getTemporaryDirectory()).path}/' + id);
-    await file
-        .writeAsBytes((await rootBundle.load(assetPath)).buffer.asUint8List());
-
-    if(isSoundEffect){
-      await this.audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
-      await this.audioPlayer.play(file.path, isLocal: true);
+      this.audioCache = AudioCache(prefix: "sounds/game/", fixedPlayer: this.audioPlayer);
+      this.audioPlayer.setReleaseMode(ReleaseMode.RELEASE);
+      this.audioCache.loadAll(noiseFileNames); // Future fct in constructor
     }
     else{
-      await this.audioPlayer.setReleaseMode(ReleaseMode.LOOP);
-      await this.audioPlayer.play(file.path, isLocal: true, stayAwake: true);
+      this.audioPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
+      this.audioPlayer.setReleaseMode(ReleaseMode.LOOP);
+      this.audioCache = AudioCache(prefix: "sounds/menu/", fixedPlayer: this.audioPlayer);
+    }
+  }
+
+  // Volume percentage => [0., 1.]
+  void playLocalAudio(String fileName, [double volume = 1.0]) async {
+
+    if(lowLatencyMode){
+      this.audioCache.play(fileName, volume: volume);
+    }
+    else{
+      await this.audioCache.load(fileName);
+      this.audioCache.play(fileName, volume: volume);
     }
   }
 

@@ -24,20 +24,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   SoundPlayer soundPlayer = SoundPlayer(false);
-  final _menuMusicPath = "assets/sounds/menu/sample.mp3";
-  final _menuMusicId = "sample.mp3";
-  final _gameMusicPath = "assets/sounds/menu/sample2.mp3";
-  final _gameMusicId = "sample2.mp3";
+  final _menuMusicName = "sample.mp3";
+  final _gameMusicName = "sample2.mp3";
 
 // Function for child to stop menu music
   void _stopMusic() {
     //soundPlayer.release();
-    soundPlayer.playLocalAudio(_gameMusicPath, _gameMusicId, false);
+    soundPlayer.playLocalAudio(_gameMusicName, 1.0);
   }
 
   void _reload() {
     Navigator.of(context).pop();
-    soundPlayer.playLocalAudio(_menuMusicPath, _menuMusicId, false);
+    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
   }
 
   @override
@@ -45,7 +43,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     this
         .soundPlayer
-        .playLocalAudio(_menuMusicPath, _menuMusicId, false);
+        .playLocalAudio(_menuMusicName, 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -58,7 +56,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
     // Play music in background (loop) if home page main rendered rendered
     if (ModalRoute.of(context).isCurrent)
-      this.soundPlayer.playLocalAudio("assets/sounds/menu/sample.mp3", 'sample.mp3', false);
+      this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
 
 
 

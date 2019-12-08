@@ -36,6 +36,10 @@ class ProjectileDrawer extends CustomDrawer{
           debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+    // If frictionFactor == 1 means that we have to stay with the same frame
+    if(projectile.animationStopped)
+      canvas.drawImage(fetchCurrentFrame(), Offset(left, top), Paint());
+    else
+      canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
   }
 }

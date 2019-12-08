@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:info2051_2018/draw/Projectile.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/sound_player.dart';
 
 import 'character.dart';
 
@@ -48,7 +49,7 @@ abstract class Weapon{
 
   ///Function which apply Damage and knockback to charactere according to
   /// its actual position and range.
-  void applyImpact(Projectile p, List<List<Character>> characters){
+  void applyImpact(Projectile p, List<List<Character>> characters, SoundPlayer soundPlayer){
     for (var i = 0; i < characters.length; i++) {
       for (var j = 0; j < characters[i].length; j++) {
         // apply a circular HitBox
@@ -56,7 +57,7 @@ abstract class Weapon{
         var dist = (p.position - characters[i][j].position).distance;
 
         if (dist < range) {
-          characters[i][j].removeHp(damage);
+          characters[i][j].removeHp(damage, soundPlayer);
 
           // Apply a vector field for knockback
           Offset projection = characters[i][j].position - p.position;
@@ -82,7 +83,10 @@ class Projectile extends MovingEntity{
   double weight;
   int damage;
   int maxSpeed;
-  double frictionFactor; // Percentage of the velocity to remove at each frame
+  double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
+
+  // To be used by the canvas and modified in applyFriction()
+  bool animationStopped = false;
 
   Projectile(Offset position, Rectangle hitbox, Offset velocity, this.weight, this.damage, this.maxSpeed)
       : super.withSpeed(position, hitbox, velocity, new Offset(0, 0));
@@ -100,6 +104,10 @@ class Projectile extends MovingEntity{
   ///By reducing the actual velocity until it is a zero Offset
   void applyFriction(){
     this.addVelocity(Offset(0,0) - this.velocity * frictionFactor);
+
+    // To indicate canvas to stay on same frame
+    if( !this.animationStopped || frictionFactor == 1)
+      this.animationStopped = true;
   }
 
 }
@@ -114,6 +122,17 @@ class Boulet extends Projectile {
       : super(position, hitbox, velocity, weight, damage, maxSpeed){
     this.drawer = ProjectileDrawer(assets, this);
     this.frictionFactor = 0.02;
+  }
+}
+
+class ProjDHS extends Projectile {
+  static final String assets = 'assets/graphics/arsenal/projectiles/hand-spinner.gif';
+
+  ProjDHS(Offset position, Rectangle hitbox, Offset velocity, double weight,
+      int damage, int maxSpeed)
+      : super(position, hitbox, velocity, weight, damage, maxSpeed){
+    this.drawer = ProjectileDrawer(assets, this);
+    this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
   }
 }
 
