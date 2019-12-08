@@ -286,7 +286,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       var tmp = await DefaultAssetBundle.of(context)
           .loadString('assets/data/shop/items.json');
 
-      List<Item> items = parseJson(tmp.toString());
+      List<Item> items = Item.parseJsonItemList(tmp.toString());
       ret.add(items);
       ret.add(prefs);
       return ret;
@@ -302,30 +302,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             child: Container(
               child: Column(
                 children: <Widget>[
-                  Container(
-                    child: Stack(
-                      children: <Widget>[
-                        Positioned(
-                          left: 10.0,
-                          top: 10.0,
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              size: 30.0,
-                              color: Theme
-                                  .of(context)
-                                  .primaryColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    height: 50.0,
-                    width: 50.0,
-                  ),
                   Expanded(
                     child: new FutureBuilder(
                         future: getShopInfo(),
