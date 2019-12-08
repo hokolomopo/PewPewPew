@@ -2,8 +2,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/Projectile.dart';
-import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
@@ -201,6 +199,7 @@ class GameState{
     }
 
     // Check for end of the game
+    // TODO le jeu se termine quand il ne reste qu'une équipe, pas un seul joueur !
     if(players.length == 1){
         PewPewPew.navigatorKey.currentState.pop();
     }
@@ -269,17 +268,18 @@ class GameState{
     Offset tapPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
 
     //Take camera into account
-    Offset tapPositionCamera = tapPosition + camera.position;
+    tapPosition += camera.position;
 
     print("OnTap : " + tapPosition.toString());
 
     switch(currentState){
       case GameStateMode.char_selection:
         for(int i = 0;i < players[currentPlayer].length;i++)
-          if(GameUtils.rectContains(players[currentPlayer][i].hitbox, tapPositionCamera)){
+          if(GameUtils.rectContains(players[currentPlayer][i].hitbox, tapPosition)){
             currentCharacter = i;
 
             switchState(GameStateMode.moving);
+            break;
           }
         break;
 
@@ -287,7 +287,7 @@ class GameState{
         Character currentChar = getCurrentCharacter();
 
         //Touch event on the current character
-        if(GameUtils.rectContains(currentChar.hitbox, tapPositionCamera)){
+        if(GameUtils.rectContains(currentChar.hitbox, tapPosition)){
           if(!currentChar.isAirborne()) {
             currentChar.stopX();
             moveDestination = null;
@@ -296,18 +296,18 @@ class GameState{
         }
 
         //Touch event left of the current character
-        else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPositionCamera)){
+        else if(GameUtils.rectLeftOf(currentChar.hitbox, tapPosition)){
           if(!currentChar.isAirborne()) {
             currentChar.beginWalking(Character.LEFT);
-            this.startMoving(tapPositionCamera);
+            this.startMoving(tapPosition);
           }
         }
 
         //Touch event right of the current character
-        else if(GameUtils.rectRightOf(currentChar.hitbox, tapPositionCamera)){
+        else if(GameUtils.rectRightOf(currentChar.hitbox, tapPosition)){
           if(!currentChar.isAirborne()) {
             currentChar.beginWalking(Character.RIGHT);
-            this.startMoving(tapPositionCamera);
+            this.startMoving(tapPosition);
           }
         }
         break;
@@ -435,9 +435,13 @@ class GameState{
     }
   }
 
-  void onLongPress(){
+  void onLongPress(LongPressStartDetails details){
     Character currentChar = getCurrentCharacter();
-    //Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+
+    Offset longPressPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+    longPressPosition += camera.position;
+
+    print("OnLongPress : " + longPressPosition.toString());
 
     switch(currentState){
 
@@ -445,10 +449,12 @@ class GameState{
         break;
 
       case GameStateMode.moving:
-//        if(GameUtils.rectContains(currentChar.hitbox, dragPosition)){
-//          if(currentChar.isAirborne())
-//            return;
-//          currentChar.stop();
+        print("on long press moving");
+        if(GameUtils.rectContains(currentChar.hitbox, longPressPosition)){
+          print("on long press moving contains hitbox");
+          if(currentChar.isAirborne())
+            return;
+          currentChar.stop();
 
           //TODO : display armory
           print("Armory is here");
@@ -467,7 +473,7 @@ class GameState{
           // add weapon to be draw in a neutral position aligned with char
 
 
-//        }
+        }
 
         break;
 

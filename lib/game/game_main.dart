@@ -65,8 +65,6 @@ class _GameMainState extends State<GameMain> {
   /// Function called at each frame.
   /// Update the GameState and re-draw the game on the screen
   void _update(Duration timestamp) {
-    _scheduleFrame();
-
     int timeElapsed =
         lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;
@@ -77,6 +75,7 @@ class _GameMainState extends State<GameMain> {
     setState(() {
       position = position * 1;
     });
+    _scheduleFrame();
   }
 
   Future<bool> _mayExitGame() {
@@ -108,7 +107,7 @@ class _GameMainState extends State<GameMain> {
       child: new Scaffold(
         body: Container(
             child: GestureDetector(
-                onTapDown: (details) {
+                onTapUp: (details) {
                   state.onTap(details);
                 },
                 onPanStart: (details) {
