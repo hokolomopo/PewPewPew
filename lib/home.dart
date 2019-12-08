@@ -49,15 +49,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print("home build");
     Home.screenSize = MediaQuery.of(context).size;
     Color primary = Theme
         .of(context)
         .primaryColor;
-
-    // Play music in background (loop) if home page main rendered rendered
-    if (ModalRoute.of(context).isCurrent)
-      this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
 
     // logo widget
     Widget logo() {
@@ -429,7 +424,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("change app life cycle state : " + state.toString());
     switch(state) {
       case AppLifecycleState.resumed:
         soundPlayer.resume();
