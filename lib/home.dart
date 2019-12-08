@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/game/sound_player.dart';
+import 'package:info2051_2018/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
