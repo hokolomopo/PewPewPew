@@ -4,6 +4,7 @@ import 'package:info2051_2018/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // To counter Flutter update inconvenient
+  SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]); // t
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then( (_) {runApp(new PewPewPew()); });
 }
