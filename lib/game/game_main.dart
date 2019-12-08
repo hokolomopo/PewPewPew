@@ -9,6 +9,7 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_state.dart';
+import 'package:info2051_2018/home.dart';
 
 import 'level.dart';
 
@@ -44,7 +45,7 @@ class _GameMainState extends State<GameMain> {
 
     Camera camera = Camera(Offset(0, 0));
 
-    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
+    this.levelPainter = LevelPainter(camera, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size));
 
     state = GameState(2, 2, levelPainter, level, camera);
@@ -101,6 +102,8 @@ class _GameMainState extends State<GameMain> {
   @override
   Widget build(BuildContext context) {
     GameMain.size = MediaQuery.of(context).size;
+    levelPainter.screenSize = Home.screenSizeLandscape;
+    int i = 0;
 
     return WillPopScope(
       onWillPop: _mayExitGame,
