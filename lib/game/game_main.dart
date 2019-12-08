@@ -45,7 +45,7 @@ class _GameMainState extends State<GameMain> {
 
     Camera camera = Camera(Offset(0, 0));
 
-    this.levelPainter = LevelPainter(camera, showHitBoxes: true);
+    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size));
 
     state = GameState(2, 2, levelPainter, level, camera);

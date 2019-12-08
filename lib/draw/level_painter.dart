@@ -87,11 +87,12 @@ class LevelPainter {
   bool showHitBoxes = false;
   Camera camera;
   Size screenSize;
+  Size levelSize;
   bool gameStarted = false;
   bool loading = false;
   Map<String, Map<Size, GifInfo>> imgAndGif = Map();
 
-  LevelPainter(this.camera, {this.showHitBoxes = false});
+  LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false});
 
   addElement(CustomDrawer customDrawer, {index}) {
     elements.update(
@@ -155,7 +156,7 @@ class LevelPainter {
   Widget get level {
     return CustomPaint(
       size: Size.infinite,
-      painter: _LevelPainterAux(this, this.camera, this.screenSize),
+      painter: _LevelPainterAux(this, this.camera, this.levelSize),
     );
   }
 }
