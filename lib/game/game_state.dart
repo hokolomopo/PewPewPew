@@ -1,6 +1,8 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/Projectile.dart';
 import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
@@ -9,6 +11,7 @@ import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
 
 import '../main.dart';
@@ -16,13 +19,16 @@ import 'camera.dart';
 import 'level.dart';
 
 /// Enum to describe the current state of the game
-enum GameStateMode{char_selection, moving, attacking, cinematic}
+enum GameStateMode{char_selection, moving, attacking, projectile, cinematic}
 
 class GameState{
   static const List<String> teamNames = ["Red", "Blue", "Green", "Orange"];
 
   /// Ratio between the size of a drag event and the length of the resulting jump
   static const double JumpVectorNormalizer = 2;
+
+  /// Ratio between the size of a drag event and the length of the resulting jump
+  static const double LaunchVectorNormalizer = 5;
 
   ///Speed of the camera when dragging
   static const double CameraSpeed = 1;
@@ -50,6 +56,16 @@ class GameState{
   Offset moveDestination;
 
   bool currentCharIsDead = false;
+  /// GameStateMode.attacking variables
+  bool ammoLaunching;
+  Offset launchDragStartPosition;
+  Offset launchDragEndPosition;
+  Weapon currentWeapon;
+
+  /// GameStateMode.projectile variables
+  Stopwatch stopWatch = Stopwatch();
+
+
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter, this.level, this.camera){
     uiManager = UiManager(painter);
@@ -119,7 +135,39 @@ class GameState{
         break;
       case GameStateMode.attacking:
         // TODO: Handle this case.
-        switchState(GameStateMode.char_selection);
+        // <JL> commenter pour travailler sur la phase attack
+        //switchState(GameStateMode.char_selection);
+
+        break;
+      case GameStateMode.projectile:
+
+        // center camera on projectile
+        this.camera.centerOn(currentWeapon.projectile.position);
+
+        // Stop stopWatch if non detonating projectile
+        if(currentWeapon.detonationTime == -1) {
+          if (stopWatch.isRunning) {
+            stopWatch.stop();
+            stopWatch.reset();
+          }
+
+          break;
+
+        }
+
+        // Time to detonate projectile
+        if(stopWatch.elapsedMilliseconds > currentWeapon.detonationTime){
+          stopWatch.stop();
+          stopWatch.reset();
+
+          currentWeapon.applyImpact(currentWeapon.projectile, players);
+          this.removeProjectile(currentWeapon.projectile);
+          currentWeapon=null;
+
+          switchState(GameStateMode.char_selection);
+        }
+
+
         break;
       case GameStateMode.cinematic:
         break;
@@ -187,10 +235,10 @@ class GameState{
     world.addTerrain(block);
     painter.addElement(block.drawer);
   }
-  
+
   void removeTerrainBlock(TerrainBlock block){
     world.removeTerrain(block);
-    painter.addElement(block.drawer);
+    painter.removeElement(block.drawer);
   }
 
   void removePlayer(int playerID){
@@ -207,7 +255,17 @@ class GameState{
     return players[currentPlayer][currentCharacter];
   }
 
-  void onTap(TapDownDetails details){
+  void addProjectile(Projectile projectile){
+    world.addProjectile(projectile);
+    painter.addElement(projectile.drawer);
+  }
+
+  void removeProjectile(Projectile projectile){
+    world.removeProjectile(projectile);
+    painter.removeElement(projectile);
+  }
+
+  void onTap(TapUpDetails details){
     Offset tapPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
 
     //Take camera into account
@@ -256,8 +314,12 @@ class GameState{
 
       case GameStateMode.attacking:
         // TODO: Handle this case.
+      // For development only
+      switchState(GameStateMode.moving);
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -289,15 +351,20 @@ class GameState{
 
           characterJumping = true;
           jumpDragStartPosition = dragPositionCamera;
-          
+
           uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         }
         break;
 
       case GameStateMode.attacking:
         // TODO: Handle this case.
+        // Should color it in red
+          launchDragStartPosition = dragPositionCamera;
+          uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -322,8 +389,13 @@ class GameState{
 
       case GameStateMode.attacking:
       // TODO: Handle this case.
+        launchDragEndPosition = dragPositionCamera;
+        Offset tmp = currentWeapon.projectile.getLaunchSpeed((dragPositionCamera - launchDragStartPosition ) * LaunchVectorNormalizer);
+        uiManager.updateJump(tmp);
         break;
 
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -346,16 +418,26 @@ class GameState{
 
       case GameStateMode.attacking:
         // TODO: Handle this case.
+        // J.L
+
+        this.addProjectile(currentWeapon.projectile);
+        currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) * LaunchVectorNormalizer);
+        uiManager.endJump();
+        switchState(GameStateMode.projectile);
+        stopWatch.start();
         break;
 
+
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
   }
 
-  void onLongPress(LongPressStartDetails details){
+  void onLongPress(){
     Character currentChar = getCurrentCharacter();
-    Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
+    //Offset dragPosition = GameUtils.absoluteToRelativeOffset(details.globalPosition, GameMain.size.height);
 
     switch(currentState){
 
@@ -363,18 +445,35 @@ class GameState{
         break;
 
       case GameStateMode.moving:
-        if(GameUtils.rectContains(currentChar.hitbox, dragPosition)){
-          if(currentChar.isAirborne())
-            return;
-          currentChar.stop();
+//        if(GameUtils.rectContains(currentChar.hitbox, dragPosition)){
+//          if(currentChar.isAirborne())
+//            return;
+//          currentChar.stop();
 
           //TODO : display armory
           print("Armory is here");
-        }
+          // For the moment skip the selection to implement the rest
+          Weapon selectedWeapon = currentChar.currentArsenal.arsenal[1];
+          currentChar.currentArsenal.selectWeapon(selectedWeapon);
+          currentWeapon = currentChar.currentArsenal.actualSelection;
+          Offset pos = currentChar.position;
+          Offset hit = Offset(5,5);
+          Boulet boulet = new Boulet(pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy), new Offset(0, 0), 5.0, 15, 3000);
+
+          currentWeapon.projectile = boulet;
+
+          switchState(GameStateMode.attacking);
+
+          // add weapon to be draw in a neutral position aligned with char
+
+
+//        }
 
         break;
 
       case GameStateMode.attacking:
+        break;
+      case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
         break;
@@ -425,6 +524,8 @@ class GameState{
         break;
       case GameStateMode.attacking:
         break;
+      case GameStateMode.projectile:
+        break;
       case GameStateMode.cinematic:
         break;
     }
@@ -442,6 +543,8 @@ class GameState{
           getCurrentCharacter().stop();
         break;
       case GameStateMode.attacking:
+        break;
+      case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
         break;

@@ -35,6 +35,8 @@ class Character extends MovingEntity {
 
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.drawer = new CharacterDrawer(asset, this);
+    // TODO Initiate "correctly" arsenal
+    this.currentArsenal = new Arsenal([Fist(), Colt()]);
 
   }
 
@@ -109,6 +111,14 @@ class Character extends MovingEntity {
 
   Color getTeamColor(){
     return teamColors[team];
+  }
+
+  void removeHp(int damage){
+    this.hp -= damage;
+
+    // TODO Handle death
+    if (this.hp < 0)
+      this.hp = 0;
   }
 
 }
