@@ -11,12 +11,12 @@ class ProjectileDrawer extends CustomDrawer{
   Projectile projectile;
 
   ProjectileDrawer(String gifPath, this.projectile,
-      {Size screenSize, Size size = const Size(5, 5)})
-      : super(size, gifPath, screenSize: screenSize);
+      {Size size = const Size(5, 5)})
+      : super(size, gifPath);
 
   @override
-  bool isReady2(Size screenSize) {
-    super.isReady2(screenSize);
+  bool isReady(Size screenSize) {
+    super.isReady(screenSize);
     return imgAndGif.containsKey(gifPath) &&
         imgAndGif[gifPath].containsKey(relativeSize) &&
         imgAndGif[gifPath][relativeSize] != null &&
@@ -36,7 +36,6 @@ class ProjectileDrawer extends CustomDrawer{
           debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(fetchNextFrame2(), Offset(left, top), Paint());
+    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
   }
-
 }

@@ -9,12 +9,12 @@ class CharacterDrawer extends CustomDrawer {
   Character character;
 
   CharacterDrawer(String gifPath, this.character,
-      {Size screenSize, Size size = const Size(10, 10)})
-      : super(size, gifPath, screenSize: screenSize);
+      {Size size = const Size(10, 10)})
+      : super(size, gifPath);
 
   @override
-  bool isReady2(Size screenSize) {
-    super.isReady2(screenSize);
+  bool isReady(Size screenSize) {
+    super.isReady(screenSize);
     return imgAndGif.containsKey(gifPath) &&
         imgAndGif[gifPath].containsKey(relativeSize) &&
         imgAndGif[gifPath][relativeSize] != null &&
@@ -35,7 +35,7 @@ class CharacterDrawer extends CustomDrawer {
           debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(fetchNextFrame2(), Offset(left, top), Paint());
+    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();

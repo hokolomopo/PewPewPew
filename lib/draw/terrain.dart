@@ -6,65 +6,12 @@ import 'math.dart';
 import 'level_painter.dart';
 import 'package:info2051_2018/game/terrain.dart';
 
-/// Represents the terrain (the ground) of the game.
-///
-/// This class provides methods to create and manage the state of the terrain.
-/// The basics are adding a block or removing it, however this provides other
-/// methods that you can use to perform usual actions on the terrain.
-///
-/// For performance purposes (avoiding drawing each modification), this class
-/// is not a widget and thus *never* set the state, the caller should do that
-/// itself when all modifications are done.
-///
-/// It must be noted that all distances, ranges, and sizes **have to**
-/// be expressed in proportion of the screen size, meaning that the valid
-/// range is [0;1]. Providing values outside this range to the functions may
-/// lead to unexpected behaviour.
 class TerrainBlockDrawer extends CustomDrawer {
   TerrainBlock terrainBlock;
-
-  //Set<TerrainBlock> blocks = Set();
 
   TerrainBlockDrawer(this.terrainBlock)
       : super(
             Size(terrainBlock.hitBox.width, terrainBlock.hitBox.height), null);
-
-  /// Creates a new terrain block.
-  ///
-  /// The [position] follows the axis system of Flutter : (0,0) is top left;
-  /// (1,1) is bottom right. If [width] (resp. [height]) is not given, it
-  /// will be infinite, meaning that the block will expand to the right
-  /// (resp. bottom) of the screen. In that case, the corresponding stroke line
-  /// will not be drawn.
-  /*addTerrainBlock(Offset position, {width, height}) {
-    blocks.add(TerrainBlock(position.dx, position.dy, width ?? double.infinity,
-        height ?? double.infinity));
-  }*/
-
-  /// Creates a terrain whose shape is given by a function.
-  ///
-  /// [createTerrainFromFunction] adds [nbBlocks] uniformly from left = 0 to
-  /// the screen size, the heights being given by [heightFromLeft],
-  /// 0 being the bottom of the screen. [heightFromLeft] should take one
-  /// argument, the left position, and return a double : the corresponding
-  /// desired height.
-  ///
-  /// Remember everything should be expressed in percentage of the screen size.
-  /*createTerrainFromFunction(Function heightFromLeft, {nbBlocks = 10}) {
-    blocks.clear();
-
-    for (double curLeft = 0;
-        curLeft < 180*(nbBlocks - 0.5) / nbBlocks;
-        curLeft += 180 / nbBlocks) {
-      // The width is increased a bit so that we don't see hairlines
-      // between the blocks (otherwise at some points there is a one pixel
-      // hole between blocks due to double computations inaccuracy).
-      blocks.add(TerrainBlock(curLeft, 100 - heightFromLeft(curLeft),
-          100 / nbBlocks + 0.5, double.infinity,
-          withStroke: false));
-    }
-  }
-*/
 
   /// Removes a set of blocks from their top-left positions.
   ///
@@ -114,15 +61,6 @@ class TerrainBlockDrawer extends CustomDrawer {
     double top =
         GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.top, size.height);
 
-//    Rect toDraw = Rect.fromLTWH(
-//        left,
-//        top,
-//        // [canvas.drawRect] does not like [double.infinity] while stroking.
-//        // As we don't know the size before painting, we can only truncate those
-//        // infinities here.
-//        min(width, size.width - left),
-//        min(height, size.height - top));
-
     Rect toDraw = Rect.fromLTWH(left, top, actualSize.width, actualSize.height);
 
     canvas.drawRect(toDraw, terrainFillPaint);
@@ -135,15 +73,3 @@ class TerrainBlockDrawer extends CustomDrawer {
     }
   }
 }
-
-// Simple wrapper around the Rect class
-// used to maintain information about stroke.
-/*class _TerrainBlock extends Rect {
-  // Note that even if [withStroke] is [false], the top stroke will still
-  // be painted.
-  bool withStroke;
-
-  _TerrainBlock(left, top, width, height, {this.withStroke = true})
-      : super.fromLTWH(left, top, width, height);
-}
-*/

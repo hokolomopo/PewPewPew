@@ -26,8 +26,6 @@ class GifInfo {
 
   ui.Image fetchNextFrame() {
     if (gif.length < 1) return null;
-    if (gif.length < 2) //[curFrameIndex] == 0
-      return gif[curFrameIndex].image;
 
     DateTime curTime = DateTime.now();
     Duration curDuration = gif[curFrameIndex].duration;
@@ -44,27 +42,16 @@ class GifInfo {
 }
 
 abstract class CustomDrawer {
-  TestListenable repaint;
-  List<MyFrameInfo> gif;
   Size screenSize;
   Size relativeSize;
   Size actualSize;
   String gifPath;
-  DateTime lastFetch;
-  int curFrameIndex;
-  DateTime lastSizeUpdate;
-  int frameCount;
-  int updating = 0;
   Map<String, Map<Size, GifInfo>> imgAndGif;
 
-  CustomDrawer(this.relativeSize, this.gifPath, {screenSize}) {
-    if (screenSize == null) return;
-
-    updateScreenSize(screenSize);
-  }
+  CustomDrawer(this.relativeSize, this.gifPath);
 
   @mustCallSuper
-  bool isReady2(Size screenSize) {
+  bool isReady(Size screenSize) {
     if (this.relativeSize != null) {
       this.actualSize =
           GameUtils.relativeToAbsoluteSize(relativeSize, screenSize.height);
@@ -74,100 +61,14 @@ abstract class CustomDrawer {
     return true;
   }
 
-  ui.Image fetchNextFrame2() {
+  ui.Image fetchNextFrame() {
     return imgAndGif[gifPath][relativeSize].fetchNextFrame();
-  }
-
-  bool isReady(Size screenSize) {
-    if (this.screenSize != screenSize) {
-      updateScreenSize(screenSize);
-      return false;
-    }
-    if (updating != 0) {
-      return false;
-    }
-    return true;
   }
 
   Map<String, Size> get imagePathsAndSizes {
     Map<String, Size> ret = Map();
     if (gifPath != null) ret.putIfAbsent(gifPath, () => relativeSize);
     return ret;
-  }
-
-  ui.Image fetchNextFrame() {
-    if (gif.length > frameCount) {
-      List<MyFrameInfo> mostRecent = List();
-      for (MyFrameInfo info in gif) {
-        if (info.addedTimestamp == lastSizeUpdate) {
-          mostRecent.add(info);
-        }
-      }
-      gif = mostRecent;
-    }
-
-    if (gif.length < 2) //[curFrameIndex] == 0
-      return gif[curFrameIndex].image;
-
-    DateTime curTime = DateTime.now();
-    Duration curDuration = gif[curFrameIndex].duration;
-    if (lastFetch == null || curTime.difference(lastFetch) > curDuration) {
-      lastFetch = curTime;
-      if (curFrameIndex == gif.length - 1)
-        curFrameIndex = 0;
-      else
-        curFrameIndex += 1;
-    }
-
-    return gif[curFrameIndex].image;
-  }
-
-  updateScreenSize(Size screenSize) {
-    updating += 1;
-    lastSizeUpdate = DateTime.now();
-    _updateScreenSize(screenSize, lastSizeUpdate.add(Duration(seconds: 0)));
-  }
-
-  _updateScreenSize(Size screenSize, DateTime callTimestamp) async {
-    if (gifPath != null) {
-      gif = List();
-      curFrameIndex = 0;
-      int targetWidth = GameUtils.relativeToAbsoluteDist(
-              relativeSize.width, screenSize.height)
-          .toInt();
-      int targetHeight = GameUtils.relativeToAbsoluteDist(
-              relativeSize.height, screenSize.height)
-          .toInt();
-
-      Uint8List gifBytes =
-          (await rootBundle.load(gifPath)).buffer.asUint8List();
-      ui.Codec codec = await ui.instantiateImageCodec(gifBytes);
-      frameCount = codec.frameCount;
-
-      ui.FrameInfo info;
-      ui.Image img;
-      Uint8List byteData;
-      for (int i = 0; i < frameCount; i++) {
-        info = await codec.getNextFrame();
-        img = info.image;
-        byteData = (await img.toByteData()).buffer.asUint8List();
-
-        ui.decodeImageFromPixels(
-            byteData, img.width, img.height, ui.PixelFormat.rgba8888,
-            (ui.Image result) {
-          this.gif.add(MyFrameInfo(info.duration, result, callTimestamp));
-        }, targetWidth: targetWidth, targetHeight: targetHeight);
-      }
-    }
-
-    if (this.relativeSize != null) {
-      this.actualSize =
-          GameUtils.relativeToAbsoluteSize(relativeSize, screenSize.height);
-    }
-
-    this.screenSize = screenSize;
-    updating -= 1;
-    //repaint.notifyListeners();
   }
 
   void paint(
@@ -179,25 +80,16 @@ abstract class CustomDrawer {
   }
 }
 
-class TestListenable extends ChangeNotifier {
-  @override
-  void notifyListeners() {
-    super.notifyListeners();
-  }
-}
-
 class LevelPainter {
   // The keys of the SplayTreeMap define an order. That means that we first
   // paint the elements with low keys, which thus appear in the background.
   SplayTreeMap<int, CustomDrawer> elements = SplayTreeMap();
-  TestListenable repaint = TestListenable();
   bool showHitBoxes = false;
   Camera camera;
   Size screenSize;
   bool gameStarted = false;
   bool loading = false;
   Map<String, Map<Size, GifInfo>> imgAndGif = Map();
-  int remainingToPreload = -1;
 
   LevelPainter(this.camera, {this.showHitBoxes = false});
 
@@ -205,12 +97,7 @@ class LevelPainter {
     elements.update(
         index ?? ((elements.lastKey() ?? 0) + 1), (value) => customDrawer,
         ifAbsent: () => customDrawer);
-    customDrawer.repaint = repaint;
     customDrawer.imgAndGif = imgAndGif;
-  }
-
-  removeElementByIndex(index) {
-    elements.remove(index);
   }
 
   removeElement(customDrawer) {
@@ -278,8 +165,7 @@ class _LevelPainterAux extends CustomPainter {
   Camera camera;
   Size levelSize;
 
-  _LevelPainterAux(this.levelPainter, this.camera, this.levelSize)
-      : super(repaint: levelPainter.repaint);
+  _LevelPainterAux(this.levelPainter, this.camera, this.levelSize);
 
   @override
   void paint(ui.Canvas canvas, Size size) {
@@ -293,7 +179,7 @@ class _LevelPainterAux extends CustomPainter {
 
       bool everyDrawerReady = true;
       for (CustomDrawer drawer in levelPainter.elements.values) {
-        if (!drawer.isReady2(size) && everyDrawerReady) {
+        if (!drawer.isReady(size) && everyDrawerReady) {
           // TODO real loading screen
           ui.ParagraphBuilder textBuilder = ui.ParagraphBuilder(
               ui.ParagraphStyle(textAlign: TextAlign.left, fontSize: 50.0))
@@ -323,14 +209,13 @@ class _LevelPainterAux extends CustomPainter {
     Offset absoluteCameraPosition = applyCamera(camera, canvas, size);
 
     for (CustomDrawer drawer in levelPainter.elements.values) {
-      if (drawer.isReady2(size)) {
+      if (drawer.isReady(size)) {
         drawer.paint(
             canvas, size, levelPainter.showHitBoxes, absoluteCameraPosition);
       } else {
         for (MapEntry<String, Size> entry in drawer.imagePathsAndSizes.entries) {
           levelPainter.addGif(entry.key, entry.value);
         }
-        //TODO handle case in which an element has been added after the loading
       }
     }
   }
