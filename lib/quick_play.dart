@@ -84,7 +84,7 @@ class ParametersState extends State<Parameters> {
         Text(texts[i]),
         Radio(
           activeColor: colors[i],
-          value: i,
+          value: i+1,
           groupValue: groupValue,
           onChanged: onChanged,
         )
@@ -184,7 +184,7 @@ class ParametersState extends State<Parameters> {
                     .push(
                       MaterialPageRoute(
                           builder: (context) =>
-                              GameMain(level: _terrain.levelObject)),
+                              GameMain(_terrain.levelObject, _nbPlayer, _nbWorms)),
                     )
                     .then(_gameOver);
               },

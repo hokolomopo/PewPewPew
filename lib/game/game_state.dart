@@ -13,7 +13,6 @@ import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
-import '../main.dart';
 import 'camera.dart';
 import 'level.dart';
 

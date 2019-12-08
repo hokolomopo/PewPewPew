@@ -13,23 +13,25 @@ import 'package:info2051_2018/home.dart';
 import 'level.dart';
 
 class GameMain extends StatefulWidget {
-  GameMain({Key key, this.level}) : super(key: key);
+  GameMain(this.levelJson, this.nbPlayers, this.nbCharacters);
 
-  final String level;
+  final String levelJson;
+  final int nbPlayers;
+  final int nbCharacters;
   static Size size;
 
   @override
-  _GameMainState createState() => new _GameMainState(level);
+  _GameMainState createState() =>
+      new _GameMainState(levelJson, nbPlayers, nbCharacters);
 }
 
 class _GameMainState extends State<GameMain> {
-  String levelJson;
   GameState state;
   int _callbackId;
   LevelPainter levelPainter;
   Duration lastTimeStamp;
 
-  _GameMainState(this.levelJson) {
+  _GameMainState(String levelJson, int nbPlayers, int nbCharacters) {
     Level level = Level.fromJson(jsonDecode(levelJson));
 
     Camera camera = Camera(Offset(0, 0));
@@ -37,7 +39,8 @@ class _GameMainState extends State<GameMain> {
     this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size));
 
-    state = GameState(2, 2, levelPainter, level, camera);
+    state = GameState(
+        nbPlayers, nbCharacters, levelPainter, level, camera);
 
     _scheduleFrame();
   }
@@ -59,7 +62,9 @@ class _GameMainState extends State<GameMain> {
     lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;
 
-    state.update(timeElapsed.toDouble() / 1000);
+    if (levelPainter.gameStarted) {
+      state.update(timeElapsed.toDouble() / 1000);
+    }
     if (!mounted) return;
 
     setState(() {});
@@ -67,7 +72,6 @@ class _GameMainState extends State<GameMain> {
   }
 
   Future<bool> _mayExitGame() {
-    print("on will pop");
     return showDialog(
       context: context,
       builder: (context) =>
@@ -107,25 +111,35 @@ class _GameMainState extends State<GameMain> {
       };
     }
 
+    var gestureDetector;
+    if (levelPainter.gameStarted) {
+      gestureDetector = GestureDetector(
+          onTapUp: onTapUp,
+          onPanStart: (details) {
+            state.onPanStart(details);
+          },
+          onPanUpdate: (details) {
+            state.onPanUpdate(details);
+          },
+          onPanEnd: (details) {
+            state.onPanEnd(details);
+          },
+          onLongPressStart: (details) {
+            state.onLongPress(details);
+          },
+          child: levelPainter.level);
+    } else {
+      gestureDetector = GestureDetector(
+          child: levelPainter.level
+      );
+    }
+
     return WillPopScope(
       onWillPop: _mayExitGame,
       child: new Scaffold(
         body: Container(
-            child: GestureDetector(
-                onTapUp: onTapUp,
-                onPanStart: (details) {
-                  state.onPanStart(details);
-                },
-                onPanUpdate: (details) {
-                  state.onPanUpdate(details);
-                },
-                onPanEnd: (details) {
-                  state.onPanEnd(details);
-                },
-                onLongPressStart: (details) {
-                  state.onLongPress(details);
-                },
-                child: levelPainter.level)),
+          child: gestureDetector,
+        ),
       ),
     );
   }
