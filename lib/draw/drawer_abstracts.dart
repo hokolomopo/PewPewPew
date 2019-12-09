@@ -4,43 +4,39 @@ import 'package:flutter/cupertino.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'assets_manager.dart';
 
+
+/// Class to draw image. We consider that a png is a gif with only one image
 abstract class ImagedDrawer extends CustomDrawer {
-  AssetId gifId;
+  AssetId assetId;
   AssetsManager assetsManager;
   GifInfo gifInfo;
 
-  ImagedDrawer(Size relativeSize, this.gifId) : super(relativeSize);
+  ImagedDrawer(Size relativeSize, this.assetId) : super(relativeSize);
 
   @override
   bool isReady(Size screenSize) {
     super.isReady(screenSize);
 
-    bool databaseContainsImg = assetsManager.loadedAssets.containsKey(gifId) &&
-        assetsManager.loadedAssets[gifId].containsKey(relativeSize);
+    // Check if the asset is loaded
+    bool isAssetLoaded = assetsManager.isAssetLoaded(assetId, relativeSize);
 
-    if (databaseContainsImg) {
+    if (isAssetLoaded) {
       if (gifInfo == null) {
-        gifInfo = GifInfo(assetsManager.loadedAssets[gifId][relativeSize]);
+        gifInfo = assetsManager.getGifInfo(assetId, relativeSize);
       }
       return fetchNextFrame() != null;
     }
     return false;
   }
 
+  /// Fetch the next frame of the gif
   ui.Image fetchNextFrame() {
     return gifInfo.fetchNextFrame();
   }
 
   set gif(AssetId newGifId) {
-    gifId = newGifId;
+    assetId = newGifId;
     gifInfo = null;
-  }
-
-  @override
-  Map<AssetId, Size> get imagePathsAndSizes {
-    Map<AssetId, Size> ret = Map();
-    ret.putIfAbsent(gifId, () => relativeSize);
-    return ret;
   }
 }
 
@@ -52,6 +48,7 @@ abstract class CustomDrawer {
   CustomDrawer(this.relativeSize);
 
   @mustCallSuper
+  /// Return true if the drawer is ready to be painted
   bool isReady(Size screenSize) {
     if (this.relativeSize != null) {
       this.actualSize =
@@ -69,9 +66,4 @@ abstract class CustomDrawer {
   Offset cancelCamera(Offset position, Offset cameraPosition) {
     return position + cameraPosition;
   }
-
-  // To be overridden by ImagedDrawers, used here for compatibility
-  set assetsManager(AssetsManager assetsManager) {}
-  set gif(AssetId newGifId) {}
-  Map<AssetId, Size> get imagePathsAndSizes => Map();
 }

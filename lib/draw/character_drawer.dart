@@ -17,14 +17,22 @@ class CharacterDrawer extends ImagedDrawer {
   void paint(
       Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
     double left = GameUtils.relativeToAbsoluteDist(
-        character.position.dx, screenSize.height);
+        character.getSpritePosition().dx, screenSize.height);
     double top = GameUtils.relativeToAbsoluteDist(
-        character.position.dy, screenSize.height);
+        character.getSpritePosition().dy, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(
-          Rect.fromLTWH(left, top, actualSize.width, actualSize.height),
-          debugShowHitBoxesPaint);
+          Rect.fromLTWH(
+              GameUtils.relativeToAbsoluteDist(
+                  character.hitbox.left, screenSize.height),
+              GameUtils.relativeToAbsoluteDist(
+                  character.hitbox.top, screenSize.height),
+              GameUtils.relativeToAbsoluteDist(
+                  character.hitbox.width, screenSize.height),
+              GameUtils.relativeToAbsoluteDist(
+                  character.hitbox.height, screenSize.height)),
+              debugShowHitBoxesPaint);
     }
 
     canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());

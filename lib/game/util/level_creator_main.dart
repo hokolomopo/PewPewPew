@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
@@ -78,7 +79,7 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
     camera.zoom = Offset(0.3,0.3);
 
     this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: false);
-    levelPainter.addElement(BackgroundDrawer(level.size));
+    levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
     createSpawns();
 

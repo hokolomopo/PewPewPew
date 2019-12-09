@@ -4,63 +4,71 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
+import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 enum AssetId{char_running, char_idle, background, projectile_boulet, projectile_dhs,
 }
 
+/// An image asset. The size is in relative game size
 class Asset{
   AssetId id;
   String path;
   Size size;
 
   Asset(this.id, this.path, {this.size});
-
 }
 
+/// Class to manage the image assets of the game
 class AssetsManager{
 
+  /// Default assets of the game
   final Map<AssetId, Asset> assets = {
-    AssetId.char_running:Asset(AssetId.char_running, "assets/graphics/characters/char1_run.gif", size:Size(10,10)),
-    AssetId.char_idle:Asset(AssetId.char_idle, "assets/graphics/characters/char1_idle.gif", size:Size(10,10)),
-    AssetId.background:Asset(AssetId.background, "assets/graphics/user_interface/animated-worm-image-0090.gif"),
+    AssetId.char_running:Asset(AssetId.char_running, "assets/graphics/characters/char1_run.gif", size:Character.characterSpriteSize),
+    AssetId.char_idle:Asset(AssetId.char_idle, "assets/graphics/characters/char1_idle.gif", size:Character.characterSpriteSize),
+    AssetId.background:Asset(AssetId.background, "assets/graphics/backgrounds/default_background.png"),
     AssetId.projectile_boulet:Asset(AssetId.projectile_boulet, "assets/graphics/arsenal/projectiles/red_arc.gif"),
     AssetId.projectile_dhs:Asset(AssetId.projectile_dhs, "assets/graphics/arsenal/projectiles/hand-spinner.gif"),
   };
 
-  Map<AssetId, Map<Size, List<MyFrameInfo>>> loadedAssets = Map();
+  Map<AssetId, Map<Size, List<MyFrameInfo>>> _loadedAssets = Map();
 
-  Size screenSize;
+  Size _screenSize;
 
   AssetsManager(Size levelSize){
     assets[AssetId.background].size = levelSize;
   }
 
+  /// Initialize the asset manager with the size of the screen. Thi must be called
+  /// before anything else
   void init(Size screenSize){
-    this.screenSize = screenSize;
+    this._screenSize = screenSize;
   }
 
+  /// Load the default assets of the game
   void preLoadAssets() async{
     for (Asset asset in assets.values) {
-        await addGif(asset);
+        await _loadGif(asset);
     }
   }
 
-  addGif(Asset asset) async {
+  /// Load a gif file (or a png, which we consider as a one frame gif)
+  _loadGif(Asset asset) async {
+    // Cannot load without a size
     if(asset.size == null)
       return;
-    if (this.loadedAssets.containsKey(asset.id) &&
-        this.loadedAssets[asset.id].containsKey(asset.size))
+
+    // Check if asset is not already loaded
+    if (this._loadedAssets.containsKey(asset.id) &&
+        this._loadedAssets[asset.id].containsKey(asset.size))
       return;
 
+    // Get absolute size
     List<MyFrameInfo> curGif = List();
-    int targetWidth =
-    GameUtils.relativeToAbsoluteDist(asset.size.width, screenSize.height)
-        .toInt();
-    int targetHeight =
-    GameUtils.relativeToAbsoluteDist(asset.size.height, screenSize.height)
-        .toInt();
+    int targetWidth = GameUtils.relativeToAbsoluteDist(asset.size.width, _screenSize.height).toInt();
+    int targetHeight = GameUtils.relativeToAbsoluteDist(asset.size.height, _screenSize.height).toInt();
 
+    // Load image
     Uint8List gifBytes = (await rootBundle.load(asset.path)).buffer.asUint8List();
     ui.Codec codec = await ui.instantiateImageCodec(gifBytes);
 
@@ -79,31 +87,35 @@ class AssetsManager{
           }, targetWidth: targetWidth, targetHeight: targetHeight);
     }
 
-    Map<Size, List<MyFrameInfo>> curSizes =
-    this.loadedAssets.putIfAbsent(asset.id, () => Map());
+    // Add asset to loaded assets
+    Map<Size, List<MyFrameInfo>> curSizes = this._loadedAssets.putIfAbsent(asset.id, () => Map());
     curSizes.putIfAbsent(asset.size, () => curGif);
     return;
   }
 
-//  MyFrameInfo getFrameInfo(AssetId id, Size size){
-//    if (this.loadedAssets.containsKey(asset.id) &&
-//        this.loadedAssets[asset.id].containsKey(asset.size))
-//      return this.loadedAssets[asset.id][size];
-//
-//    return null;
-//  }
-
+  // Load an asset
   void loadAsset(AssetId assetId, Size size){
-    Asset defaultAsset = assets[assetId];
-    if(defaultAsset.size == size)
+    if(isAssetLoaded(assetId, size))
       return;
-    this.addGif(Asset(assetId, defaultAsset.path, size:size));
+
+    this._loadGif(Asset(assetId, assets[assetId].path, size:size));
   }
 
+  bool isAssetLoaded(AssetId assetId, Size size){
+    return _loadedAssets.containsKey(assetId) &&
+        _loadedAssets[assetId].containsKey(size);
+  }
+
+  GifInfo getGifInfo(AssetId assetId, Size size){
+    if(!isAssetLoaded(assetId, size))
+      return null;
+
+    return GifInfo(_loadedAssets[assetId][size]);
+  }
 
 }
 
-/// ui.FrameInfo is an interface
+/// Information about a frame
 class MyFrameInfo {
   Duration duration;
   Image image;
@@ -112,22 +124,25 @@ class MyFrameInfo {
   MyFrameInfo(this.duration, this.image, [this.addedTimestamp]);
 }
 
+/// Information about a gif
 class GifInfo {
   List<MyFrameInfo> gif;
   DateTime lastFetch;
   int curFrameIndex = 0;
 
   // For projectile which get stuck
-  bool lockAnimation = false;
+  bool _lockAnimation = false;
 
   GifInfo(this.gif);
 
+  /// Get the next frame of the gif
   Image fetchNextFrame() {
     if (gif.length < 1) return null;
 
-    if (lockAnimation)
+    if (_lockAnimation)
       return gif[curFrameIndex].image;
 
+    // Check if we must change the frame of the gif
     DateTime curTime = DateTime.now();
     Duration curDuration = gif[curFrameIndex].duration;
     if (lastFetch == null || curTime.difference(lastFetch) > curDuration) {
@@ -139,5 +154,11 @@ class GifInfo {
     }
 
     return gif[curFrameIndex].image;
+  }
+
+  void freezeGif({int frameNumber}){
+    if(frameNumber != null)
+      curFrameIndex = frameNumber;
+    _lockAnimation = true;
   }
 }

@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:info2051_2018/draw/Projectile.dart';
+import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
@@ -55,7 +55,7 @@ abstract class Weapon{
       for (var j = 0; j < characters[i].length; j++) {
         // apply a circular HitBox
 
-        var dist = (p.position - characters[i][j].position).distance;
+        var dist = (p.getPosition() - characters[i][j].getPosition()).distance;
 
         if (dist < range) {
 
@@ -63,7 +63,7 @@ abstract class Weapon{
           characters[i][j].removeHp(damage, soundPlayer);
 
           // Apply a vector field for knockback
-          Offset projection = characters[i][j].position - p.position;
+          Offset projection = characters[i][j].getPosition() - p.getPosition();
 
           // normilize offset
           projection /= projection.distance;

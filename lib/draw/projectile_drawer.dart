@@ -20,9 +20,9 @@ class ProjectileDrawer extends ImagedDrawer{
   void paint(
       Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
     double left = GameUtils.relativeToAbsoluteDist(
-        projectile.position.dx, screenSize.height);
+        projectile.getSpritePosition().dx, screenSize.height);
     double top = GameUtils.relativeToAbsoluteDist(
-        projectile.position.dy, screenSize.height);
+        projectile.getSpritePosition().dy, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(
@@ -32,7 +32,7 @@ class ProjectileDrawer extends ImagedDrawer{
 
     // If frictionFactor == 1, we have to stay with the same frame
     if(projectile.animationStopped)
-      gifInfo.lockAnimation = true;
+      gifInfo.freezeGif();
 
       canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
   }

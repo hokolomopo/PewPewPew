@@ -134,7 +134,7 @@ class GameState {
         }
 
         //Center the camera on the character
-        this.camera.centerOn(getCurrentCharacter().position);
+        this.camera.centerOn(getCurrentCharacter().getPosition());
 
         break;
       case GameStateMode.attacking:
@@ -145,7 +145,7 @@ class GameState {
         break;
       case GameStateMode.projectile:
         // center camera on projectile
-        this.camera.centerOn(currentWeapon.projectile.position);
+        this.camera.centerOn(currentWeapon.projectile.getPosition());
 
         // Stop stopWatch if non detonating projectile
         if (currentWeapon.detonationTime == -1) {
@@ -477,7 +477,7 @@ class GameState {
           Weapon selectedWeapon = currentChar.currentArsenal.arsenal[1];
           currentChar.currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentChar.currentArsenal.actualSelection;
-          Offset pos = currentChar.position;
+          Offset pos = currentChar.getPosition();
           Offset hit = Offset(5, 5);
           ProjDHS boulet = new ProjDHS(
               pos,

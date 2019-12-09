@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/paint_constants.dart';
@@ -76,4 +77,24 @@ class JumpArrowDrawer extends CustomDrawer{
 
   }
 
+}
+
+class LoadingScreenDrawer extends CustomDrawer{
+  LoadingScreenDrawer() : super(null);
+
+  @override
+  void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
+    ParagraphBuilder textBuilder = ParagraphBuilder(
+        ParagraphStyle(textAlign: TextAlign.left, fontSize: 50.0))
+      ..pushStyle(ui.TextStyle(color: Colors.white))
+      ..addText('loading...');
+    Paragraph text = textBuilder.build()
+      ..layout(ParagraphConstraints(
+          width: (size.width < 250) ? size.width : 250));
+
+    canvas.drawParagraph(
+        text,
+        Offset((size.width - text.width) / 2,
+            (size.height - text.height) / 2));
+  }
 }

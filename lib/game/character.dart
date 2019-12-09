@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/Character.dart';
+import 'package:info2051_2018/draw/character_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/drawer_abstracts.dart';
 import 'package:info2051_2018/game/entity.dart';
@@ -21,8 +21,11 @@ class Character extends MovingEntity {
   static const double max_jump_speed = 50;
   static const double walk_speed = 20;
 
-  static final Offset hitboxSize = new Offset(10,10);
-  
+  static final Size characterSpriteSize = Size(10, 10);
+  final Offset characterSpritePositionOffset = Offset(-2, 0);
+
+  static final Offset hitboxSize = new Offset(6,10);
+
   static final String hurtSoundName = "hurtSound.mp3";
 
   int hp = base_hp;
@@ -36,10 +39,10 @@ class Character extends MovingEntity {
   bool isDead = false;
 
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
+    this.spritePositionOffset = characterSpritePositionOffset;
     this.drawer = new CharacterDrawer(AssetId.char_idle, this);
     // TODO Initiate "correctly" arsenal
     this.currentArsenal = new Arsenal([Fist(), Colt()]);
-
   }
 
   void jump(Offset direction){
@@ -96,16 +99,16 @@ class Character extends MovingEntity {
     //Set the velocity
     this.setXSpeed(newXSpeed);
 
-    if((this.drawer as ImagedDrawer).gifId != AssetId.char_running)
-      this.drawer.gif = AssetId.char_running;
+    if((this.drawer as ImagedDrawer).assetId != AssetId.char_running)
+      (this.drawer as ImagedDrawer).gif = AssetId.char_running;
   }
 
   @override
   void stopX(){
     super.stopX();
 
-    if((this.drawer as ImagedDrawer).gifId != AssetId.char_idle)
-      this.drawer.gif = AssetId.char_idle;
+    if((this.drawer as ImagedDrawer).assetId != AssetId.char_idle)
+      (this.drawer as ImagedDrawer).gif = AssetId.char_idle;
   }
 
   /// Override mode to update stamina when the character is moving

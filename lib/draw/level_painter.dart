@@ -1,10 +1,8 @@
 import 'dart:collection';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
@@ -32,8 +30,8 @@ class LevelPainter {
     elements.update(actualIndex, (value) => customDrawer,
         ifAbsent: () => customDrawer);
 
-    //TODO if customDrawer is type ImageDrawer, et virer le champ imgAndGif du customDrawer
-    customDrawer.assetsManager = assetsManager;
+    if(customDrawer is ImagedDrawer)
+      customDrawer.assetsManager = assetsManager;
   }
 
   removeElement(CustomDrawer toRemove) {
@@ -41,14 +39,6 @@ class LevelPainter {
     elements.removeWhere((key, drawer) => (drawer == toRemove));
   }
 
-
-//  loadGame() async {
-//    for (CustomDrawer drawer in elements.values) {
-//      for (MapEntry<String, Size> entry in drawer.imagePathsAndSizes.entries) {
-//        await addGif(entry.key, entry.value);
-//      }
-//    }
-//  }
 
   /// Getter for the previously built level.
   ///
@@ -68,11 +58,14 @@ class _LevelPainterAux extends CustomPainter {
   Camera camera;
   Size levelSize;
   AssetsManager assetsManager;
+  LoadingScreenDrawer loadingScreenDrawer;
 
   _LevelPainterAux(this.levelPainter, this.camera, this.levelSize, this.assetsManager);
 
   @override
   void paint(ui.Canvas canvas, Size size) {
+
+    //Load the assets if this is not already done
     if (!levelPainter.gameStarted) {
       if (!levelPainter.loading) {
         // Set loading here to benefit from the fact that this function is
@@ -84,19 +77,10 @@ class _LevelPainterAux extends CustomPainter {
       bool everyDrawerReady = true;
       for (CustomDrawer drawer in levelPainter.elements.values) {
         if (!drawer.isReady(size) && everyDrawerReady) {
-          // TODO real loading screen
-          ui.ParagraphBuilder textBuilder = ui.ParagraphBuilder(
-              ui.ParagraphStyle(textAlign: TextAlign.left, fontSize: 50.0))
-            ..pushStyle(ui.TextStyle(color: Colors.white))
-            ..addText('loading...');
-          ui.Paragraph text = textBuilder.build()
-            ..layout(ui.ParagraphConstraints(
-                width: (size.width < 250) ? size.width : 250));
+          if(loadingScreenDrawer == null)
+            loadingScreenDrawer = LoadingScreenDrawer();
 
-          canvas.drawParagraph(
-              text,
-              Offset((size.width - text.width) / 2,
-                  (size.height - text.height) / 2));
+          loadingScreenDrawer.paint(canvas, size, false, null);
 
           everyDrawerReady = false;
         }
@@ -107,54 +91,56 @@ class _LevelPainterAux extends CustomPainter {
       }
     }
 
+    // The game is starting, lose pointer to loading screen for garbage collector
     levelPainter.gameStarted = true;
+    loadingScreenDrawer = null;
 
     //Apply camera transforms
     Offset absoluteCameraPosition = applyCamera(camera, canvas, size);
 
     for (CustomDrawer drawer in levelPainter.elements.values) {
+      // Check if the drawer is ready
       if (drawer.isReady(size)) {
         drawer.paint(
             canvas, size, levelPainter.showHitBoxes, absoluteCameraPosition);
-      } else {
-        for (MapEntry<AssetId, Size> entry
-            in drawer.imagePathsAndSizes.entries) {
-          assetsManager
-              .loadAsset(entry.key, entry.value);
-        }
+      }
+      // If not ready, load its asset
+      else {
+        if(drawer is ImagedDrawer)
+            assetsManager.loadAsset(drawer.assetId, drawer.relativeSize);
       }
     }
   }
 
-  ///Apply camera offset to the canvas and return its absolute position for the drawing
+  //Apply camera offset to the canvas and return its absolute position for the drawing
   Offset applyCamera(Camera camera, Canvas canvas, Size screenSize) {
-    Offset absoluteCameraPosition =
-        GameUtils.relativeToAbsoluteOffset(camera.position, screenSize.height);
-    Offset absoluteLevelSize = GameUtils.relativeToAbsoluteOffset(
-        GameUtils.getDimFromSize(levelSize), screenSize.height);
+  Offset absoluteCameraPosition =
+      GameUtils.relativeToAbsoluteOffset(camera.position, screenSize.height);
+  Offset absoluteLevelSize = GameUtils.relativeToAbsoluteOffset(
+      GameUtils.getDimFromSize(levelSize), screenSize.height);
 
-    //Fix camera position to stay inside level limits
-    double fixedX = absoluteCameraPosition.dx;
-    double fixedY = absoluteCameraPosition.dy;
-    if (fixedX < 0)
-      fixedX = 0;
-    else if (fixedX + screenSize.width > absoluteLevelSize.dx)
-      fixedX = absoluteLevelSize.dx - screenSize.width;
+  //Fix camera position to stay inside level limits
+  double fixedX = absoluteCameraPosition.dx;
+  double fixedY = absoluteCameraPosition.dy;
+  if (fixedX < 0)
+    fixedX = 0;
+  else if (fixedX + screenSize.width > absoluteLevelSize.dx)
+    fixedX = absoluteLevelSize.dx - screenSize.width;
 
-    if (fixedY < 0)
-      fixedY = 0;
-    else if (fixedY + screenSize.height > absoluteLevelSize.dy)
-      fixedY = absoluteLevelSize.dy - screenSize.height;
+  if (fixedY < 0)
+    fixedY = 0;
+  else if (fixedY + screenSize.height > absoluteLevelSize.dy)
+    fixedY = absoluteLevelSize.dy - screenSize.height;
 
-    absoluteCameraPosition = Offset(fixedX, fixedY);
+  absoluteCameraPosition = Offset(fixedX, fixedY);
+  camera.position = GameUtils.absoluteToRelativeOffset(
+      absoluteCameraPosition, screenSize.height);
 
-    canvas.translate(-absoluteCameraPosition.dx, -absoluteCameraPosition.dy);
-    canvas.scale(camera.zoom.dx, camera.zoom.dy);
+  // Apply camera transformation to the canvas
+  canvas.translate(-absoluteCameraPosition.dx, -absoluteCameraPosition.dy);
+  canvas.scale(camera.zoom.dx, camera.zoom.dy);
 
-    camera.position = GameUtils.absoluteToRelativeOffset(
-        absoluteCameraPosition, screenSize.height);
-
-    return absoluteCameraPosition;
+  return absoluteCameraPosition;
   }
 
   @override
