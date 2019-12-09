@@ -10,6 +10,7 @@ abstract class ImagedDrawer extends CustomDrawer {
   AssetId assetId;
   AssetsManager assetsManager;
   GifInfo gifInfo;
+  bool changeGif = true;
 
   ImagedDrawer(Size relativeSize, this.assetId) : super(relativeSize);
 

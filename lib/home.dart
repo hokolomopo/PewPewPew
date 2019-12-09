@@ -35,7 +35,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
   void _reload() {
-//    Navigator.of(context).pop();
+    Navigator.of(context).pop();
 //    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
   }
 
