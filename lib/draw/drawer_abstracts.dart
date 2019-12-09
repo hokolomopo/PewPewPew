@@ -110,5 +110,6 @@ abstract class CustomDrawer {
 
   // To be overridden by ImagedDrawers, used here for compatibility
   set imgAndGif(Map<String, Map<Size, List<MyFrameInfo>>> imgAndGif) {}
+  set gif(String newGifPath) {}
   Map<String, Size> get imagePathsAndSizes => Map();
 }
