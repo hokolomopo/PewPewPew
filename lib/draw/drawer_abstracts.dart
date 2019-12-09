@@ -53,7 +53,6 @@ abstract class ImagedDrawer extends CustomDrawer {
   bool isReady(Size screenSize) {
     super.isReady(screenSize);
 
-
     bool databaseContainsImg = imgAndGif.containsKey(gifPath) &&
         imgAndGif[gifPath].containsKey(relativeSize);
 
@@ -68,6 +67,11 @@ abstract class ImagedDrawer extends CustomDrawer {
 
   ui.Image fetchNextFrame() {
     return gifInfo.fetchNextFrame();
+  }
+
+  set gif(String newGifPath) {
+    gifPath = newGifPath;
+    gifInfo = null;
   }
 
   @override
