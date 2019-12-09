@@ -44,21 +44,30 @@ class GifInfo {
 
 abstract class ImagedDrawer extends CustomDrawer {
   String gifPath;
-  Map<String, Map<Size, GifInfo>> imgAndGif;
+  Map<String, Map<Size, List<MyFrameInfo>>> imgAndGif;
+  GifInfo gifInfo;
 
   ImagedDrawer(Size relativeSize, this.gifPath) : super(relativeSize);
 
   @override
   bool isReady(Size screenSize) {
     super.isReady(screenSize);
-    return imgAndGif.containsKey(gifPath) &&
-        imgAndGif[gifPath].containsKey(relativeSize) &&
-        imgAndGif[gifPath][relativeSize] != null &&
-        fetchNextFrame() != null;
+
+
+    bool databaseContainsImg = imgAndGif.containsKey(gifPath) &&
+        imgAndGif[gifPath].containsKey(relativeSize);
+
+    if (databaseContainsImg) {
+      if (gifInfo == null) {
+        gifInfo = GifInfo(imgAndGif[gifPath][relativeSize]);
+      }
+      return fetchNextFrame() != null;
+    }
+    return false;
   }
 
   ui.Image fetchNextFrame() {
-    return imgAndGif[gifPath][relativeSize].fetchNextFrame();
+    return gifInfo.fetchNextFrame();
   }
 
   @override
@@ -96,6 +105,6 @@ abstract class CustomDrawer {
   }
 
   // To be overridden by ImagedDrawers, used here for compatibility
-  set imgAndGif(Map<String, Map<Size, GifInfo>> imgAndGif) {}
+  set imgAndGif(Map<String, Map<Size, List<MyFrameInfo>>> imgAndGif) {}
   Map<String, Size> get imagePathsAndSizes => Map();
 }

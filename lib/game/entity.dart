@@ -13,7 +13,6 @@ abstract class Entity{
   void setPosition(Offset position){
     this.position = position;
     _updateHitboxPosition();
-
   }
 
   void setXPosition(double X){

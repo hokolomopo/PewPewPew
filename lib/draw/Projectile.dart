@@ -30,7 +30,7 @@ class ProjectileDrawer extends ImagedDrawer{
 
     // If frictionFactor == 1, we have to stay with the same frame
     if(projectile.animationStopped)
-      imgAndGif[gifPath][relativeSize].lockAnimation = true;
+      gifInfo.lockAnimation = true;
 
       canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
   }

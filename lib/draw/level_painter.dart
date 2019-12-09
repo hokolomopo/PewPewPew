@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +20,7 @@ class LevelPainter {
   Size levelSize;
   bool gameStarted = false;
   bool loading = false;
-  Map<String, Map<Size, GifInfo>> imgAndGif = Map();
+  Map<String, Map<Size, List<MyFrameInfo>>> imgAndGif = Map();
 
   LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false});
 
@@ -37,7 +38,8 @@ class LevelPainter {
 
   addGif(String path, Size relativeSize) async {
     if (imgAndGif.containsKey(path) &&
-        imgAndGif[path].containsKey(relativeSize)) return;
+        imgAndGif[path].containsKey(relativeSize))
+      return;
 
     List<MyFrameInfo> curGif = List();
     int targetWidth =
@@ -65,8 +67,10 @@ class LevelPainter {
       }, targetWidth: targetWidth, targetHeight: targetHeight);
     }
 
-    Map<Size, GifInfo> curSizes = imgAndGif.putIfAbsent(path, () => Map());
-    curSizes.putIfAbsent(relativeSize, () => GifInfo(curGif));
+    Map<Size, List<MyFrameInfo>> curSizes =
+        imgAndGif.putIfAbsent(path, () => Map());
+    curSizes.putIfAbsent(relativeSize, () => curGif);
+    return;
   }
 
   loadGame() async {
@@ -145,7 +149,8 @@ class _LevelPainterAux extends CustomPainter {
       } else {
         for (MapEntry<String, Size> entry
             in drawer.imagePathsAndSizes.entries) {
-          levelPainter.addGif(entry.key, entry.value);
+          levelPainter
+              .addGif(entry.key, entry.value);
         }
       }
     }
