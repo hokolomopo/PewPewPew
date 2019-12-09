@@ -27,8 +27,6 @@ class ShopListState extends State<ShopList> {
   // To track actual sorting policy of the list
   int activeSort = 1; // Alphabetical sort first
 
-  //ShopListState({this.items}) ;
-
   @override
   void initState() {
     super.initState();

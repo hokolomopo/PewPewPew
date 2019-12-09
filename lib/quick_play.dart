@@ -19,8 +19,8 @@ class Parameters extends StatefulWidget {
 }
 
 class ParametersState extends State<Parameters> {
-  int _nbPlayer = 0; // nb of player in game
-  int _nbWorms = 0; // nb of Worms per team
+  int _nbPlayer = 2; // nb of player in game
+  int _nbWorms = 1; // nb of Worms per team
   Terrain _terrain; // identification of the selected map to instantiate
 
   @override
@@ -71,7 +71,8 @@ class ParametersState extends State<Parameters> {
       List<String> texts,
       List<Color> colors,
       int groupValue,
-      Function onChanged}) {
+      Function onChanged,
+      List<int> values}) {
     List<Widget> list = List();
     list.add(Expanded(
         child: FittedBox(
@@ -84,7 +85,7 @@ class ParametersState extends State<Parameters> {
         Text(texts[i]),
         Radio(
           activeColor: colors[i],
-          value: i+1,
+          value: values == null ? i+1 : values[i],
           groupValue: groupValue,
           onChanged: onChanged,
         )
@@ -106,14 +107,14 @@ class ParametersState extends State<Parameters> {
           child: Row(
               children: buildRadioList(
                   title: "Number\nPlayers",
-                  texts: ["1P", "2P", "3P", "4P"],
+                  texts: ["2P", "3P", "4P"],
                   colors: [
-                    Colors.redAccent,
                     Colors.lightBlueAccent,
                     Colors.green,
                     Colors.deepPurpleAccent
                   ],
                   groupValue: _nbPlayer,
+                  values: [2, 3, 4],
                   onChanged: _handleNbPlayers)),
         ),
         Padding(
@@ -180,13 +181,16 @@ class ParametersState extends State<Parameters> {
                 //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
                 //ap.pause();
 
-                Navigator.of(context)
-                    .push(
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              GameMain(_terrain.levelObject, _nbPlayer, _nbWorms)),
-                    )
-                    .then(_gameOver);
+                if(_terrain == null)
+                  _simpleAlertDialog("Please select a level", context);
+                else
+                  Navigator.of(context)
+                      .push(
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                GameMain(_terrain.levelObject, _nbPlayer, _nbWorms)),
+                      )
+                      .then(_gameOver);
               },
             ),
             height: 50.0,
@@ -196,4 +200,17 @@ class ParametersState extends State<Parameters> {
       ],
     );
   }
+
+  /// Simple Alert dialog
+  void _simpleAlertDialog(String text, BuildContext context){
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: new Text(text, style: TextStyle(height: 1.5, color: Colors.black),),
+        );
+      },
+    );
+  }
+
 }
