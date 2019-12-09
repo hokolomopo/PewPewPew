@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:info2051_2018/draw/Projectile.dart';
+import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/sound_player.dart';
@@ -117,23 +118,21 @@ class Projectile extends MovingEntity{
 // TODO precise value in constructor body instead of arg (useful for tests)
 // Class Test for projectile
 class Boulet extends Projectile {
-  static final String assets = 'assets/graphics/arsenal/projectiles/red_arc.gif';
 
   Boulet(Offset position, Rectangle hitbox, Offset velocity, double weight,
       int damage, int maxSpeed)
       : super(position, hitbox, velocity, weight, damage, maxSpeed){
-    this.drawer = ProjectileDrawer(assets, this);
+    this.drawer = ProjectileDrawer(AssetId.projectile_boulet, this);
     this.frictionFactor = 0.02;
   }
 }
 
 class ProjDHS extends Projectile {
-  static final String assets = 'assets/graphics/arsenal/projectiles/hand-spinner.gif';
 
   ProjDHS(Offset position, Rectangle hitbox, Offset velocity, double weight,
       int damage, int maxSpeed)
       : super(position, hitbox, velocity, weight, damage, maxSpeed){
-    this.drawer = ProjectileDrawer(assets, this);
+    this.drawer = ProjectileDrawer(AssetId.projectile_dhs, this);
     this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
   }
 }

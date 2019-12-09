@@ -9,6 +9,7 @@ import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 import 'drawer_abstracts.dart';
+import 'assets_manager.dart';
 
 class LevelPainter {
   // The keys of the SplayTreeMap define an order. That means that we first
@@ -20,15 +21,19 @@ class LevelPainter {
   Size levelSize;
   bool gameStarted = false;
   bool loading = false;
-  Map<String, Map<Size, List<MyFrameInfo>>> imgAndGif = Map();
+  AssetsManager assetsManager;
 
-  LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false});
+  LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false}){
+    assetsManager = AssetsManager(levelSize);
+  }
 
   addElement(CustomDrawer customDrawer, {index}) {
     int actualIndex = index ?? ((elements.lastKey() ?? 0) + 1);
     elements.update(actualIndex, (value) => customDrawer,
         ifAbsent: () => customDrawer);
-    customDrawer.imgAndGif = imgAndGif;
+
+    //TODO if customDrawer is type ImageDrawer, et virer le champ imgAndGif du customDrawer
+    customDrawer.assetsManager = assetsManager;
   }
 
   removeElement(CustomDrawer toRemove) {
@@ -36,50 +41,14 @@ class LevelPainter {
     elements.removeWhere((key, drawer) => (drawer == toRemove));
   }
 
-  addGif(String path, Size relativeSize) async {
-    if (imgAndGif.containsKey(path) &&
-        imgAndGif[path].containsKey(relativeSize))
-      return;
 
-    List<MyFrameInfo> curGif = List();
-    int targetWidth =
-        GameUtils.relativeToAbsoluteDist(relativeSize.width, screenSize.height)
-            .toInt();
-    int targetHeight =
-        GameUtils.relativeToAbsoluteDist(relativeSize.height, screenSize.height)
-            .toInt();
-
-    Uint8List gifBytes = (await rootBundle.load(path)).buffer.asUint8List();
-    ui.Codec codec = await ui.instantiateImageCodec(gifBytes);
-
-    ui.FrameInfo info;
-    ui.Image img;
-    Uint8List byteData;
-    for (int i = 0; i < codec.frameCount; i++) {
-      info = await codec.getNextFrame();
-      img = info.image;
-      byteData = (await img.toByteData()).buffer.asUint8List();
-
-      ui.decodeImageFromPixels(
-          byteData, img.width, img.height, ui.PixelFormat.rgba8888,
-          (ui.Image result) {
-        curGif.add(MyFrameInfo(info.duration, result));
-      }, targetWidth: targetWidth, targetHeight: targetHeight);
-    }
-
-    Map<Size, List<MyFrameInfo>> curSizes =
-        imgAndGif.putIfAbsent(path, () => Map());
-    curSizes.putIfAbsent(relativeSize, () => curGif);
-    return;
-  }
-
-  loadGame() async {
-    for (CustomDrawer drawer in elements.values) {
-      for (MapEntry<String, Size> entry in drawer.imagePathsAndSizes.entries) {
-        await addGif(entry.key, entry.value);
-      }
-    }
-  }
+//  loadGame() async {
+//    for (CustomDrawer drawer in elements.values) {
+//      for (MapEntry<String, Size> entry in drawer.imagePathsAndSizes.entries) {
+//        await addGif(entry.key, entry.value);
+//      }
+//    }
+//  }
 
   /// Getter for the previously built level.
   ///
@@ -89,7 +58,7 @@ class LevelPainter {
   Widget get level {
     return CustomPaint(
       size: Size.infinite,
-      painter: _LevelPainterAux(this, this.camera, this.levelSize),
+      painter: _LevelPainterAux(this, this.camera, this.levelSize, assetsManager),
     );
   }
 }
@@ -98,8 +67,9 @@ class _LevelPainterAux extends CustomPainter {
   LevelPainter levelPainter;
   Camera camera;
   Size levelSize;
+  AssetsManager assetsManager;
 
-  _LevelPainterAux(this.levelPainter, this.camera, this.levelSize);
+  _LevelPainterAux(this.levelPainter, this.camera, this.levelSize, this.assetsManager);
 
   @override
   void paint(ui.Canvas canvas, Size size) {
@@ -108,7 +78,7 @@ class _LevelPainterAux extends CustomPainter {
         // Set loading here to benefit from the fact that this function is
         // synchronous
         levelPainter.loading = true;
-        levelPainter.loadGame();
+        assetsManager.preLoadAssets();
       }
 
       bool everyDrawerReady = true;
@@ -147,10 +117,10 @@ class _LevelPainterAux extends CustomPainter {
         drawer.paint(
             canvas, size, levelPainter.showHitBoxes, absoluteCameraPosition);
       } else {
-        for (MapEntry<String, Size> entry
+        for (MapEntry<AssetId, Size> entry
             in drawer.imagePathsAndSizes.entries) {
-          levelPainter
-              .addGif(entry.key, entry.value);
+          assetsManager
+              .loadAsset(entry.key, entry.value);
         }
       }
     }

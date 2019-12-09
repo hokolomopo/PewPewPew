@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:info2051_2018/draw/assets_manager.dart';
+
 import 'drawer_abstracts.dart';
 import 'paint_constants.dart';
 import 'package:info2051_2018/game/weaponry.dart';
@@ -10,9 +12,9 @@ import 'package:info2051_2018/game/util/utils.dart';
 class ProjectileDrawer extends ImagedDrawer{
   Projectile projectile;
 
-  ProjectileDrawer(String gifPath, this.projectile,
+  ProjectileDrawer(AssetId assetId, this.projectile,
       {Size size = const Size(5, 5)})
-      : super(size, gifPath);
+      : super(size, assetId);
 
   @override
   void paint(

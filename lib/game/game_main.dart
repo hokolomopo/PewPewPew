@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
@@ -37,7 +38,7 @@ class _GameMainState extends State<GameMain> {
     Camera camera = Camera(Offset(0, 0));
 
     this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
-    levelPainter.addElement(BackgroundDrawer(level.size));
+    levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
     state = GameState(
         nbPlayers, nbCharacters, levelPainter, level, camera);
@@ -99,6 +100,7 @@ class _GameMainState extends State<GameMain> {
         .of(context)
         .size;
     levelPainter.screenSize = Home.screenSizeLandscape;
+    levelPainter.assetsManager.init(Home.screenSizeLandscape);
 
     var onTapUp;
     if (state.currentState == GameStateMode.over) {

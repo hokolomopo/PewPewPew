@@ -31,18 +31,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 // Function for child to stop menu music
   void _stopMusic() {
     //soundPlayer.release();
-    soundPlayer.playLocalAudio(_gameMusicName, 0.7);
+//    soundPlayer.playLocalAudio(_gameMusicName, 0.7);
   }
 
   void _reload() {
-    Navigator.of(context).pop();
-    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
+//    Navigator.of(context).pop();
+//    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
   }
 
   @override
   void initState() {
     super.initState();
-    this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
+//    this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -355,7 +355,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    soundPlayer.release();
+//    soundPlayer.release();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -364,12 +364,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        soundPlayer.resume();
+//        soundPlayer.resume();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-        soundPlayer.pause();
+//        soundPlayer.pause();
         break;
     }
   }
