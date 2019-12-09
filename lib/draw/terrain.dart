@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
+import 'drawer_abstracts.dart';
 import 'paint_constants.dart';
 import 'math.dart';
-import 'level_painter.dart';
 import 'package:info2051_2018/game/terrain.dart';
 
 class TerrainBlockDrawer extends CustomDrawer {
@@ -11,7 +11,7 @@ class TerrainBlockDrawer extends CustomDrawer {
 
   TerrainBlockDrawer(this.terrainBlock)
       : super(
-            Size(terrainBlock.hitBox.width, terrainBlock.hitBox.height), null);
+            Size(terrainBlock.hitBox.width, terrainBlock.hitBox.height));
 
   /// Removes a set of blocks from their top-left positions.
   ///

@@ -5,7 +5,7 @@ import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
-import 'level_painter.dart';
+import 'drawer_abstracts.dart';
 
 class StaminaDrawer extends CustomDrawer {
   static const double actionBarWidth = 30;
@@ -14,7 +14,7 @@ class StaminaDrawer extends CustomDrawer {
 
   Character character;
 
-  StaminaDrawer(this.character) : super(null, null);
+  StaminaDrawer(this.character) : super(null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
@@ -38,7 +38,7 @@ class MarkerDrawer extends CustomDrawer{
 
   Offset position;
 
-  MarkerDrawer(this.position) : super(null, null);
+  MarkerDrawer(this.position) : super(null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
@@ -60,7 +60,7 @@ class JumpArrowDrawer extends CustomDrawer{
   Offset origin;
   Offset end;
 
-  JumpArrowDrawer(this.origin, this.end) : super(null, null);
+  JumpArrowDrawer(this.origin, this.end) : super(null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {

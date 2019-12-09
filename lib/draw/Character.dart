@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 
+import 'drawer_abstracts.dart';
 import 'paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
-import 'level_painter.dart';
 
-class CharacterDrawer extends CustomDrawer {
+class CharacterDrawer extends ImagedDrawer {
   Character character;
 
   CharacterDrawer(String gifPath, this.character,
       {Size size = const Size(10, 10)})
       : super(size, gifPath);
-
-  @override
-  bool isReady(Size screenSize) {
-    super.isReady(screenSize);
-    return imgAndGif.containsKey(gifPath) &&
-        imgAndGif[gifPath].containsKey(relativeSize) &&
-        imgAndGif[gifPath][relativeSize] != null &&
-        imgAndGif[gifPath][relativeSize].fetchNextFrame() != null;
-  }
 
   @override
   void paint(

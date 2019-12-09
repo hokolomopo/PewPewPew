@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'level_painter.dart';
+import 'drawer_abstracts.dart';
 
 enum TextPositions{center, custom}
 
@@ -21,7 +21,7 @@ class TextDrawer extends CustomDrawer {
       {this.customPosition : const Offset(0,0),
         this.color : Colors.white,
         this.opacity: 1,
-        this.ignoreCamera = false}) : super(null, null);
+        this.ignoreCamera = false}) : super(null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {

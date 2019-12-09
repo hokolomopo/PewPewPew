@@ -1,92 +1,13 @@
 import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
-/// ui.FrameInfo is an interface
-class MyFrameInfo {
-  Duration duration;
-  ui.Image image;
-  DateTime addedTimestamp;
-
-  MyFrameInfo(this.duration, this.image, [this.addedTimestamp]);
-}
-
-class GifInfo {
-  List<MyFrameInfo> gif;
-  DateTime lastFetch;
-  int curFrameIndex = 0;
-
-  // For projectile which get stuck
-  bool lockAnimation = false;
-
-  GifInfo(this.gif);
-
-  ui.Image fetchNextFrame() {
-    if (gif.length < 1) return null;
-
-    if (lockAnimation)
-      return gif[curFrameIndex].image;
-
-    DateTime curTime = DateTime.now();
-    Duration curDuration = gif[curFrameIndex].duration;
-    if (lastFetch == null || curTime.difference(lastFetch) > curDuration) {
-      lastFetch = curTime;
-      if (curFrameIndex == gif.length - 1)
-        curFrameIndex = 0;
-      else
-        curFrameIndex += 1;
-    }
-
-    return gif[curFrameIndex].image;
-  }
-
-}
-
-abstract class CustomDrawer {
-  Size screenSize;
-  Size relativeSize;
-  Size actualSize;
-  String gifPath;
-  Map<String, Map<Size, GifInfo>> imgAndGif;
-
-  CustomDrawer(this.relativeSize, this.gifPath);
-
-  @mustCallSuper
-  bool isReady(Size screenSize) {
-    if (this.relativeSize != null) {
-      this.actualSize =
-          GameUtils.relativeToAbsoluteSize(relativeSize, screenSize.height);
-    }
-
-    this.screenSize = screenSize;
-    return true;
-  }
-
-  ui.Image fetchNextFrame() {
-    return imgAndGif[gifPath][relativeSize].fetchNextFrame();
-  }
-
-
-  Map<String, Size> get imagePathsAndSizes {
-    Map<String, Size> ret = Map();
-    if (gifPath != null) ret.putIfAbsent(gifPath, () => relativeSize);
-    return ret;
-  }
-
-  void paint(
-      Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition);
-
-  ///Modify position to ignore the camera
-  Offset cancelCamera(Offset position, Offset cameraPosition) {
-    return position + cameraPosition;
-  }
-}
+import 'drawer_abstracts.dart';
 
 class LevelPainter {
   // The keys of the SplayTreeMap define an order. That means that we first
