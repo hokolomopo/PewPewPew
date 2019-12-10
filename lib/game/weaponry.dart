@@ -19,15 +19,12 @@ final List<List<String>> _WeaponryData = [
 
 class Arsenal {
   static final double selectionElementRadius = sqrt(
-          pow(Character.spriteSize.width, 2) +
-              pow(Character.spriteSize.height, 2)) /
+          pow(Character.hitboxSize.width, 2) +
+              pow(Character.hitboxSize.height, 2)) /
       2;
   static final double selectionElementLength = sqrt(2) * selectionElementRadius;
   static final Size selectionElementSize =
       Size(selectionElementLength, selectionElementLength);
-
-  // TODO probably better to compute list radius based on the number of elements
-  static final double selectionListRadius = 2.2 * selectionElementRadius;
 
   List<Weapon> arsenal;
   Weapon currentSelection;
@@ -35,6 +32,9 @@ class Arsenal {
   Arsenal(this.arsenal);
 
   showWeaponSelection(MutableRectangle charHitBox) {
+    double angleBetweenElem = 2 * pi / arsenal.length;
+    double selectionListRadius = max(2.2 * selectionElementRadius,
+        1.1 * selectionElementRadius / sin(angleBetweenElem / 2));
     Offset charCenterPos = Offset(charHitBox.left + charHitBox.width / 2,
         charHitBox.top + charHitBox.height / 2);
 
@@ -51,7 +51,7 @@ class Arsenal {
 
       weapon.showSelection(curWeaponCenterPos, curWeaponTopLeftPos);
 
-      curAngle += 2 * pi / arsenal.length;
+      curAngle += angleBetweenElem;
     }
   }
 
@@ -69,25 +69,24 @@ class Arsenal {
     return null;
   }
 
-  void selectWeapon(Weapon selectedWeapon, Character charGettingWeapon) {
+  selectWeapon(Weapon selectedWeapon) {
     this.currentSelection = selectedWeapon;
-    selectedWeapon.selected(charGettingWeapon);
+    selectedWeapon.selected();
   }
 }
 
 
 abstract class Weapon {
-  // TODO maybe having different sizes for inSelection / on the character
   static final Size relativeSize = Size(5, 3);
 
   static Offset getOffsetRightOfChar(Size relativeSize) {
-    return Offset(Character.spriteSize.width,
-        Character.spriteSize.height - relativeSize.height / 2);
+    return Offset(Character.hitboxSize.width,
+        (Character.hitboxSize.height - relativeSize.height) / 2);
   }
 
   static Offset getOffsetLeftOfChar(Size relativeSize) {
     return Offset(-relativeSize.width,
-        Character.spriteSize.height - relativeSize.height / 2);
+        (Character.hitboxSize.height - relativeSize.height) / 2);
   }
 
   static final Map<int, Offset Function(Size)> directionFacedToOffset = Map()
@@ -96,16 +95,14 @@ abstract class Weapon {
 
   // This variable should be initialised properly in the children, however
   // we initialise it here because we can't define abstract variables.
-  final Map<int, AssetId> directionFacedToAsset = Map();
   final AssetId selectionAsset = AssetId.background;
 
   //TODO sprite
   ImagedDrawer drawer;
+  Character owner;
   Offset centerPos;
   Offset topLeftPos;
   bool inSelection;
-
-  int team;
 
   bool useProjectile;
   bool hasKnockback;
@@ -119,7 +116,7 @@ abstract class Weapon {
 
   Projectile projectile;
 
-  Weapon(this.team);
+  Weapon(this.owner);
 
   showSelection(Offset centerPos, Offset topLeftPos) {
     this.centerPos = centerPos;
@@ -129,12 +126,9 @@ abstract class Weapon {
     drawer.gif = selectionAsset;
   }
 
-  selected(Character charGettingWeapon) {
-    int dirFaced = charGettingWeapon.directionFaced;
-    topLeftPos += directionFacedToOffset[dirFaced](relativeSize);
+  selected() {
     inSelection = false;
     drawer.relativeSize = relativeSize;
-    drawer.gif = directionFacedToAsset[dirFaced];
   }
 
   fireProjectile(Offset direction) {
@@ -189,6 +183,48 @@ abstract class Weapon {
         }
       }
     }
+  }
+}
+
+class Fist extends Weapon {
+  static final relativeSize = Weapon.relativeSize;
+
+  final AssetId selectionAsset = AssetId.weapon_fist_sel;
+
+  Fist(Character owner) : super(owner) {
+    this.drawer =
+        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
+    this.useProjectile = false;
+    this.hasKnockback = true;
+
+    this.ammunition = -1;
+    this.range = 10;
+    this.damage = 10;
+    this.knockbackStrength = 10;
+  }
+}
+
+class Colt extends Weapon {
+  static final relativeSize = Weapon.relativeSize;
+
+  final AssetId selectionAsset = AssetId.weapon_colt_sel;
+
+  //TODO best way to get static info for shop and else? cannot be in abstract class as static
+  // What info should it be
+  static List<num> infos = [];
+
+  Colt(Character owner) : super(owner) {
+    this.drawer =
+        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
+    this.useProjectile = true;
+    this.hasKnockback = true;
+
+    this.ammunition = 6;
+    this.range = 60; // 60 seems good value
+    this.damage = 30;
+    this.knockbackStrength = 50;
+
+    this.detonationTime = 5000;
   }
 }
 

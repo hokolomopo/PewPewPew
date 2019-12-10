@@ -18,11 +18,9 @@ enum AssetId {
   projectile_dhs,
   explosion_dhs,
   ui_arrow,
-  weapon_fist_left,
-  weapon_fist_right,
+  weapon_fist,
   weapon_fist_sel,
-  weapon_colt_left,
-  weapon_colt_right,
+  weapon_colt,
   weapon_colt_sel,
 }
 
@@ -60,23 +58,17 @@ class AssetsManager {
     AssetId.ui_arrow: Asset(
         AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif",
         size: MarkerDrawer.markerArrowSize),
-    AssetId.weapon_fist_left: Asset(
-        AssetId.weapon_fist_left, _weaponAssetPrefix + "fist_left.png",
-        size: Fist.relativeSize),
-    AssetId.weapon_fist_right: Asset(
-        AssetId.weapon_fist_right, _weaponAssetPrefix + "fist_right.png",
+    AssetId.weapon_fist: Asset(
+        AssetId.weapon_fist, _weaponAssetPrefix + "fist.png",
         size: Fist.relativeSize),
     AssetId.weapon_fist_sel: Asset(
-        AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist_right.png",
+        AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist.png",
         size: Arsenal.selectionElementSize),
-    AssetId.weapon_colt_left: Asset(
-        AssetId.weapon_colt_left, _weaponAssetPrefix + "colt_45_left.png",
-        size: Colt.relativeSize),
-    AssetId.weapon_colt_right: Asset(
-        AssetId.weapon_colt_right, _weaponAssetPrefix + "colt_45_right.png",
+    AssetId.weapon_colt: Asset(
+        AssetId.weapon_colt, _weaponAssetPrefix + "colt_45.png",
         size: Colt.relativeSize),
     AssetId.weapon_colt_sel: Asset(
-        AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45_right.png",
+        AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
         size: Arsenal.selectionElementSize),
     AssetId.explosion_dhs:
         Asset(AssetId.explosion_dhs, _weaponAssetPrefix + "explosion.gif"),

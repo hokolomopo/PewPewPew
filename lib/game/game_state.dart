@@ -420,11 +420,10 @@ class GameState {
         break;
 
       case GameStateMode.weapon_selection:
-        Character currentChar = getCurrentCharacter();
-        Arsenal currentArsenal = currentChar.currentArsenal;
+        Arsenal currentArsenal = getCurrentCharacter().currentArsenal;
         Weapon selectedWeapon = currentArsenal.getWeaponAt(tapPosition);
         if (selectedWeapon != null) {
-          currentArsenal.selectWeapon(selectedWeapon, currentChar);
+          currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
           switchState(GameStateMode.attacking);
         }
@@ -603,9 +602,6 @@ class GameState {
           currentWeapon.projectile = boulet;*/
 
           switchState(GameStateMode.weapon_selection);
-
-          // TODO add weapon to be draw in a neutral position aligned with char
-
         }
         break;
 
