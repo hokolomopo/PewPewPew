@@ -23,7 +23,7 @@ enum GameStateMode {
   moving,
   attacking,
   projectile,
-  explosion,
+  explosion, //TODO remove this state
   cinematic,
   over
 }
@@ -109,6 +109,13 @@ class GameState {
 
     bool shouldEndTurn = false;
 
+    // Before going through States checking, check if there is any explosion to remove from the painters
+    if (currentExplosion != null)
+      if (currentExplosion.hasEnded()) {
+        this.removeExplosion(currentExplosion);
+        currentExplosion = null;
+      }
+
     switch (currentState) {
       case GameStateMode.char_selection:
         break;
@@ -186,30 +193,11 @@ class GameState {
 
           this.addExplosion(currentExplosion);
 
-          switchState(GameStateMode.explosion);
+          switchState(GameStateMode.cinematic);
         }
 
         break;
       case GameStateMode.explosion:
-
-        if(!currentExplosion.animationEnded)
-          break;
-
-        if(!stopWatch.isRunning){
-          stopWatch.reset();
-          stopWatch.start();
-        }
-        else{
-          if(stopWatch.elapsedMilliseconds > 1000){  // One second waiting after explosion effect
-            stopWatch.stop();
-            stopWatch.reset();
-
-            this.removeExplosion(currentExplosion);
-            currentExplosion = null;
-
-            switchState(GameStateMode.char_selection);
-          }
-        }
 
         break;
       case GameStateMode.cinematic:
@@ -571,11 +559,7 @@ class GameState {
           Offset hit = Offset(5, 5);
           ProjDHS boulet = new ProjDHS(
               pos,
-              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy),
-              new Offset(0, 0),
-              5.0,
-              15,
-              3000);
+              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
 
           currentWeapon.projectile = boulet;
 
