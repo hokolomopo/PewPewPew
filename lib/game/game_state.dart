@@ -48,7 +48,6 @@ class GameState {
   UiManager uiManager;
   Level level;
   Camera camera;
-  SoundPlayer soundPlayer = new SoundPlayer(true);
 
   int currentPlayer = 0;
   int currentCharacter = 0;
@@ -179,10 +178,10 @@ class GameState {
           stopWatch.reset();
 
           currentWeapon.applyImpact(
-              currentWeapon.projectile, players, soundPlayer, players[currentPlayer].updateStats);
+              currentWeapon.projectile, players, players[currentPlayer].updateStats);
 
           // Send back an not movable entity with will play an explosion effect
-          currentExplosion = currentWeapon.projectile.returnExplosionInstance(soundPlayer);
+          currentExplosion = currentWeapon.projectile.returnExplosionInstance();
 
           // Play audio file of explosion in //
           currentExplosion.playSound();

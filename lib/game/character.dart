@@ -151,7 +151,7 @@ class Character extends MovingEntity {
   }
 
   // Pass a sound Player ref to play hurt sound
-  void removeHp(double damage, SoundPlayer soundPlayer){
+  void removeHp(double damage){
     this.hp -= damage;
 
     if (this.hp < 0)
@@ -160,8 +160,10 @@ class Character extends MovingEntity {
     if(this.hp == 0)
       this.kill();
 
+    SoundPlayer soundPlayer = MySoundPlayer.getInstance();
+
     if(soundPlayer != null)
-      soundPlayer.playLocalAudio(hurtSoundName, 1.0);
+      soundPlayer.playSoundEffect(hurtSoundName, volume: 1.0);
   }
 
   void updateAnimation(){

@@ -56,7 +56,7 @@ abstract class Weapon {
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
-  void applyImpact(Projectile p, List<Team> characters, SoundPlayer soundPlayer,
+  void applyImpact(Projectile p, List<Team> characters,
       Function statUpdater) {
     for (var i = 0; i < characters.length; i++) {
       for (var j = 0; j < characters[i].length; j++) {
@@ -67,8 +67,8 @@ abstract class Weapon {
             .distance;
 
         if (dist < range) {
-          // Apply damage reduce according to dist [50% - 100%]
-          double effectiveDamage = damage.toDouble() * (1 - (range - dist) / 2);
+          // Apply damage reduce according to dist [33% - 100%]
+          double effectiveDamage = damage.toDouble() * (0.32 + (range - dist) / (3 * range));
 
           // Update stats
           double damageDealt =
@@ -77,7 +77,7 @@ abstract class Weapon {
           if (characters[i].getCharacter(j).hp == 0)
             statUpdater(TeamStat.killed, 1, teamTakingAttack: i);
 
-          characters[i].getCharacter(j).removeHp(effectiveDamage, soundPlayer);
+          characters[i].getCharacter(j).removeHp(effectiveDamage);
 
           // Apply a vector field for knockback
           Offset projection =
@@ -135,7 +135,7 @@ class Projectile extends MovingEntity {
   }
 
   // Have to be override by children
-  Explosion returnExplosionInstance(SoundPlayer soundPlayer) {
+  Explosion returnExplosionInstance() {
     return null;
   }
 }
@@ -170,7 +170,7 @@ class ProjDHS extends Projectile {
   }
 
   @override
-  Explosion returnExplosionInstance(SoundPlayer soundPlayer) {
+  Explosion returnExplosionInstance() {
     Size s = explosionSize;
     if (s == null) s = Size(60, 60);
 
@@ -181,7 +181,7 @@ class ProjDHS extends Projectile {
     this.setPosition(pos);
 
     return Explosion(
-        pos, explosionAssetID, s, hitbox, explosionSound, soundPlayer);
+        pos, explosionAssetID, s, hitbox, explosionSound);
   }
 }
 
@@ -220,17 +220,17 @@ class Colt extends Weapon {
 class Explosion extends Entity {
   bool animationEnded = false;
   String explosionSound;
-  SoundPlayer soundPlayer;
 
   Explosion(Offset position, AssetId assetId, Size size,
-      MutableRectangle hitbox, this.explosionSound, this.soundPlayer)
+      MutableRectangle hitbox, this.explosionSound)
       : super(position, hitbox) {
     this.drawer = ExplosionDrawer(assetId, this, size: size);
   }
 
   void playSound() {
+    SoundPlayer soundPlayer = MySoundPlayer.getInstance();
     if (soundPlayer != null && explosionSound != null)
-      soundPlayer.playLocalAudio(explosionSound);
+      soundPlayer.playSoundEffect(explosionSound);
   }
 
   bool hasEnded() {
