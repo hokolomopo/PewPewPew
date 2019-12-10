@@ -553,6 +553,7 @@ class GameState {
             teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
             duration: 3, fadeDuration: 3, ignoreCamera: true);
         break;
+
       case GameStateMode.moving:
         this.characterJumping = false;
         this.jumpDragStartPosition = null;

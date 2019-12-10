@@ -11,6 +11,7 @@ abstract class ImagedDrawer extends CustomDrawer {
   AssetId assetId;
   AssetsManager assetsManager;
   GifInfo gifInfo;
+  bool changeGif = true;
 
   // For team specific assets
   int team;
