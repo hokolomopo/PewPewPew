@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -413,7 +414,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // For development only
-        switchState(GameStateMode.moving);
+//        switchState(GameStateMode.moving);
         break;
 
       case GameStateMode.projectile:
@@ -425,6 +426,14 @@ class GameState {
         if (selectedWeapon != null) {
           currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
+          // TODO correctly assign projectile to weapon (certainly in overridable method)
+          Offset pos = getCurrentCharacter().getPosition();
+          Offset hit = Offset(5, 5);
+          ProjDHS projDHS = new ProjDHS(
+              pos,
+              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
+          currentWeapon.projectile = projDHS;
+
           switchState(GameStateMode.attacking);
         }
         break;

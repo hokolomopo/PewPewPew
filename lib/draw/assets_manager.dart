@@ -43,6 +43,7 @@ class Asset {
 class AssetsManager {
   static final String _charAssetPrefix = "assets/graphics/characters/char";
   static final String _weaponAssetPrefix = "assets/graphics/arsenal/weapons/";
+  static final String _explosionAssetPrefic = "assets/graphics/arsenal/explosions/";
 
   //TODO fix cat death gif
 
@@ -71,7 +72,7 @@ class AssetsManager {
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
         size: Arsenal.selectionElementSize),
     AssetId.explosion_dhs:
-        Asset(AssetId.explosion_dhs, _weaponAssetPrefix + "explosion.gif"),
+        Asset(AssetId.explosion_dhs, _explosionAssetPrefic + "explosion.gif"),
   };
 
   Map<String, Size> _currentlyLoading = Map();
