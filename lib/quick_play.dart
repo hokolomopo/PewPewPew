@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/quickplay_widgets.dart';
 
 import 'game/game_main.dart';
+import 'route_arguments.dart';
 
 class Parameters extends StatefulWidget {
   final void Function() parentAction;
@@ -94,9 +96,6 @@ class ParametersState extends State<Parameters> {
     return list;
   }
 
-  _gameOver(gameReturnValue) {
-    widget.reloadHome();
-  }
 
   Widget _parameter(BuildContext context) {
     return Column(
@@ -183,14 +182,13 @@ class ParametersState extends State<Parameters> {
 
                 if(_terrain == null)
                   _simpleAlertDialog("Please select a level", context);
-                else
-                  Navigator.of(context)
-                      .push(
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                GameMain(_terrain.levelObject, _nbPlayer, _nbWorms)),
-                      )
-                      .then(_gameOver);
+                else{
+                  Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      GameMain.routeName,
+                      (Route<dynamic> route) => false,
+                      arguments: MainGameArguments(_terrain.levelObject, _nbPlayer, _nbWorms));
+                }
               },
             ),
             height: 50.0,

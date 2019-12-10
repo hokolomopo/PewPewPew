@@ -12,7 +12,7 @@ class CharacterDrawer extends ImagedDrawer {
   Character character;
 
   CharacterDrawer(AssetId id, this.character,
-      {Size size = Character.characterSpriteSize, int team})
+      {Size size = Character.spriteSize, int team})
       : super(size, id, team: team);
 
   @override
@@ -23,9 +23,9 @@ class CharacterDrawer extends ImagedDrawer {
     double top = GameUtils.relativeToAbsoluteDist(
         character.getSpritePosition().dy, screenSize.height);
     double width = GameUtils.relativeToAbsoluteDist(
-        Character.characterSpriteSize.width, screenSize.height);
+        Character.spriteSize.width, screenSize.height);
     double height = GameUtils.relativeToAbsoluteDist(
-        Character.characterSpriteSize.height, screenSize.height);
+        Character.spriteSize.height, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(
@@ -47,7 +47,7 @@ class CharacterDrawer extends ImagedDrawer {
     if(character.directionFaced == Character.RIGHT)
       canvas.drawImage(sprite, Offset(left, top), Paint());
     else
-      this.drawFlippedImage(canvas, sprite, Rect.fromLTWH(left, top, width, height), paint: Paint());
+      drawFlippedImage(canvas, sprite, Rect.fromLTWH(left, top, width, height), paint: Paint());
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();

@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
-import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'assets_manager.dart';
 
@@ -44,7 +43,6 @@ abstract class ImagedDrawer extends CustomDrawer {
   }
 
   set gif(AssetId newGifId) {
-    print("Set asset to " + newGifId.toString());
     assetId = newGifId;
     gifInfo = null;
   }
