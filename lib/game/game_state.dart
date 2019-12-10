@@ -162,12 +162,29 @@ class GameState {
         // center camera on projectile
         this.camera.centerOn(currentWeapon.projectile.getPosition());
 
+        // check if the projectile is out of bounds
+        if(!level.isInsideBounds(currentWeapon.projectile.hitbox)){
+          if (stopWatch.isRunning) {
+            stopWatch.stop();
+            stopWatch.reset();
+          }
+
+          this.removeProjectile(currentWeapon.projectile);
+          currentWeapon = null;
+
+          switchState(GameStateMode.cinematic);
+
+          break;
+        }
+
         // Stop stopWatch if non detonating projectile
         if (currentWeapon.detonationTime == -1) {
           if (stopWatch.isRunning) {
             stopWatch.stop();
             stopWatch.reset();
           }
+
+          //TODO set a variable and methode "explose" on collision
 
           break;
         }

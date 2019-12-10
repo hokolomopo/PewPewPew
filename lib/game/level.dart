@@ -25,7 +25,13 @@ class Level {
   }
 
   bool isInsideBounds(Rectangle other){
-    return _bounds.intersects(other) || _bounds.containsRectangle(other);
+    return _bounds.intersects(other) || _bounds.containsRectangle(other) || isAboveLevel(other);
+  }
+
+  // Useful to not remove projectile early if they go up
+  bool isAboveLevel(Rectangle other) {
+    return other.top < _bounds.top  && _bounds.left < other.left + other.width &&
+        other.left < _bounds.left + _bounds.width;
   }
 
   Level.fromJson(Map<String, dynamic> json){
