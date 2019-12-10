@@ -9,11 +9,8 @@ class WeaponDrawer extends ImagedDrawer {
   Weapon weapon;
   Color teamColor;
 
-  WeaponDrawer(AssetId id, this.weapon, Size relativeSize, Color teamColor)
-      : super(relativeSize, id){
-    if(teamColor == null)
-      print("wtf");
-  }
+  WeaponDrawer(AssetId id, this.weapon, Size relativeSize, this.teamColor)
+      : super(relativeSize, id);
 
   @override
   void paint(

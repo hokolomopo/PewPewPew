@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/level.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 import 'drawer_abstracts.dart';
 import 'paint_constants.dart';
 import 'math.dart';
-import 'package:info2051_2018/game/terrain.dart';
 
 class TerrainBlockDrawer extends CustomDrawer {
   TerrainBlock terrainBlock;
@@ -62,6 +62,10 @@ class TerrainBlockDrawer extends CustomDrawer {
         GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.top, size.height);
 
     Rect toDraw = Rect.fromLTWH(left, top, actualSize.width, actualSize.height);
+
+    Paint terrainFillPaint = Paint()
+      ..color = terrainBlock.color
+    ..style = PaintingStyle.fill;
 
     canvas.drawRect(toDraw, terrainFillPaint);
     if (terrainBlock.withStroke) {

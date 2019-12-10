@@ -4,20 +4,25 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/entity.dart';
-import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
+import 'level.dart';
+
 class World{
-  static final double gravityForce = 0.02;
+  final double gravityForce;
 
   static final double epsilon = 0.00000000001;
   
-  List<Character> players = new List();
-  List<Projectile> projectiles = new List();
-  Set<TerrainBlock> terrain = new Set();
+  List<Character> players = List();
+  List<Projectile> projectiles = List();
+  Set<TerrainBlock> terrain = Set();
 
-  Offset gravity = new Offset(0, gravityForce);
+  Offset gravity;
+
+  World({this.gravityForce=0.02}){
+    gravity = Offset(0, gravityForce);
+  }
 
   void updateWorld(double timeElapsed){
     for(Character c in players){
@@ -41,7 +46,7 @@ class World{
   void moveEntity(MovingEntity entity, double timeElapsed){
 
     //Move in X axis
-    Offset vector = new Offset(entity.velocity.dx, 0);
+    Offset vector = Offset(entity.velocity.dx, 0);
     entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){
@@ -52,7 +57,7 @@ class World{
     }
 
     //Move on Y axis
-    vector = new Offset(0, entity.velocity.dy);
+    vector = Offset(0, entity.velocity.dy);
     entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){

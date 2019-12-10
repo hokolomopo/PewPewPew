@@ -30,7 +30,7 @@ class PewPewPew extends StatelessWidget {
         final MainGameArguments args = settings.arguments;
         return MaterialPageRoute(
           builder: (context) {
-            return GameMain(args.levelJson, args.nbPlayers, args.nbCharacters);
+            return GameMain(args.terrain, args.nbPlayers, args.nbCharacters);
           },
         );
       }

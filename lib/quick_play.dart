@@ -187,7 +187,7 @@ class ParametersState extends State<Parameters> {
                       context,
                       GameMain.routeName,
                       (Route<dynamic> route) => false,
-                      arguments: MainGameArguments(_terrain.levelObject, _nbPlayer, _nbWorms));
+                      arguments: MainGameArguments(_terrain, _nbPlayer, _nbWorms));
                 }
               },
             ),

@@ -6,7 +6,6 @@ import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/team.dart';
-import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/game/util/utils.dart';
@@ -45,7 +44,7 @@ class GameState {
   List<Team> players = new List();
   GameStats gameStats = GameStats(null, Map());
 
-  World world = new World();
+  World world;
   LevelPainter painter;
   UiManager uiManager;
   Level level;
@@ -77,7 +76,7 @@ class GameState {
   Stopwatch stopWatch = Stopwatch();
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
-      this.level, this.camera) {
+      this.level, this.camera, this.world) {
 
     uiManager = UiManager(painter);
 
@@ -581,9 +580,10 @@ class GameState {
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
         uiManager.removeStaminaDrawer();
-        this.teamTurnText = uiManager.addText(
-            teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
-            duration: 3, fadeDuration: 3, ignoreCamera: true);
+        //TODO uncomment this
+//        this.teamTurnText = uiManager.addText(
+//            teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
+//            duration: 3, fadeDuration: 3, ignoreCamera: true);
         break;
 
       case GameStateMode.moving:

@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:info2051_2018/game/terrain.dart';
+import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/terrain_drawer.dart';
 import 'package:info2051_2018/game/util/json_utils.dart';
 
 
@@ -47,4 +48,35 @@ class Level {
       'spawnPoints': jsonSpawns,
     };
   }
+
+  set color(Color color){
+    for(TerrainBlock block in terrain)
+      block.color = color;
+  }
+}
+
+class TerrainBlock {
+  Rectangle hitBox;
+  // Note that even if [withStroke] is [false], the top stroke will still
+  // be painted.
+  bool withStroke = true;
+  TerrainBlockDrawer drawer;
+  Color color = Colors.green;
+
+  TerrainBlock(double x, double y, double w, double h, {this.withStroke = true}){
+    hitBox = new Rectangle(x, y, w, h);
+    drawer = TerrainBlockDrawer(this);
+  }
+
+  TerrainBlock.fromJson(Map<String, dynamic> json)
+      : hitBox = SerializableRectangle.fromJson(json['hitBox']).toRectangle()
+  {
+    drawer = TerrainBlockDrawer(this);
+  }
+
+  Map<String, dynamic> toJson() =>
+      {
+        'hitBox': SerializableRectangle(hitBox),
+      };
+
 }
