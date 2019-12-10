@@ -7,8 +7,6 @@ import 'paint_constants.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
-// TODO Remove and Merge this with Draw Character File (maybe create a new abstract class ImagedCustomDrawer ?)
-
 class ProjectileDrawer extends ImagedDrawer{
   Projectile projectile;
 

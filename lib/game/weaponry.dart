@@ -14,15 +14,12 @@ import 'character.dart';
 
 class Arsenal {
   static final double selectionElementRadius = sqrt(
-          pow(Character.spriteSize.width, 2) +
-              pow(Character.spriteSize.height, 2)) /
+          pow(Character.hitboxSize.width, 2) +
+              pow(Character.hitboxSize.height, 2)) /
       2;
   static final double selectionElementLength = sqrt(2) * selectionElementRadius;
   static final Size selectionElementSize =
       Size(selectionElementLength, selectionElementLength);
-
-  // TODO probably better to compute list radius based on the number of elements
-  static final double selectionListRadius = 2.2 * selectionElementRadius;
 
   List<Weapon> arsenal;
   Weapon currentSelection;
@@ -30,6 +27,9 @@ class Arsenal {
   Arsenal(this.arsenal);
 
   showWeaponSelection(MutableRectangle charHitBox) {
+    double angleBetweenElem = 2 * pi / arsenal.length;
+    double selectionListRadius = max(2.2 * selectionElementRadius,
+        1.1 * selectionElementRadius / sin(angleBetweenElem / 2));
     Offset charCenterPos = Offset(charHitBox.left + charHitBox.width / 2,
         charHitBox.top + charHitBox.height / 2);
 
@@ -46,7 +46,7 @@ class Arsenal {
 
       weapon.showSelection(curWeaponCenterPos, curWeaponTopLeftPos);
 
-      curAngle += 2 * pi / arsenal.length;
+      curAngle += angleBetweenElem;
     }
   }
 
@@ -67,7 +67,6 @@ class Arsenal {
 }
 
 abstract class Weapon {
-  // TODO maybe having different sizes for inSelection / on the character
   static final Size relativeSize = Size(5, 3);
 
   static Offset getOffsetRightOfChar(Size relativeSize) {
@@ -134,26 +133,32 @@ abstract class Weapon {
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
-  void applyImpact(Projectile p, List<Team> characters, SoundPlayer soundPlayer, Function statUpdater){
+  void applyImpact(Projectile p, List<Team> characters, SoundPlayer soundPlayer,
+      Function statUpdater) {
     for (var i = 0; i < characters.length; i++) {
       for (var j = 0; j < characters[i].length; j++) {
         // apply a circular HitBox
 
-        var dist = (p.getPosition() - characters[i].getCharacter(j).getPosition()).distance;
+        var dist =
+            (p.getPosition() - characters[i].getCharacter(j).getPosition())
+                .distance;
 
         if (dist < range) {
-
           // Update stats
-          double damageDealt = min(damage.toDouble(), characters[i].getCharacter(j).hp);
+          double damageDealt =
+              min(damage.toDouble(), characters[i].getCharacter(j).hp);
           statUpdater(TeamStat.damage_dealt, damageDealt, teamTakingAttack: i);
-          if(characters[i].getCharacter(j).hp == 0)
+          if (characters[i].getCharacter(j).hp == 0)
             statUpdater(TeamStat.killed, 1, teamTakingAttack: i);
 
           //TODO Damage reduce based on distance? [50%-100%]
-          characters[i].getCharacter(j).removeHp(damage.toDouble(), soundPlayer);
+          characters[i]
+              .getCharacter(j)
+              .removeHp(damage.toDouble(), soundPlayer);
 
           // Apply a vector field for knockback
-          Offset projection = characters[i].getCharacter(j).getPosition() - p.getPosition();
+          Offset projection =
+              characters[i].getCharacter(j).getPosition() - p.getPosition();
 
           // Normalize offset
           projection /= projection.distance;
@@ -176,8 +181,8 @@ class Fist extends Weapon {
   final AssetId selectionAsset = AssetId.weapon_fist_sel;
 
   Fist(Character owner) : super(owner) {
-    this.drawer = WeaponDrawer(
-        AssetId.weapon_fist_sel, this, Weapon.relativeSize);
+    this.drawer =
+        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
     this.useProjectile = false;
     this.hasKnockback = true;
 
@@ -198,8 +203,8 @@ class Colt extends Weapon {
   static List<num> infos = [];
 
   Colt(Character owner) : super(owner) {
-    this.drawer = WeaponDrawer(
-        AssetId.weapon_colt_sel, this, Weapon.relativeSize);
+    this.drawer =
+        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
     this.useProjectile = true;
     this.hasKnockback = true;
 

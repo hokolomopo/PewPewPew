@@ -533,9 +533,6 @@ class GameState {
           currentWeapon.projectile = boulet;*/
 
           switchState(GameStateMode.weapon_selection);
-
-          // TODO add weapon to be draw in a neutral position aligned with char
-
         }
         break;
 
