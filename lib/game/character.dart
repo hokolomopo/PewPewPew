@@ -167,7 +167,13 @@ class Character extends MovingEntity {
   void updateAnimation(){
     ImagedDrawer drawer = this.drawer;
 
-    //TODO fix animation when falling
+    // Give priority to death animation
+    if(isDying || isDead){
+      _isWalking = false;
+      _isAirborne = false;
+      isIdle = false;
+    }
+
     // Check if we need to change the animation
     if(this.isWalking() && drawer.assetId != AssetId.char_running)
       drawer.gif = AssetId.char_running;
