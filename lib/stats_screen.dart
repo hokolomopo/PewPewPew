@@ -9,7 +9,7 @@ import 'shop.dart';
 class StatsScreen extends StatefulWidget {
   static const routeName = '/Stats';
 
-  GameStats gameStats;
+  final GameStats gameStats;
 
   StatsScreen(this.gameStats);
 
@@ -46,13 +46,8 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
     prefs.setInt(ShopList.moneySharedPrefKey, currentMoney + totalMoneyGain);
   }
 
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
-
   SoundPlayer soundPlayer = MySoundPlayer.getInstance();
   final _menuMusicName = "sample.mp3";
-  final _gameMusicName = "sample2.mp3";
-
 
   @override
   void initState() {

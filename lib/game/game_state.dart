@@ -13,7 +13,6 @@ import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
-import 'package:info2051_2018/sound_player.dart';
 
 import 'camera.dart';
 import 'level.dart';
@@ -187,7 +186,7 @@ class GameState {
         }
 
         // Stop stopWatch if non detonating projectile
-        if (currentWeapon.detonationTime == -1) {
+        if (currentWeapon.detonationTime == null) {
           if (stopWatch.isRunning) {
             stopWatch.stop();
             stopWatch.reset();

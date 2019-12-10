@@ -9,7 +9,6 @@ import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/game_state.dart';
-import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/stats_screen.dart';
 

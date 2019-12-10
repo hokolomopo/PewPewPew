@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 
 import 'drawer_abstracts.dart';
-import 'paint_constants.dart';
 
 class BackgroundDrawer extends ImagedDrawer {
   AssetId backgroundId;

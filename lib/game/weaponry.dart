@@ -13,7 +13,7 @@ import 'package:info2051_2018/sound_player.dart';
 import 'character.dart';
 
 // TODO Use this structure to centralise info
-final List<List<String>> _WeaponryData = [
+final List<List<String>> _weaponryData = [
   ["proj", "hello"]
 ];
 
@@ -109,7 +109,7 @@ abstract class Weapon {
 
   int range;
   int damage;
-  int detonationTime; // Detonation Time in ms ( < 0 means no detonation) Need collusion trigger
+  int detonationTime;
 
   int ammunition = -1;
   int knockbackStrength = 0;
@@ -201,6 +201,7 @@ class Fist extends Weapon {
     this.range = 10;
     this.damage = 10;
     this.knockbackStrength = 10;
+    this.detonationTime = 1000;
   }
 }
 
@@ -220,7 +221,7 @@ class Colt extends Weapon {
     this.hasKnockback = true;
 
     this.ammunition = 6;
-    this.range = 60; // 60 seems good value
+    this.range = 60;
     this.damage = 30;
     this.knockbackStrength = 50;
 
@@ -313,38 +314,6 @@ class ProjDHS extends Projectile {
         pos, explosionAssetID, s, hitbox, explosionSound);
   }
 }
-
-//class Colt extends Weapon {
-//  static final relativeSize = Weapon.relativeSize;
-//
-//  final Map<int, AssetId> directionFacedToAsset = Map()
-//    ..putIfAbsent(Character.RIGHT, () => AssetId.weapon_colt_right)
-//    ..putIfAbsent(Character.LEFT, () => AssetId.weapon_colt_left);
-//  final AssetId selectionAsset = AssetId.weapon_colt_right;
-//
-//  //TODO best way to get static info for shop and else? cannot be in abstract class as static
-//  // What info should it be
-//  static List<num> infos = [];
-//
-//  Colt(int team) : super(team) {
-//    print("colt color " + Character.teamColors[team].toString());
-//    this.drawer = WeaponDrawer(
-//        AssetId.weapon_colt_right, this, Weapon.relativeSize, Character.teamColors[team]);
-//    this.useProjectile = true;
-//    this.hasKnockback = true;
-//
-//    this.ammunition = 6;
-//    this.range = 60; // 60 seems good value
-//    this.damage = 30;
-//    this.knockbackStrength = 50;
-//
-////    this.projectileHitbox;
-//    this.projectile;
-//
-//
-//    this.detonationTime = 5000;
-//  }
-//}
 
 class Explosion extends Entity {
   bool animationEnded = false;
