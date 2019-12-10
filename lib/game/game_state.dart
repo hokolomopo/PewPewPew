@@ -6,6 +6,7 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
+import 'package:info2051_2018/game/team.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/utils.dart';
@@ -40,7 +41,7 @@ class GameState {
 
   GameStateMode currentState = GameStateMode.char_selection;
 
-  List<List<Character>> players = new List();
+  List<Team> players = new List();
   World world = new World();
   LevelPainter painter;
   UiManager uiManager;
@@ -81,8 +82,8 @@ class GameState {
     for (TerrainBlock block in level.terrain) this.addTerrainBlock(block);
 
     for (int i = 0; i < numberOfPlayers; i++) {
-      List<Character> chars = List();
-      players.add(chars);
+      Team t = Team(i, teamNames[i], numberOfCharacters);
+      players.add(t);
 
       for (int j = 0; j < numberOfCharacters; j++) {
         Character c =
@@ -102,8 +103,8 @@ class GameState {
     uiManager.updateUi(timeElapsed);
 
     //TODO delete dis
-    for(var v in players)
-      for(Character c in v)
+    for(Team v in players)
+      for(Character c in v.characters)
         c.removeHp(0.06, null);
 
 
@@ -149,7 +150,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // <JL> commenter pour travailler sur la phase attack
-        switchState(GameStateMode.char_selection);
+        //switchState(GameStateMode.char_selection);
 
         break;
       case GameStateMode.projectile:
@@ -172,15 +173,26 @@ class GameState {
           stopWatch.reset();
 
           currentWeapon.applyImpact(
-              currentWeapon.projectile, players, soundPlayer);
+              currentWeapon.projectile, players, soundPlayer, players[currentPlayer].updateStats);
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
 
-          switchState(GameStateMode.char_selection);
+          switchState(GameStateMode.cinematic);
         }
 
         break;
       case GameStateMode.cinematic:
+        // If the last attack has knocked back someone, film him until he stop moving
+        bool isSomeoneMoving = false;
+        for(Team v in players) {
+          for (Character c in v.characters)
+            if (c.isMoving()) {
+              isSomeoneMoving = true;
+            }
+        }
+
+        if(!isSomeoneMoving)
+          switchState(GameStateMode.char_selection);
         break;
       case GameStateMode.over:
         break;
@@ -190,11 +202,12 @@ class GameState {
     for (int p = 0; p < players.length; p++) {
       for (int c = 0; c < players[p].length; c++) {
         //Check if the character is out of bounds
-        if (!level.isInsideBounds(players[p][c].hitbox))
-          players[p][c].isDead = true;
+        // Don't use character.kill function to skip death animation
+        if (!level.isInsideBounds(players[p].getCharacter(c).hitbox))
+          players[p].getCharacter(c).isDead = true;
 
         // Check if the character is dead
-        if (players[p][c].isDead) {
+        if (players[p].getCharacter(c).isDead) {
           this.removeCharacter(p, c);
 
           if (p == currentPlayer && c == currentCharacter)
@@ -225,7 +238,7 @@ class GameState {
   }
 
   void addCharacter(int playerId, Character character) {
-    players[playerId].add(character);
+    players[playerId].addCharacter(character);
 
     world.addCharacter(character);
     painter.addElement(character.drawer);
@@ -234,8 +247,8 @@ class GameState {
   void removeCharacter(int playerId, int charID) {
     print("Character of player " + currentPlayer.toString() + " is dead");
 
-    Character toRemove = players[playerId][charID];
-    players[playerId].remove(toRemove);
+    Character toRemove = players[playerId].getCharacter(charID);
+    players[playerId].removeCharacter(toRemove);
 
     world.removeCharacter(toRemove);
     painter.removeElement(toRemove.drawer);
@@ -265,7 +278,7 @@ class GameState {
     if (currentCharIsDead ||
         players.length <= currentPlayer ||
         players[currentPlayer].length <= currentCharacter) return null;
-    return players[currentPlayer][currentCharacter];
+    return players[currentPlayer].getCharacter(currentCharacter);
   }
 
   void addProjectile(Projectile projectile) {
@@ -291,7 +304,7 @@ class GameState {
       case GameStateMode.char_selection:
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
-              GameUtils.extendRect(players[currentPlayer][i].hitbox, 10), tapPosition)) {
+              GameUtils.extendRect(players[currentPlayer].getCharacter(i).hitbox, 10), tapPosition)) {
             currentCharacter = i;
 
             switchState(GameStateMode.moving);

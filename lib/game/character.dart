@@ -38,7 +38,7 @@ class Character extends MovingEntity {
   bool isDying = false;
   bool isDead = false;
   bool isLanding = false;
-  bool isWalking = false;
+  bool _isWalking = false;
   bool isIdle = true;
 
   int directionFaced = RIGHT;
@@ -84,6 +84,10 @@ class Character extends MovingEntity {
     return _isAirborne || velocity.dy != 0;
   }
 
+  bool isWalking(){
+    return !isAirborne() && _isWalking;
+  }
+
   void kill(){
     isDying = true;
     _isAirborne = false;
@@ -106,7 +110,7 @@ class Character extends MovingEntity {
     //Set the velocity
     this.setXSpeed(newXSpeed);
 
-    this.isWalking = true;
+    this._isWalking = true;
     this.isIdle = false;
   }
 
@@ -116,7 +120,7 @@ class Character extends MovingEntity {
 
     if(!isDying)
       this.isIdle = true;
-    this.isWalking = false;
+    this._isWalking = false;
   }
 
   /// Override mode to update stamina when the character is moving and change its orientation
@@ -165,7 +169,7 @@ class Character extends MovingEntity {
 
     //TODO fix animation when falling
     // Check if we need to change the animation
-    if(this.isWalking && drawer.assetId != AssetId.char_running)
+    if(this.isWalking() && drawer.assetId != AssetId.char_running)
       drawer.gif = AssetId.char_running;
     else if(isAirborne() && drawer.assetId != AssetId.char_jumping)
       drawer.gif = AssetId.char_jumping;

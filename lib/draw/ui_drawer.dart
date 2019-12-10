@@ -10,8 +10,7 @@ import 'assets_manager.dart';
 import 'drawer_abstracts.dart';
 
 class StaminaDrawer extends CustomDrawer {
-  static const double actionBarWidth = 30;
-  static const double actionBarHeight = 8;
+  static const Size actionBarSize = Size(30, 8);
   static const double distFromBottom = 3;
 
   Character character;
@@ -20,8 +19,8 @@ class StaminaDrawer extends CustomDrawer {
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
-    double width = GameUtils.relativeToAbsoluteDist(actionBarWidth, size.height);
-    double height = GameUtils.relativeToAbsoluteDist(actionBarHeight, size.height);
+    double width = GameUtils.relativeToAbsoluteDist(actionBarSize.width, size.height);
+    double height = GameUtils.relativeToAbsoluteDist(actionBarSize.height, size.height);
     double left = size.width / 2 - width / 2;
     double top = size.height - height -
         GameUtils.relativeToAbsoluteDist(distFromBottom, size.height);
@@ -47,8 +46,10 @@ class MarkerDrawer extends ImagedDrawer{
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
     double x = GameUtils.relativeToAbsoluteDist(position.dx, size.height);
     double y = GameUtils.relativeToAbsoluteDist(position.dy, size.height);
+    double width = GameUtils.relativeToAbsoluteDist(markerArrowSize.width, size.height);
+    double height = GameUtils.relativeToAbsoluteDist(markerArrowSize.height, size.height);
 
-    canvas.drawImage(fetchNextFrame(), Offset(x - markerArrowSize.width / 2, y - 20), Paint());
+    canvas.drawImage(fetchNextFrame(), Offset(x - width / 2, y - height), Paint());
   }
 
 }
