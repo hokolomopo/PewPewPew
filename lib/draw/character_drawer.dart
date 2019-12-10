@@ -6,12 +6,14 @@ import 'paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
+import 'dart:ui' as ui;
+
 class CharacterDrawer extends ImagedDrawer {
   Character character;
 
   CharacterDrawer(AssetId id, this.character,
-      {Size size = const Size(10, 10)})
-      : super(size, id);
+      {Size size = Character.characterSpriteSize, int team})
+      : super(size, id, team: team);
 
   @override
   void paint(
@@ -20,6 +22,10 @@ class CharacterDrawer extends ImagedDrawer {
         character.getSpritePosition().dx, screenSize.height);
     double top = GameUtils.relativeToAbsoluteDist(
         character.getSpritePosition().dy, screenSize.height);
+    double width = GameUtils.relativeToAbsoluteDist(
+        Character.characterSpriteSize.width, screenSize.height);
+    double height = GameUtils.relativeToAbsoluteDist(
+        Character.characterSpriteSize.height, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(
@@ -35,7 +41,13 @@ class CharacterDrawer extends ImagedDrawer {
               debugShowHitBoxesPaint);
     }
 
-    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+    ui.Image sprite = fetchNextFrame();
+
+    // Flip the sprite depending on the character orientation
+    if(character.directionFaced == Character.RIGHT)
+      canvas.drawImage(sprite, Offset(left, top), Paint());
+    else
+      this.drawFlippedImage(canvas, sprite, Rect.fromLTWH(left, top, width, height), paint: Paint());
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();

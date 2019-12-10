@@ -12,6 +12,7 @@ class BackgroundDrawer extends ImagedDrawer {
 
   @override
   void paint(Canvas canvas, Size size, showHitBoxes, Offset cameraPosition) {
+
     canvas.drawImage(fetchNextFrame(), Offset.zero, Paint());
   }
 }

@@ -21,6 +21,8 @@ class World{
 
   void updateWorld(double timeElapsed){
     for(Character c in players){
+      c.updateAnimation();
+
       if(c.isMoving()){
         c.addAcceleration(gravity);
         c.accelerate();

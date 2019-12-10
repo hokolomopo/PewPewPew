@@ -6,6 +6,7 @@ import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
+import 'assets_manager.dart';
 import 'drawer_abstracts.dart';
 
 class StaminaDrawer extends CustomDrawer {
@@ -35,22 +36,19 @@ class StaminaDrawer extends CustomDrawer {
 
 }
 
-class MarkerDrawer extends CustomDrawer{
+class MarkerDrawer extends ImagedDrawer{
+  static const Size markerArrowSize = Size(6, 6);
 
   Offset position;
 
-  MarkerDrawer(this.position) : super(null);
+  MarkerDrawer(this.position) : super(markerArrowSize, AssetId.ui_arrow);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {
     double x = GameUtils.relativeToAbsoluteDist(position.dx, size.height);
     double y = GameUtils.relativeToAbsoluteDist(position.dy, size.height);
 
-    double width = 10;
-    double height = 10;
-
-    //TODO draw arrow instead of random rectangle
-    canvas.drawRect(Rect.fromLTWH(x - width /2, y - height, 10, 10), blackPaint);
+    canvas.drawImage(fetchNextFrame(), Offset(x - markerArrowSize.width / 2, y - 20), Paint());
   }
 
 }

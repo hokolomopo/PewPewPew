@@ -16,31 +16,36 @@ class Character extends MovingEntity {
   static const int LEFT = 0;
   static const int RIGHT = 1;
 
-  static const int base_hp = 100;
-  static const double baseStamina = 10000;
+  static const double base_hp = 100;
+  static const double baseStamina = 100;
   static const double max_jump_speed = 50;
   static const double walk_speed = 20;
 
-  static final Size characterSpriteSize = Size(10, 10);
-  final Offset characterSpritePositionOffset = Offset(-2, 0);
+  static const Size characterSpriteSize = Size(10, 10);
+  static const Offset characterSpritePositionOffset = Offset(-2, 0);
 
-  static final Offset hitboxSize = new Offset(6,10);
+  static const Offset hitboxSize = Offset(6,10);
 
-  static final String hurtSoundName = "hurtSound.mp3";
+  static const String hurtSoundName = "hurtSound.mp3";
 
-  int hp = base_hp;
+  double hp = base_hp;
   int team;
   Arsenal currentArsenal;
 
   double stamina = baseStamina;
 
   bool _isAirborne = false;
-
+  bool isDying = false;
   bool isDead = false;
+  bool isLanding = false;
+  bool isWalking = false;
+  bool isIdle = true;
+
+  int directionFaced = RIGHT;
 
   Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.spritePositionOffset = characterSpritePositionOffset;
-    this.drawer = new CharacterDrawer(AssetId.char_idle, this);
+    this.drawer = new CharacterDrawer(AssetId.char_idle, this, team: this.team);
     // TODO Initiate "correctly" arsenal
     this.currentArsenal = new Arsenal([Fist(), Colt()]);
   }
@@ -80,8 +85,10 @@ class Character extends MovingEntity {
   }
 
   void kill(){
-    //TODO maybe death animation
-    isDead = true;
+    isDying = true;
+    _isAirborne = false;
+    isIdle = false;
+    this.stop();
   }
 
   void beginWalking(int direction){
@@ -99,26 +106,35 @@ class Character extends MovingEntity {
     //Set the velocity
     this.setXSpeed(newXSpeed);
 
-    if((this.drawer as ImagedDrawer).assetId != AssetId.char_running)
-      (this.drawer as ImagedDrawer).gif = AssetId.char_running;
+    this.isWalking = true;
+    this.isIdle = false;
   }
 
   @override
   void stopX(){
     super.stopX();
 
-    if((this.drawer as ImagedDrawer).assetId != AssetId.char_idle)
-      (this.drawer as ImagedDrawer).gif = AssetId.char_idle;
+    if(!isDying)
+      this.isIdle = true;
+    this.isWalking = false;
   }
 
-  /// Override mode to update stamina when the character is moving
+  /// Override mode to update stamina when the character is moving and change its orientation
   @override
   void move(Offset o){
     super.move(o);
 
+    // Reduce stamina
     this.stamina -= o.dx.abs();
     stamina < 0 ? stamina = 0 : stamina = stamina;
 
+    // Update which side the character is facing
+    if(o.dx > 0)
+      this.directionFaced = RIGHT;
+    else if(o.dx < 0)
+      this.directionFaced = LEFT;
+
+    this.isIdle = false;
   }
 
   /// Reset the character's stamina
@@ -131,13 +147,43 @@ class Character extends MovingEntity {
   }
 
   // Pass a sound Player ref to play hurt sound
-  void removeHp(int damage, SoundPlayer soundPlayer){
+  void removeHp(double damage, SoundPlayer soundPlayer){
     this.hp -= damage;
 
     if (this.hp < 0)
       this.hp = 0;
 
-    soundPlayer.playLocalAudio(hurtSoundName, 1.0);
+    if(this.hp == 0)
+      this.kill();
+
+    if(soundPlayer != null)
+      soundPlayer.playLocalAudio(hurtSoundName, 1.0);
   }
+
+  void updateAnimation(){
+    ImagedDrawer drawer = this.drawer;
+
+    //TODO fix animation when falling
+    // Check if we need to change the animation
+    if(this.isWalking && drawer.assetId != AssetId.char_running)
+      drawer.gif = AssetId.char_running;
+    else if(isAirborne() && drawer.assetId != AssetId.char_jumping)
+      drawer.gif = AssetId.char_jumping;
+    else if(isDying && drawer.assetId != AssetId.char_death)
+      drawer.gif = AssetId.char_death;
+    else if(isIdle && drawer.assetId != AssetId.char_idle)
+      drawer.gif = AssetId.char_idle;
+
+    // We don't need to change the animation
+    else if(drawer.gifInfo != null){
+      if(isDying && drawer.gifInfo.curFrameIndex == drawer.gifInfo.gif.length - 1){
+        drawer.gifInfo.freezeGif();
+        isDead = true;
+      }
+    }
+
+
+  }
+
 
 }

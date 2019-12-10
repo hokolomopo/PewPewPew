@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'assets_manager.dart';
 
@@ -11,18 +12,23 @@ abstract class ImagedDrawer extends CustomDrawer {
   AssetsManager assetsManager;
   GifInfo gifInfo;
 
-  ImagedDrawer(Size relativeSize, this.assetId) : super(relativeSize);
+  // For team specific assets
+  int team;
+
+  ImagedDrawer(Size relativeSize, this.assetId, {this.team})
+      : super(relativeSize);
 
   @override
   bool isReady(Size screenSize) {
     super.isReady(screenSize);
 
     // Check if the asset is loaded
-    bool isAssetLoaded = assetsManager.isAssetLoaded(assetId, relativeSize);
+    bool isAssetLoaded = assetsManager.isAssetLoaded(
+        assetId, relativeSize, team: team);
 
     if (isAssetLoaded) {
       if (gifInfo == null) {
-        gifInfo = assetsManager.getGifInfo(assetId, relativeSize);
+        gifInfo = assetsManager.getGifInfo(assetId, relativeSize, team: team);
       }
       return fetchNextFrame() != null;
     }
@@ -31,13 +37,30 @@ abstract class ImagedDrawer extends CustomDrawer {
 
   /// Fetch the next frame of the gif
   ui.Image fetchNextFrame() {
+    if (gifInfo == null)
+      print(assetId.toString() + " " + team.toString());
     return gifInfo.fetchNextFrame();
   }
 
   set gif(AssetId newGifId) {
+    print("Set asset to " + newGifId.toString());
     assetId = newGifId;
     gifInfo = null;
   }
+
+  void drawFlippedImage(Canvas canvas, ui.Image image, Rect imgDims, {Paint paint}) {
+    if (paint == null)
+      paint = Paint();
+
+    canvas.save();
+    canvas.scale(-1, 1);
+
+    double x = - imgDims.left - imgDims.width;
+    canvas.drawImage(image, Offset(x, imgDims.top), paint);
+
+    canvas.restore();
+  }
+
 }
 
 abstract class CustomDrawer {

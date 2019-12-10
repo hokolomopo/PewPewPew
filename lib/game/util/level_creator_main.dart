@@ -78,7 +78,7 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
     //camera.zoom = Offset(100 / level.size.width, 100 / level.size.height / (16 / 9));
     camera.zoom = Offset(0.3,0.3);
 
-    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: false);
+//    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: false);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
     createSpawns();

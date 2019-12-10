@@ -60,7 +60,7 @@ abstract class Weapon{
         if (dist < range) {
 
           //TODO Damage reduce based on distance? [50%-100%]
-          characters[i][j].removeHp(damage, soundPlayer);
+          characters[i][j].removeHp(damage.toDouble(), soundPlayer);
 
           // Apply a vector field for knockback
           Offset projection = characters[i][j].getPosition() - p.getPosition();

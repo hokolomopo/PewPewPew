@@ -101,6 +101,12 @@ class GameState {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
 
+    //TODO delete dis
+    for(var v in players)
+      for(Character c in v)
+        c.removeHp(0.06, null);
+
+
     bool shouldEndTurn = false;
 
     switch (currentState) {
@@ -117,30 +123,33 @@ class GameState {
 
         //Check if the destination of a displacement has been reached
         if (moveDestination != null && !currentChar.isAirborne()) {
-          //We stop only if the destination is within the centric third of the hitbox
-          if (moveDestination.dx >=
+          //We stop only if the destination is within the central third of the hitbox
+          //or if the character has stopped
+          if ((moveDestination.dx >=
                   currentChar.hitbox.left + currentChar.hitbox.width / 3 &&
               moveDestination.dx <=
-                  currentChar.hitbox.left + currentChar.hitbox.width * 2 / 3) {
+                  currentChar.hitbox.left + currentChar.hitbox.width * 2 / 3) ||
+                !currentChar.isMoving()) {
             currentChar.stop();
             uiManager.removeMarker();
             moveDestination = null;
           }
         }
 
+        //Center the camera on the character
+        this.camera.centerOn(getCurrentCharacter().getPosition());
+
         //Stop the phase if the character has no stamina left
         if (currentChar.stamina == 0 && !currentChar.isAirborne()) {
           switchState(GameStateMode.attacking);
         }
 
-        //Center the camera on the character
-        this.camera.centerOn(getCurrentCharacter().getPosition());
 
         break;
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // <JL> commenter pour travailler sur la phase attack
-        //switchState(GameStateMode.char_selection);
+        switchState(GameStateMode.char_selection);
 
         break;
       case GameStateMode.projectile:
@@ -181,13 +190,15 @@ class GameState {
     for (int p = 0; p < players.length; p++) {
       for (int c = 0; c < players[p].length; c++) {
         //Check if the character is out of bounds
-        if (!level.isInsideBounds(players[p][c].hitbox)) players[p][c].kill();
+        if (!level.isInsideBounds(players[p][c].hitbox))
+          players[p][c].isDead = true;
 
         // Check if the character is dead
         if (players[p][c].isDead) {
           this.removeCharacter(p, c);
 
-          if (p == currentPlayer && c == currentCharacter) shouldEndTurn = true;
+          if (p == currentPlayer && c == currentCharacter)
+            shouldEndTurn = true;
 
           c--;
         }
@@ -195,14 +206,15 @@ class GameState {
       if (players[p].length == 0) {
         this.removePlayer(p);
 
-        if (p == currentPlayer) shouldEndTurn = true;
+        if (p == currentPlayer)
+          shouldEndTurn = true;
 
         p--;
       }
     }
 
     // Check for end of the game
-    if (players.length == 1) {
+    if (players.length <= 1) {
       switchState(GameStateMode.over);
       return;
     }
@@ -279,7 +291,7 @@ class GameState {
       case GameStateMode.char_selection:
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
-              players[currentPlayer][i].hitbox, tapPosition)) {
+              GameUtils.extendRect(players[currentPlayer][i].hitbox, 10), tapPosition)) {
             currentCharacter = i;
 
             switchState(GameStateMode.moving);
@@ -570,7 +582,8 @@ class GameState {
         break;
       case GameStateMode.moving:
         uiManager.removeMarker();
-        if (!currentCharIsDead) getCurrentCharacter().stop();
+        if (!currentCharIsDead && getCurrentCharacter() != null)
+          getCurrentCharacter().stop();
         break;
       case GameStateMode.attacking:
         break;

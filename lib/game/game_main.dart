@@ -37,7 +37,8 @@ class _GameMainState extends State<GameMain> {
 
     Camera camera = Camera(Offset(0, 0));
 
-    this.levelPainter = LevelPainter(camera, level.size, showHitBoxes: true);
+    AssetsManager assetManager = AssetsManager(level.size, nbPlayers);
+    this.levelPainter = LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
     state = GameState(
@@ -59,6 +60,7 @@ class _GameMainState extends State<GameMain> {
   /// Function called at each frame.
   /// Update the GameState and re-draw the game on the screen
   void _update(Duration timestamp) {
+    //TODO pause timer when quitting the app
     int timeElapsed =
     lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;

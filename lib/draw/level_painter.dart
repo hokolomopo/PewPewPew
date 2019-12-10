@@ -21,9 +21,7 @@ class LevelPainter {
   bool loading = false;
   AssetsManager assetsManager;
 
-  LevelPainter(this.camera, this.levelSize, {this.showHitBoxes = false}){
-    assetsManager = AssetsManager(levelSize);
-  }
+  LevelPainter(this.camera, this.levelSize, this.assetsManager, {this.showHitBoxes = false});
 
   addElement(CustomDrawer customDrawer, {index}) {
     int actualIndex = index ?? ((elements.lastKey() ?? 0) + 1);
@@ -119,7 +117,7 @@ class _LevelPainterAux extends CustomPainter {
   Offset absoluteLevelSize = GameUtils.relativeToAbsoluteOffset(
       GameUtils.getDimFromSize(levelSize), screenSize.height);
 
-  //Fix camera position to stay inside level limits
+  //Fix camera position to stay inside level limitss
   double fixedX = absoluteCameraPosition.dx;
   double fixedY = absoluteCameraPosition.dy;
   if (fixedX < 0)
