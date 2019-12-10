@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:info2051_2018/draw/drawer_abstracts.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/game/entity.dart';
@@ -8,6 +9,9 @@ import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/sound_player.dart';
 
 import 'character.dart';
+
+// TODO Use this structure to centralise info
+final List<List<String>> _WeaponryData = [["proj", "hello"]];
 
 class Arsenal{
   List<Weapon> arsenal;
@@ -55,7 +59,7 @@ abstract class Weapon{
       for (var j = 0; j < characters[i].length; j++) {
         // apply a circular HitBox
 
-        var dist = (p.getPosition() - characters[i][j].getPosition()).distance;
+        var dist = (p.getSpritePosition() - characters[i][j].getSpritePosition()).distance;
 
         if (dist < range) {
 
@@ -63,7 +67,7 @@ abstract class Weapon{
           characters[i][j].removeHp(damage.toDouble(), soundPlayer);
 
           // Apply a vector field for knockback
-          Offset projection = characters[i][j].getPosition() - p.getPosition();
+          Offset projection = characters[i][j].getSpritePosition() - p.getSpritePosition();
 
           // normilize offset
           projection /= projection.distance;
@@ -88,8 +92,9 @@ class Projectile extends MovingEntity{
   int maxSpeed;
   double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
-  // To be used by the canvas and modified in applyFriction()
-  bool animationStopped = false;
+  String explosionSound;
+
+  Size explosionSize;
 
   Projectile(Offset position, Rectangle hitbox, Offset velocity, this.weight, this.damage, this.maxSpeed)
       : super.withSpeed(position, hitbox, velocity, new Offset(0, 0));
@@ -109,8 +114,13 @@ class Projectile extends MovingEntity{
     this.addVelocity(Offset(0,0) - this.velocity * frictionFactor);
 
     // To indicate canvas to stay on same frame
-    if( !this.animationStopped || frictionFactor == 1)
-      this.animationStopped = true;
+    if( frictionFactor == 1)
+      drawer.freezeAnimation();
+  }
+
+  // Have to be override by children
+  Explosion returnExplosionInstance(SoundPlayer soundPlayer){
+    return null;
   }
 
 }
@@ -129,11 +139,33 @@ class Boulet extends Projectile {
 
 class ProjDHS extends Projectile {
 
+  final AssetId explosionAssetID = AssetId.explosion_dhs;
+
+  // TODO put arg as optional
   ProjDHS(Offset position, Rectangle hitbox, Offset velocity, double weight,
       int damage, int maxSpeed)
       : super(position, hitbox, velocity, weight, damage, maxSpeed){
     this.drawer = ProjectileDrawer(AssetId.projectile_dhs, this);
     this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
+    this.explosionSound = "explosion.mp3";
+    this.explosionSize = Size(60, 60);
+  }
+
+
+  @override
+  Explosion returnExplosionInstance(SoundPlayer soundPlayer){
+    Size s = explosionSize;
+    if (s == null)
+      s = Size(60,60);
+
+    drawer.changeRelativeSize(s);
+
+    Offset pos = this.getSpritePosition();
+    pos += Offset(-s.width/2, -s.height/2 );
+    this.setPosition(pos);
+
+    return Explosion(pos, explosionAssetID, s, hitbox, explosionSound, soundPlayer);
+
   }
 }
 
@@ -173,4 +205,24 @@ class Colt extends Weapon{
 
   }
 
+}
+
+class Explosion extends Entity{
+
+  bool animationEnded = false;
+  String explosionSound;
+  SoundPlayer soundPlayer;
+
+  Explosion(Offset position, AssetId assetId, Size size, MutableRectangle hitbox, this.explosionSound, this.soundPlayer,):super(position, hitbox){
+    this.drawer = ExplosionDrawer(assetId, this, size: size);
+  }
+  
+  void playSound(){
+    if(soundPlayer != null && explosionSound != null)
+      soundPlayer.playLocalAudio(explosionSound);
+  }
+
+  bool hasEnded(){
+    return animationEnded;
+  }
 }

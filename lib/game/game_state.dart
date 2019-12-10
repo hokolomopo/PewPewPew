@@ -22,6 +22,7 @@ enum GameStateMode {
   moving,
   attacking,
   projectile,
+  explosion,
   cinematic,
   over
 }
@@ -72,6 +73,9 @@ class GameState {
   /// GameStateMode.projectile variables
   Stopwatch stopWatch = Stopwatch();
 
+  /// GameStateMode.explosion variables
+  Explosion currentExplosion;
+
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera) {
     uiManager = UiManager(painter);
@@ -102,9 +106,9 @@ class GameState {
     uiManager.updateUi(timeElapsed);
 
     //TODO delete dis
-    for(var v in players)
-      for(Character c in v)
-        c.removeHp(0.06, null);
+//    for(var v in players)
+//      for(Character c in v)
+//        c.removeHp(0.06, null);
 
 
     bool shouldEndTurn = false;
@@ -149,7 +153,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // <JL> commenter pour travailler sur la phase attack
-        switchState(GameStateMode.char_selection);
+//        switchState(GameStateMode.char_selection);
 
         break;
       case GameStateMode.projectile:
@@ -173,10 +177,42 @@ class GameState {
 
           currentWeapon.applyImpact(
               currentWeapon.projectile, players, soundPlayer);
+
+          // Send back an not movable entity with will play an explosion effect
+          currentExplosion = currentWeapon.projectile.returnExplosionInstance(soundPlayer);
+
+          // Play audio file of explosion in //
+          currentExplosion.playSound();
+
+
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
 
-          switchState(GameStateMode.char_selection);
+          this.addExplosion(currentExplosion);
+
+          switchState(GameStateMode.explosion);
+        }
+
+        break;
+      case GameStateMode.explosion:
+
+        if(!currentExplosion.animationEnded)
+          break;
+
+        if(!stopWatch.isRunning){
+          stopWatch.reset();
+          stopWatch.start();
+        }
+        else{
+          if(stopWatch.elapsedMilliseconds > 1000){  // One second waiting after explosion effect
+            stopWatch.stop();
+            stopWatch.reset();
+
+            this.removeExplosion(currentExplosion);
+            currentExplosion = null;
+
+            switchState(GameStateMode.char_selection);
+          }
         }
 
         break;
@@ -278,6 +314,14 @@ class GameState {
     painter.removeElement(projectile.drawer);
   }
 
+  void addExplosion(Explosion explosion) {
+    painter.addElement(explosion.drawer);
+  }
+
+  void removeExplosion(Explosion explosion) {
+    painter.removeElement(explosion.drawer);
+  }
+
   void onTap(TapUpDetails details) {
     Offset tapPosition = GameUtils.absoluteToRelativeOffset(
         details.globalPosition, GameMain.size.height);
@@ -334,6 +378,9 @@ class GameState {
         switchState(GameStateMode.moving);
         break;
 
+      case GameStateMode.explosion:
+        break;
+
       case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
@@ -380,6 +427,8 @@ class GameState {
 
       case GameStateMode.projectile:
         break;
+      case GameStateMode.explosion:
+        break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
@@ -419,6 +468,8 @@ class GameState {
 
       case GameStateMode.projectile:
         break;
+      case GameStateMode.explosion:
+        break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
@@ -457,6 +508,8 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        break;
+      case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;
@@ -513,6 +566,8 @@ class GameState {
         break;
       case GameStateMode.projectile:
         break;
+      case GameStateMode.explosion:
+        break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
@@ -566,6 +621,8 @@ class GameState {
         break;
       case GameStateMode.projectile:
         break;
+      case GameStateMode.explosion:
+        break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
@@ -589,6 +646,8 @@ class GameState {
       case GameStateMode.attacking:
         break;
       case GameStateMode.projectile:
+        break;
+      case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;

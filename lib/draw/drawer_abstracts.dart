@@ -90,4 +90,10 @@ abstract class CustomDrawer {
   Offset cancelCamera(Offset position, Offset cameraPosition) {
     return position + cameraPosition;
   }
+
+  void changeRelativeSize(Size size){}
+  void freezeAnimation({int frameNumber}){}
+  void unfreezeAnimation(){}
+  /// To know if the git info is available (during asset change) before processing it
+  bool isGifInfoAvailable() {return true;}
 }

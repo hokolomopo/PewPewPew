@@ -16,7 +16,7 @@ class SoundPlayer {
   int increment = 0;
 
   // Static list for the lowLatencyMode to pre load the files
-  static List<String> noiseFileNames = ['hurtSound.mp3'];
+  static List<String> noiseFileNames = ['hurtSound.mp3', 'explosion.mp3'];
 
   SoundPlayer([bool lowLatencyMode = false]) {
 

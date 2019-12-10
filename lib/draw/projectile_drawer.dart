@@ -30,10 +30,69 @@ class ProjectileDrawer extends ImagedDrawer{
           debugShowHitBoxesPaint);
     }
 
-    // If frictionFactor == 1, we have to stay with the same frame
-    if(projectile.animationStopped)
-      gifInfo.freezeGif();
-
       canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+  }
+
+  // For explosion purposes only
+  @override
+  void freezeAnimation({int frameNumber}){
+    if (gifInfo == null)
+      return;
+
+    if (frameNumber == null)
+      gifInfo.freezeGif();
+    else
+      gifInfo.freezeGif(frameNumber: frameNumber);
+  }
+
+  @override
+  void unfreezeAnimation(){
+    if (gifInfo == null)
+      return;
+
+    gifInfo.unfreezeGif();
+  }
+
+  // For explosion purposes only
+  @override
+  void changeRelativeSize(Size size){
+    this.relativeSize = size;
+  }
+}
+
+
+class ExplosionDrawer extends ImagedDrawer{
+  Explosion explosion;
+
+  ExplosionDrawer(AssetId assetId, this.explosion,
+      {Size size = const Size(5, 5)})
+      : super(size, assetId);
+
+  @override
+  void paint(
+      Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
+
+    if(explosion.animationEnded)
+      return;
+
+    if(gifInfo.curFrameIndex >= gifInfo.gif.length - 1){
+      explosion.animationEnded = true;
+    }
+
+    double left = GameUtils.relativeToAbsoluteDist(
+        explosion.getSpritePosition().dx, screenSize.height);
+    double top = GameUtils.relativeToAbsoluteDist(
+        explosion.getSpritePosition().dy, screenSize.height);
+
+    if (showHitBoxes) {
+      canvas.drawRect(
+          Rect.fromLTWH(left, top, actualSize.width, actualSize.height),
+          debugShowHitBoxesPaint);
+    }
+
+
+    canvas.drawImage(fetchNextFrame(), Offset(left, top), Paint());
+
+
   }
 }

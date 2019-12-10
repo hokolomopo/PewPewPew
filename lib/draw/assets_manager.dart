@@ -10,7 +10,7 @@ import 'package:info2051_2018/game/util/utils.dart';
 
 enum AssetId{
   char_running, char_idle, char_jumping, char_death, background,
-  projectile_boulet, projectile_dhs, ui_arrow
+  projectile_boulet, projectile_dhs, explosion_dhs, ui_arrow
 }
 
 /// An image asset. The size is in relative game size
@@ -39,6 +39,7 @@ class AssetsManager{
     AssetId.background:Asset(AssetId.background, "assets/graphics/backgrounds/default_background.png"),
     AssetId.projectile_boulet:Asset(AssetId.projectile_boulet, "assets/graphics/arsenal/projectiles/red_arc.gif"),
     AssetId.projectile_dhs:Asset(AssetId.projectile_dhs, "assets/graphics/arsenal/projectiles/hand-spinner.gif"),
+    AssetId.explosion_dhs:Asset(AssetId.explosion_dhs, "assets/graphics/arsenal/explosions/explosion.gif"),
     AssetId.ui_arrow:Asset(AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif", size: MarkerDrawer.markerArrowSize),
   };
 
@@ -187,8 +188,17 @@ class GifInfo {
   }
 
   void freezeGif({int frameNumber}){
+
     if(frameNumber != null)
-      curFrameIndex = frameNumber;
+      if(frameNumber > gif.length - 1)
+        curFrameIndex = 0;
+      else
+        curFrameIndex = frameNumber;
+
     _lockAnimation = true;
+  }
+
+  void unfreezeGif(){
+    _lockAnimation = false;
   }
 }
