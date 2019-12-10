@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
-import 'package:info2051_2018/sound_player.dart';
 
 import 'camera.dart';
 import 'level.dart';
@@ -23,6 +23,7 @@ enum GameStateMode {
   attacking,
   weapon_selection,
   projectile,
+  explosion, //TODO remove this state
   cinematic,
   over
 }
@@ -49,7 +50,6 @@ class GameState {
   UiManager uiManager;
   Level level;
   Camera camera;
-  SoundPlayer soundPlayer = new SoundPlayer(true);
 
   int currentPlayer = 0;
   int currentCharacter = 0;
@@ -74,6 +74,9 @@ class GameState {
 
   /// GameStateMode.projectile variables
   Stopwatch stopWatch = Stopwatch();
+
+  /// GameStateMode.explosion variables
+  Explosion currentExplosion;
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
@@ -106,6 +109,13 @@ class GameState {
     uiManager.updateUi(timeElapsed);
     
     bool shouldEndTurn = false;
+
+    // Before going through States checking, check if there is any explosion to remove from the painters
+    if (currentExplosion != null)
+      if (currentExplosion.hasEnded()) {
+        this.removeExplosion(currentExplosion);
+        currentExplosion = null;
+      }
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -159,12 +169,29 @@ class GameState {
         // center camera on projectile
         this.camera.centerOn(currentWeapon.projectile.getPosition());
 
-        // Stop stopWatch if non detonating projectile
-        if (currentWeapon.detonationTime == -1) {
+        // check if the projectile is out of bounds
+        if(!level.isInsideBounds(currentWeapon.projectile.hitbox)){
           if (stopWatch.isRunning) {
             stopWatch.stop();
             stopWatch.reset();
           }
+
+          this.removeProjectile(currentWeapon.projectile);
+          currentWeapon = null;
+
+          switchState(GameStateMode.cinematic);
+
+          break;
+        }
+
+        // Stop stopWatch if non detonating projectile
+        if (currentWeapon.detonationTime == null) {
+          if (stopWatch.isRunning) {
+            stopWatch.stop();
+            stopWatch.reset();
+          }
+
+          //TODO set a variable and methode "explose" on collision
 
           break;
         }
@@ -175,12 +202,25 @@ class GameState {
           stopWatch.reset();
 
           currentWeapon.applyImpact(
-              currentWeapon.projectile, players, soundPlayer, players[currentPlayer].updateStats);
+              currentWeapon.projectile, players, players[currentPlayer].updateStats);
+
+          // Send back an not movable entity with will play an explosion effect
+          currentExplosion = currentWeapon.projectile.returnExplosionInstance();
+
+          // Play audio file of explosion in //
+          currentExplosion.playSound();
+
+
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
 
+          this.addExplosion(currentExplosion);
+
           switchState(GameStateMode.cinematic);
         }
+
+        break;
+      case GameStateMode.explosion:
 
         break;
       case GameStateMode.cinematic:
@@ -310,6 +350,14 @@ class GameState {
     painter.removeElement(projectile.drawer);
   }
 
+  void addExplosion(Explosion explosion) {
+    painter.addElement(explosion.drawer);
+  }
+
+  void removeExplosion(Explosion explosion) {
+    painter.removeElement(explosion.drawer);
+  }
+
   void onTap(TapUpDetails details) {
     Offset tapPosition = GameUtils.absoluteToRelativeOffset(
         details.globalPosition, GameMain.size.height);
@@ -364,18 +412,33 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // For development only
-        switchState(GameStateMode.moving);
+//        switchState(GameStateMode.moving);
+        break;
+
+      case GameStateMode.projectile:
         break;
 
       case GameStateMode.weapon_selection:
-        Character currentChar = getCurrentCharacter();
-        Arsenal currentArsenal = currentChar.currentArsenal;
+        Arsenal currentArsenal = getCurrentCharacter().currentArsenal;
         Weapon selectedWeapon = currentArsenal.getWeaponAt(tapPosition);
         if (selectedWeapon != null) {
-          currentArsenal.selectWeapon(selectedWeapon, currentChar);
+          currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
+          // TODO correctly assign projectile to weapon (certainly in overridable method)
+          Offset pos = getCurrentCharacter().getPosition();
+          Offset hit = Offset(5, 5);
+          ProjDHS projDHS = new ProjDHS(
+              pos,
+              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
+          currentWeapon.projectile = projDHS;
+
           switchState(GameStateMode.attacking);
         }
+        break;
+      case GameStateMode.explosion:
+        break;
+
+      case GameStateMode.projectile:
         break;
       default:
         break;
@@ -417,6 +480,12 @@ class GameState {
         uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
+      case GameStateMode.explosion:
+        break;
+      case GameStateMode.cinematic:
+        break;
+      case GameStateMode.over:
+        break;
       default:
         break;
     }
@@ -453,7 +522,12 @@ class GameState {
                 LaunchVectorNormalizer);
         uiManager.updateJump(tmp);
         break;
-
+      case GameStateMode.explosion:
+        break;
+      case GameStateMode.cinematic:
+        break;
+      case GameStateMode.over:
+        break;
       default:
         break;
     }
@@ -491,6 +565,12 @@ class GameState {
         uiManager.removeStaminaDrawer();
         break;
 
+      case GameStateMode.explosion:
+        break;
+      case GameStateMode.cinematic:
+        break;
+      case GameStateMode.over:
+        break;
       default:
         break;
     }
@@ -524,18 +604,11 @@ class GameState {
           Offset hit = Offset(5, 5);
           ProjDHS boulet = new ProjDHS(
               pos,
-              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy),
-              new Offset(0, 0),
-              5.0,
-              15,
-              3000);
+              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
 
           currentWeapon.projectile = boulet;*/
 
           switchState(GameStateMode.weapon_selection);
-
-          // TODO add weapon to be draw in a neutral position aligned with char
-
         }
         break;
 
@@ -543,6 +616,8 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        break;
+      case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;
@@ -611,6 +686,8 @@ class GameState {
 
       case GameStateMode.projectile:
         break;
+      case GameStateMode.explosion:
+        break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
@@ -656,6 +733,8 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        break;
+      case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;

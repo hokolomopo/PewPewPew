@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/quickplay_widgets.dart';
 

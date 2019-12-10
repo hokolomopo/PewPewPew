@@ -12,6 +12,15 @@ abstract class ImagedDrawer extends CustomDrawer {
   GifInfo gifInfo;
   bool changeGif = true;
 
+  set relativeSize(Size newSize) {
+    if (newSize != _relativeSize) {
+      _relativeSize = newSize;
+      gifInfo = null;
+    }
+  }
+
+  get relativeSize => _relativeSize;
+
   // For team specific assets
   int team;
 
@@ -24,11 +33,11 @@ abstract class ImagedDrawer extends CustomDrawer {
 
     // Check if the asset is loaded
     bool isAssetLoaded = assetsManager.isAssetLoaded(
-        assetId, relativeSize, team: team);
+        assetId, _relativeSize, team: team);
 
     if (isAssetLoaded) {
       if (gifInfo == null) {
-        gifInfo = assetsManager.getGifInfo(assetId, relativeSize, team: team);
+        gifInfo = assetsManager.getGifInfo(assetId, _relativeSize, team: team);
       }
       return fetchNextFrame() != null;
     }
@@ -64,17 +73,17 @@ abstract class ImagedDrawer extends CustomDrawer {
 
 abstract class CustomDrawer {
   Size screenSize;
-  Size relativeSize;
+  Size _relativeSize;
   Size actualSize;
 
-  CustomDrawer(this.relativeSize);
+  CustomDrawer(this._relativeSize);
 
   @mustCallSuper
   /// Return true if the drawer is ready to be painted
   bool isReady(Size screenSize) {
-    if (this.relativeSize != null) {
+    if (this._relativeSize != null) {
       this.actualSize =
-          GameUtils.relativeToAbsoluteSize(relativeSize, screenSize.height);
+          GameUtils.relativeToAbsoluteSize(_relativeSize, screenSize.height);
     }
 
     this.screenSize = screenSize;
@@ -88,4 +97,10 @@ abstract class CustomDrawer {
   Offset cancelCamera(Offset position, Offset cameraPosition) {
     return position + cameraPosition;
   }
+
+  void changeRelativeSize(Size size){}
+  void freezeAnimation({int frameNumber}){}
+  void unfreezeAnimation(){}
+  /// To know if the git info is available (during asset change) before processing it
+  bool isGifInfoAvailable() {return true;}
 }
