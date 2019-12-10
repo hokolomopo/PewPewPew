@@ -31,6 +31,12 @@ class GameUtils {
     return rectangle.containsPoint(toPoint(offset));
   }
 
+  static bool circleContains(Offset center, double radius, Offset offset) {
+    return Point(center.dx, center.dy)
+            .distanceTo(Point(offset.dx, offset.dy)) <=
+        radius;
+  }
+
   static bool rectLeftOf(Rectangle rectangle, Offset offset) {
     return rectangle.left + rectangle.width > offset.dx;
   }
