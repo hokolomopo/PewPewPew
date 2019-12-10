@@ -416,6 +416,9 @@ class GameState {
         switchState(GameStateMode.moving);
         break;
 
+      case GameStateMode.projectile:
+        break;
+
       case GameStateMode.weapon_selection:
         Character currentChar = getCurrentCharacter();
         Arsenal currentArsenal = currentChar.currentArsenal;
@@ -425,6 +428,7 @@ class GameState {
           currentWeapon = currentArsenal.currentSelection;
           switchState(GameStateMode.attacking);
         }
+        break;
       case GameStateMode.explosion:
         break;
 
@@ -470,13 +474,13 @@ class GameState {
         uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
-      default:
-        break;
       case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
+        break;
+      default:
         break;
     }
   }
@@ -512,14 +516,13 @@ class GameState {
                 LaunchVectorNormalizer);
         uiManager.updateJump(tmp);
         break;
-
-      default:
-        break;
       case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
+        break;
+      default:
         break;
     }
   }
@@ -556,13 +559,13 @@ class GameState {
         uiManager.removeStaminaDrawer();
         break;
 
-      default:
-        break;
       case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
+        break;
+      default:
         break;
     }
   }

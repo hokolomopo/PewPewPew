@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/sound_player.dart';
-import 'package:info2051_2018/quick_play.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 import 'game/util/team.dart';
 import 'shop.dart';
 
@@ -51,21 +49,15 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  //TODO sound player
-  SoundPlayer soundPlayer = SoundPlayer(false);
+  SoundPlayer soundPlayer = MySoundPlayer.getInstance();
   final _menuMusicName = "sample.mp3";
   final _gameMusicName = "sample2.mp3";
 
-// Function for child to stop menu music
-  void _stopMusic() {
-    //soundPlayer.release();
-//    soundPlayer.playLocalAudio(_gameMusicName, 0.7);
-  }
 
   @override
   void initState() {
     super.initState();
-//    this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
+    this.soundPlayer.playLoopMusic(_menuMusicName, volume : 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 

@@ -53,9 +53,11 @@ class Arsenal {
 
       curAngle += 2 * pi / arsenal.length;
     }
-  void selectWeapon(Weapon selectedWeapon) {
-    this.actualSelection = selectedWeapon;
   }
+
+//    void selectWeapon(Weapon selectedWeapon) {
+//    this.actualSelection = selectedWeapon;
+//    }
 
   Weapon getWeaponAt(Offset position) {
     for (Weapon weapon in arsenal) {
@@ -67,11 +69,12 @@ class Arsenal {
     return null;
   }
 
-  selectWeapon(Weapon selectedWeapon, Character charGettingWeapon) {
+  void selectWeapon(Weapon selectedWeapon, Character charGettingWeapon) {
     this.currentSelection = selectedWeapon;
     selectedWeapon.selected(charGettingWeapon);
   }
 }
+
 
 abstract class Weapon {
   // TODO maybe having different sizes for inSelection / on the character
@@ -287,14 +290,17 @@ class Fist extends Weapon {
     print("colt color " + Character.teamColors[team].toString());
     this.drawer = WeaponDrawer(
         AssetId.weapon_fist_right, this, Weapon.relativeSize, Character.teamColors[team]);
-class Fist extends Weapon {
-    this.useProjectile = false;
-    this.hasKnockback = true;
 
-    this.ammunition = -1;
-    this.range = 10;
-    this.damage = 10;
-    this.knockbackStrength = 10;
+//    class Fist extends Weapon {
+//    this.useProjectile = false;
+//    this.hasKnockback = true;
+//
+//    this.ammunition = -1;
+//    this.range = 10;
+//    this.damage = 10;
+//    this.knockbackStrength = 10;
+//
+//    }
   }
 }
 
@@ -321,12 +327,10 @@ class Colt extends Weapon {
     this.range = 60; // 60 seems good value
     this.damage = 30;
     this.knockbackStrength = 50;
-<<<<<<<
-    this.projectileHitbox;
-    this.projectile;
-=======
 
->>>>>>>
+//    this.projectileHitbox;
+    this.projectile;
+
 
     this.detonationTime = 5000;
   }
@@ -341,7 +345,7 @@ class Explosion extends Entity {
       : super(position, hitbox) {
     this.drawer = ExplosionDrawer(assetId, this, size: size);
   }
-}
+
 
   void playSound() {
     SoundPlayer soundPlayer = MySoundPlayer.getInstance();

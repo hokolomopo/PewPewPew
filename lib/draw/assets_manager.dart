@@ -16,6 +16,7 @@ enum AssetId {
   background,
   projectile_boulet,
   projectile_dhs,
+  explosion_dhs,
   ui_arrow,
   weapon_fist_left,
   weapon_fist_right,
@@ -63,8 +64,8 @@ class AssetsManager {
         AssetId.weapon_fist_left, _weaponAssetPrefix + "fist_left.png",
         size: Fist.relativeSize),
     AssetId.weapon_fist_right: Asset(
-      AssetId.weapon_fist_right, _weaponAssetPrefix + "fist_right.png",
-      size: Fist.relativeSize),
+        AssetId.weapon_fist_right, _weaponAssetPrefix + "fist_right.png",
+        size: Fist.relativeSize),
     AssetId.weapon_fist_sel: Asset(
         AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist_right.png",
         size: Arsenal.selectionElementSize),
@@ -77,7 +78,8 @@ class AssetsManager {
     AssetId.weapon_colt_sel: Asset(
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45_right.png",
         size: Arsenal.selectionElementSize),
-    AssetId.explosion_dhs:Asset(AssetId.explosion_dhs, "assets/graphics/arsenal/explosions/explosion.gif"),
+    AssetId.explosion_dhs:
+        Asset(AssetId.explosion_dhs, _weaponAssetPrefix + "explosion.gif"),
   };
 
   Map<String, Size> _currentlyLoading = Map();
@@ -130,8 +132,7 @@ class AssetsManager {
 
     // Check if asset is not already loaded
     if (this._loadedAssets.containsKey(asset.getStringId()) &&
-        this._loadedAssets[asset.getStringId()].containsKey(asset.size))
-      return;
+        this._loadedAssets[asset.getStringId()].containsKey(asset.size)) return;
 
     // Check if asset is not already loading
     if (this._currentlyLoading.containsKey(asset.getStringId()) &&
@@ -249,18 +250,18 @@ class GifInfo {
     return gif[curFrameIndex].image;
   }
 
-  void freezeGif({int frameNumber}){
-
-    if(frameNumber != null)
-      if(frameNumber > gif.length - 1)
+  void freezeGif({int frameNumber}) {
+    if (frameNumber != null) {
+      if (frameNumber > gif.length - 1)
         curFrameIndex = 0;
       else
         curFrameIndex = frameNumber;
+    }
 
     _lockAnimation = true;
   }
 
-  void unfreezeGif(){
+  void unfreezeGif() {
     _lockAnimation = false;
   }
 }
