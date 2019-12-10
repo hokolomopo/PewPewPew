@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // json codec
 
 class ShopList extends StatefulWidget {
+  static const String moneySharedPrefKey = "money";
+
   // For Json reading : list of item and constructor
   final List<Item> items;
 
@@ -20,7 +22,8 @@ class ShopList extends StatefulWidget {
 }
 
 class ShopListState extends State<ShopList> {
-  var _money = 50000;
+
+  var _money = 0;
   List<Item> items;
   SharedPreferences prefs;
 
@@ -32,14 +35,18 @@ class ShopListState extends State<ShopList> {
     super.initState();
     items = widget.items;
     prefs = widget.prefs;
-    if (prefs.containsKey("money")) _money = prefs.getInt("money");
+    if (prefs.containsKey(ShopList.moneySharedPrefKey))
+      _money = prefs.getInt(ShopList.moneySharedPrefKey);
+    else{
+      _money = 0;
+    }
   }
 
 
   /// Function called when selling an item. Will reduce the money and set the item as sold
   void _sellItem(int price, String item) async {
     this._money -= price;
-    await this.prefs.setInt("money", this._money);
+    await this.prefs.setInt(ShopList.moneySharedPrefKey, this._money);
     // Mark the item as SOLD
     await this.prefs.setInt(item, 0);
     // Set state applied here to be sure that changes were done before rebuilding the list

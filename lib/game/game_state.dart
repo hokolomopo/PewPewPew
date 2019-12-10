@@ -6,9 +6,10 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
-import 'package:info2051_2018/game/team.dart';
+import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/terrain.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
+import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
@@ -42,6 +43,8 @@ class GameState {
   GameStateMode currentState = GameStateMode.char_selection;
 
   List<Team> players = new List();
+  GameStats gameStats = GameStats(null, Map());
+
   World world = new World();
   LevelPainter painter;
   UiManager uiManager;
@@ -75,6 +78,7 @@ class GameState {
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera) {
+
     uiManager = UiManager(painter);
 
     level.spawnPoints.shuffle();
@@ -184,7 +188,7 @@ class GameState {
         Character movingCharacter;
         for(Team v in players) {
           for (Character c in v.characters){
-            if(c.isDying)
+            if(c.isDying || c.isDead)
               isSomeoneDying = true;
             if (c.isMoving()) {
               if (camera.isDisplayed(c.hitbox))
@@ -215,7 +219,7 @@ class GameState {
         // Don't use character.kill function to skip death animation
         if (!level.isInsideBounds(players[p].getCharacter(c).hitbox)) {
           players[p].getCharacter(c).isDead = true;
-          players[p].updateStats(TeamStat.killed, 1, teamTakingAttack: this.currentPlayer);
+          players[this.currentPlayer].updateStats(TeamStat.killed, 1, teamTakingAttack: p);
         }
 
         // Check if the character is dead
@@ -281,9 +285,11 @@ class GameState {
 
   void removePlayer(int playerID) {
     print("Player " + playerID.toString() + " is dead");
+    this.computeStats(players[playerID]);
 
     players.removeAt(playerID);
-    if (currentPlayer > playerID) currentPlayer--;
+    if (currentPlayer > playerID)
+      currentPlayer--;
   }
 
   Character getCurrentCharacter() {
@@ -364,6 +370,7 @@ class GameState {
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
+        // Managed in GameMain to pass parameters back to the main screen
         break;
     }
   }
@@ -436,6 +443,8 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
+        if(currentWeapon == null)
+          return;
         Offset tmp = currentWeapon.projectile.getLaunchSpeed(
             (dragPositionCamera - launchDragStartPosition) *
                 LaunchVectorNormalizer);
@@ -471,6 +480,8 @@ class GameState {
         // TODO: Handle this case.
         // J.L
 
+        if(currentWeapon == null)
+          return;
         this.addProjectile(currentWeapon.projectile);
         currentWeapon.fireProjectile(
             (launchDragStartPosition - launchDragEndPosition) *
@@ -594,9 +605,21 @@ class GameState {
       case GameStateMode.cinematic:
         break;
       case GameStateMode.over:
-        uiManager.addText(
-            "Game over!\nTouch to continue", TextPositions.center, 50,
-            duration: 3, ignoreCamera: true);
+        // Compute stats for last team
+        if(players.length == 1) {
+          this.computeStats(players[0]);
+          gameStats.winningTeam = players[0].teamName;
+
+          uiManager.addText(
+              "Team " + players[0].teamName + " won !\nTouch to continue",
+              TextPositions.center, 50, duration: 3, ignoreCamera: true);
+        }
+        // No players left, it's a tie
+        else{
+          uiManager.addText(
+              "Game over!\nTouch to continue", TextPositions.center, 50,
+              duration: 3, ignoreCamera: true);
+        }
         break;
     }
   }
@@ -620,5 +643,13 @@ class GameState {
       case GameStateMode.over:
         break;
     }
+  }
+
+
+  /// Compute the stats of a team and save it
+  /// Should be called when a team is eliminated
+  void computeStats(Team t){
+    Map<TeamStat, double> teamStats = t.computeStats();
+    gameStats.statistics.putIfAbsent(t.teamName, () => teamStats);
   }
 }

@@ -9,11 +9,15 @@ import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/game_state.dart';
+import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/home.dart';
+import 'package:info2051_2018/stats_screen.dart';
 
 import 'level.dart';
 
 class GameMain extends StatefulWidget {
+  static const routeName = '/GameMain';
+
   GameMain(this.levelJson, this.nbPlayers, this.nbCharacters);
 
   final String levelJson;
@@ -41,8 +45,7 @@ class _GameMainState extends State<GameMain> {
     this.levelPainter = LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
-    state = GameState(
-        nbPlayers, nbCharacters, levelPainter, level, camera);
+    state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera);
 
     _scheduleFrame();
   }
@@ -87,7 +90,11 @@ class _GameMainState extends State<GameMain> {
             child: Text("No"),
           ),
           FlatButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Home.routeName,
+                    (Route<dynamic> route) => false)
+            ,
             child: Text("Yes"),
           ),
         ],
@@ -107,7 +114,11 @@ class _GameMainState extends State<GameMain> {
     var onTapUp;
     if (state.currentState == GameStateMode.over) {
       onTapUp = (TapUpDetails details) {
-        Navigator.of(context).pop();
+        Navigator.pushNamedAndRemoveUntil(
+            context,
+            StatsScreen.routeName,
+                (Route<dynamic> route) => false,
+            arguments: state.gameStats);
       };
     } else {
       onTapUp = (TapUpDetails details) {

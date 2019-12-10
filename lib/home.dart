@@ -6,6 +6,8 @@ import 'dart:async';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
+  static const routeName = '/Home';
+
   static Size _screenSize;
   static bool sizeLocked = false;
 

@@ -15,6 +15,7 @@ class Team{
   int teamId;
   String teamName;
   int _initialNbOfCharacters;
+  bool _statComputed = false;
 
   List<Character> characters = List();
 
@@ -48,10 +49,22 @@ class Team{
   }
 
   Map<TeamStat, double> computeStats(){
+    if(_statComputed)
+      return _stats;
+
     _stats[TeamStat.alive] = (_initialNbOfCharacters - this.length).toDouble();
 
-    for(Character c in characters)
+    for(Character c in characters) {
       _stats[TeamStat.damage_taken] += (Character.base_hp - c.hp);
+    }
+    for(int i = 0;i < _initialNbOfCharacters - characters.length;i++)
+      _stats[TeamStat.damage_taken] += Character.base_hp;
+
+    _stats[TeamStat.damage_taken] -= _stats[TeamStat.damage_self_dealt];
+
+    _stats[TeamStat.alive] = characters.length.toDouble();
+
+    _statComputed = true;
 
     return _stats;
   }
