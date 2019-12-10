@@ -5,6 +5,7 @@ import 'package:info2051_2018/draw/drawer_abstracts.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/game/entity.dart';
+import 'package:info2051_2018/game/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/sound_player.dart';
 
@@ -52,24 +53,30 @@ abstract class Weapon{
   //TODO decide if methods better in Weapon or corresponding Projectile
   // Should be an overdrivable function to get different behaviour for other weapon
 
-  ///Function which apply Damage and knockback to charactere according to
+  ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
-  void applyImpact(Projectile p, List<List<Character>> characters, SoundPlayer soundPlayer){
+  void applyImpact(Projectile p, List<Team> characters, SoundPlayer soundPlayer, Function statUpdater){
     for (var i = 0; i < characters.length; i++) {
       for (var j = 0; j < characters[i].length; j++) {
         // apply a circular HitBox
 
-        var dist = (p.getSpritePosition() - characters[i][j].getSpritePosition()).distance;
+        var dist = (p.getPosition() - characters[i].getCharacter(j).getPosition()).distance;
 
         if (dist < range) {
 
+          // Update stats
+          double damageDealt = min(damage.toDouble(), characters[i].getCharacter(j).hp);
+          statUpdater(TeamStat.damage_dealt, damageDealt, teamTakingAttack: i);
+          if(characters[i].getCharacter(j).hp == 0)
+            statUpdater(TeamStat.killed, 1, teamTakingAttack: i);
+
           //TODO Damage reduce based on distance? [50%-100%]
-          characters[i][j].removeHp(damage.toDouble(), soundPlayer);
+          characters[i].getCharacter(j).removeHp(damage.toDouble(), soundPlayer);
 
           // Apply a vector field for knockback
-          Offset projection = characters[i][j].getSpritePosition() - p.getSpritePosition();
+          Offset projection = characters[i].getCharacter(j).getPosition() - p.getPosition();
 
-          // normilize offset
+          // Normalize offset
           projection /= projection.distance;
 
           // The closest to the center of detonation the stronger the knockback
@@ -77,11 +84,10 @@ abstract class Weapon{
           projection *= (range - dist)/ range;
           // Applied factor for knockback strengh
           projection *= knockbackStrength.toDouble();
-          characters[i][j].addVelocity(projection);
+          characters[i].getCharacter(j).addVelocity(projection);
         }
       }
     }
-
   }
 
 }

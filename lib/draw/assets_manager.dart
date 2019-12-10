@@ -33,7 +33,7 @@ class Asset{
 class AssetsManager{
   static final String _charAssetPrefix = "assets/graphics/characters/char";
   //TODO fix cat death gif
-  
+
   /// Default assets of the game
   final Map<AssetId, Asset> assets = {//TODO put size for projectiles
     AssetId.background:Asset(AssetId.background, "assets/graphics/backgrounds/default_background.png"),
