@@ -106,11 +106,6 @@ class GameState {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
 
-    //TODO delete dis
-//    for(var v in players)
-//      for(Character c in v)
-//        c.removeHp(0.06, null);
-
 
     bool shouldEndTurn = false;
 
@@ -218,17 +213,32 @@ class GameState {
 
         break;
       case GameStateMode.cinematic:
-        // If the last attack has knocked back someone, film him until he stop moving
+        // If the last attack has knocked back someone, film until everyone stop moving
         bool isSomeoneMoving = false;
+        bool isSomeoneMovingOnScreen = false;
+        bool isSomeoneDying = false;
+        Character movingCharacter;
         for(Team v in players) {
-          for (Character c in v.characters)
+          for (Character c in v.characters){
+            if(c.isDying)
+              isSomeoneDying = true;
             if (c.isMoving()) {
+              if (camera.isDisplayed(c.hitbox))
+                isSomeoneMovingOnScreen = true;
               isSomeoneMoving = true;
+              movingCharacter = c;
+            }
             }
         }
 
-        if(!isSomeoneMoving)
+        // If the character moving is not on screen, mode the camera to him
+        if(isSomeoneMoving && !isSomeoneMovingOnScreen)
+          camera.centerOn(movingCharacter.getPosition());
+
+        // If no one is moving, go to next player
+        else if(!isSomeoneMoving && !isSomeoneDying)
           switchState(GameStateMode.char_selection);
+
         break;
       case GameStateMode.over:
         break;
@@ -239,8 +249,10 @@ class GameState {
       for (int c = 0; c < players[p].length; c++) {
         //Check if the character is out of bounds
         // Don't use character.kill function to skip death animation
-        if (!level.isInsideBounds(players[p].getCharacter(c).hitbox))
+        if (!level.isInsideBounds(players[p].getCharacter(c).hitbox)) {
           players[p].getCharacter(c).isDead = true;
+          players[p].updateStats(TeamStat.killed, 1, teamTakingAttack: this.currentPlayer);
+        }
 
         // Check if the character is dead
         if (players[p].getCharacter(c).isDead) {
@@ -263,7 +275,7 @@ class GameState {
     }
 
     // Check for end of the game
-    if (players.length <= 1) {
+    if (currentState != GameStateMode.cinematic && players.length <= 1) {
       switchState(GameStateMode.over);
       return;
     }
