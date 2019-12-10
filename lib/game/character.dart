@@ -21,7 +21,7 @@ class Character extends MovingEntity {
   static const double max_jump_speed = 50;
   static const double walk_speed = 20;
 
-  static const Size characterSpriteSize = Size(10, 10);
+  static const Size spriteSize = Size(10, 10);
   static const Offset characterSpritePositionOffset = Offset(-2, 0);
 
   static const Offset hitboxSize = Offset(6,10);
@@ -43,11 +43,11 @@ class Character extends MovingEntity {
 
   int directionFaced = RIGHT;
 
-  Character(Offset position, this.team) : super(position, new MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
+  Character(Offset position, this.team) : super(position, MutableRectangle(position.dx, position.dy, hitboxSize.dx, hitboxSize.dy)){
     this.spritePositionOffset = characterSpritePositionOffset;
-    this.drawer = new CharacterDrawer(AssetId.char_idle, this, team: this.team);
+    this.drawer = CharacterDrawer(AssetId.char_idle, this, team: this.team);
     // TODO Initiate "correctly" arsenal
-    this.currentArsenal = new Arsenal([Fist(), Colt()]);
+    this.currentArsenal = Arsenal([Fist(this.team), Colt(this.team)]);
   }
 
   void jump(Offset direction){
@@ -58,7 +58,7 @@ class Character extends MovingEntity {
 
     //Make sure the jump is not totally horizontal for ease of collision detection
     if(direction.dy == 0)
-      direction += new Offset(0, 0.1);
+      direction += Offset(0, 0.1);
 
     direction = getJumpSpeed(direction);
     //Limit the speed of the jump to max_jump_speed
@@ -130,7 +130,7 @@ class Character extends MovingEntity {
 
     // Reduce stamina
     this.stamina -= o.dx.abs();
-    stamina < 0 ? stamina = 0 : stamina = stamina;
+    stamina = max(stamina, 0);
 
     // Update which side the character is facing
     if(o.dx > 0)
@@ -194,6 +194,4 @@ class Character extends MovingEntity {
 
 
   }
-
-
 }

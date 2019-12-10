@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -23,6 +22,7 @@ enum GameStateMode {
   char_selection,
   moving,
   attacking,
+  weapon_selection,
   projectile,
   cinematic,
   over
@@ -105,8 +105,7 @@ class GameState {
   void update(double timeElapsed) {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
-
-
+    
     bool shouldEndTurn = false;
 
     switch (currentState) {
@@ -126,10 +125,11 @@ class GameState {
           //We stop only if the destination is within the central third of the hitbox
           //or if the character has stopped
           if ((moveDestination.dx >=
-                  currentChar.hitbox.left + currentChar.hitbox.width / 3 &&
-              moveDestination.dx <=
-                  currentChar.hitbox.left + currentChar.hitbox.width * 2 / 3) ||
-                !currentChar.isMoving()) {
+                      currentChar.hitbox.left + currentChar.hitbox.width / 3 &&
+                  moveDestination.dx <=
+                      currentChar.hitbox.left +
+                          currentChar.hitbox.width * 2 / 3) ||
+              !currentChar.isMoving()) {
             currentChar.stop();
             uiManager.removeMarker();
             moveDestination = null;
@@ -144,7 +144,6 @@ class GameState {
           switchState(GameStateMode.attacking);
         }
 
-
         break;
       case GameStateMode.attacking:
         // TODO: Handle this case.
@@ -152,6 +151,11 @@ class GameState {
         //switchState(GameStateMode.char_selection);
 
         break;
+
+      case GameStateMode.weapon_selection:
+        // TODO: Handle this case.
+        break;
+
       case GameStateMode.projectile:
         // center camera on projectile
         this.camera.centerOn(currentWeapon.projectile.getPosition());
@@ -226,8 +230,7 @@ class GameState {
         if (players[p].getCharacter(c).isDead) {
           this.removeCharacter(p, c);
 
-          if (p == currentPlayer && c == currentCharacter)
-            shouldEndTurn = true;
+          if (p == currentPlayer && c == currentCharacter) shouldEndTurn = true;
 
           c--;
         }
@@ -235,8 +238,7 @@ class GameState {
       if (players[p].length == 0) {
         this.removePlayer(p);
 
-        if (p == currentPlayer)
-          shouldEndTurn = true;
+        if (p == currentPlayer) shouldEndTurn = true;
 
         p--;
       }
@@ -322,7 +324,8 @@ class GameState {
       case GameStateMode.char_selection:
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
-              GameUtils.extendRect(players[currentPlayer].getCharacter(i).hitbox, 10), tapPosition)) {
+              GameUtils.extendRect(players[currentPlayer].getCharacter(i).hitbox, 10),
+              tapPosition)) {
             currentCharacter = i;
 
             switchState(GameStateMode.moving);
@@ -365,12 +368,17 @@ class GameState {
         switchState(GameStateMode.moving);
         break;
 
-      case GameStateMode.projectile:
+      case GameStateMode.weapon_selection:
+        Character currentChar = getCurrentCharacter();
+        Arsenal currentArsenal = currentChar.currentArsenal;
+        Weapon selectedWeapon = currentArsenal.getWeaponAt(tapPosition);
+        if (selectedWeapon != null) {
+          currentArsenal.selectWeapon(selectedWeapon, currentChar);
+          currentWeapon = currentArsenal.currentSelection;
+          switchState(GameStateMode.attacking);
+        }
         break;
-      case GameStateMode.cinematic:
-        break;
-      case GameStateMode.over:
-        // Managed in GameMain to pass parameters back to the main screen
+      default:
         break;
     }
   }
@@ -410,11 +418,7 @@ class GameState {
         uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
-      case GameStateMode.projectile:
-        break;
-      case GameStateMode.cinematic:
-        break;
-      case GameStateMode.over:
+      default:
         break;
     }
   }
@@ -443,7 +447,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        if(currentWeapon == null)
+        if(currentWeapon == null || currentWeapon.projectile == null)
           return;
         Offset tmp = currentWeapon.projectile.getLaunchSpeed(
             (dragPositionCamera - launchDragStartPosition) *
@@ -451,11 +455,7 @@ class GameState {
         uiManager.updateJump(tmp);
         break;
 
-      case GameStateMode.projectile:
-        break;
-      case GameStateMode.cinematic:
-        break;
-      case GameStateMode.over:
+      default:
         break;
     }
   }
@@ -480,7 +480,7 @@ class GameState {
         // TODO: Handle this case.
         // J.L
 
-        if(currentWeapon == null)
+        if(currentWeapon == null || currentWeapon.projectile == null)
           return;
         this.addProjectile(currentWeapon.projectile);
         currentWeapon.fireProjectile(
@@ -492,11 +492,7 @@ class GameState {
         uiManager.removeStaminaDrawer();
         break;
 
-      case GameStateMode.projectile:
-        break;
-      case GameStateMode.cinematic:
-        break;
-      case GameStateMode.over:
+      default:
         break;
     }
   }
@@ -515,16 +511,16 @@ class GameState {
         break;
 
       case GameStateMode.moving:
+      case GameStateMode.attacking:
         if (GameUtils.rectContains(currentChar.hitbox, longPressPosition)) {
           if (currentChar.isAirborne()) return;
           currentChar.stop();
 
-          //TODO : display armory
-          print("Armory is here");
           // For the moment skip the selection to implement the rest
-          Weapon selectedWeapon = currentChar.currentArsenal.arsenal[1];
+          // TODO modify to take into account selection step
+          /*Weapon selectedWeapon = currentChar.currentArsenal.arsenal[1];
           currentChar.currentArsenal.selectWeapon(selectedWeapon);
-          currentWeapon = currentChar.currentArsenal.actualSelection;
+          currentWeapon = currentChar.currentArsenal.currentSelection;
           Offset pos = currentChar.getPosition();
           Offset hit = Offset(5, 5);
           ProjDHS boulet = new ProjDHS(
@@ -535,18 +531,18 @@ class GameState {
               15,
               3000);
 
-          currentWeapon.projectile = boulet;
+          currentWeapon.projectile = boulet;*/
 
-          switchState(GameStateMode.attacking);
+          switchState(GameStateMode.weapon_selection);
 
-          // add weapon to be draw in a neutral position aligned with char
+          // TODO add weapon to be draw in a neutral position aligned with char
 
         }
-
         break;
 
-      case GameStateMode.attacking:
+      case GameStateMode.weapon_selection:
         break;
+
       case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
@@ -600,6 +596,19 @@ class GameState {
         break;
       case GameStateMode.attacking:
         break;
+
+      case GameStateMode.weapon_selection:
+        Character currentChar = getCurrentCharacter();
+        Arsenal currentArsenal = currentChar.currentArsenal;
+
+        currentArsenal.showWeaponSelection(currentChar.hitbox);
+
+        for (Weapon weapon in currentArsenal.arsenal) {
+          painter.addElement(weapon.drawer);
+        }
+
+        break;
+
       case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:
@@ -636,6 +645,16 @@ class GameState {
         break;
       case GameStateMode.attacking:
         break;
+
+      case GameStateMode.weapon_selection:
+        Arsenal curArsenal = getCurrentCharacter().currentArsenal;
+        for (Weapon weapon in curArsenal.arsenal) {
+          if (weapon != curArsenal.currentSelection) {
+            painter.removeElement(weapon.drawer);
+          }
+        }
+        break;
+
       case GameStateMode.projectile:
         break;
       case GameStateMode.cinematic:

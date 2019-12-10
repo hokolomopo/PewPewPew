@@ -33,18 +33,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 // Function for child to stop menu music
   void _stopMusic() {
     //soundPlayer.release();
-//    soundPlayer.playLocalAudio(_gameMusicName, 0.7);
+    soundPlayer.playLocalAudio(_gameMusicName, 0.7);
   }
 
   void _reload() {
     Navigator.of(context).pop();
-//    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
+    soundPlayer.playLocalAudio(_menuMusicName, 1.0);
   }
 
   @override
   void initState() {
     super.initState();
-//    this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
+    this.soundPlayer.playLocalAudio(_menuMusicName, 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
