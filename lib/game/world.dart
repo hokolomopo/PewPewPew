@@ -6,6 +6,7 @@ import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/quickplay_widgets.dart';
 
 import 'level.dart';
 
@@ -36,13 +37,30 @@ class World{
     }
 
     for(Projectile p in projectiles){
-      // TODO different behavior for each projectile
-      p.addAcceleration(gravity);
-      p.accelerate();
+      // Linear trajectory projectile aren't affect by gravity
+      if(!(p is Linear) ){
+        p.addAcceleration(gravity);
+        p.accelerate();
+      }
       moveEntity(p, timeElapsed);
     }
   }
 
+  bool checkCollidableProj() {
+    for (Projectile p in projectiles) {
+      if (!(p is Collidable))
+        return false;
+
+      // First check terrains
+      for (TerrainBlock t in terrain)
+        if (t.hitBox.intersects(p.hitbox))
+          return true;
+
+      for (Character c in players)
+        if(c.hitbox.intersects(p.hitbox))
+          return true;
+    }
+  }
   void moveEntity(MovingEntity entity, double timeElapsed){
 
     //Move in X axis

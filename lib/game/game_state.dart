@@ -75,7 +75,8 @@ class GameState {
   Stopwatch stopWatch = Stopwatch();
 
   /// GameStateMode.explosion variables
-  Explosion currentExplosion;
+  // TODO make it a list of Animations
+  MyAnimation currentAnimations;
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
@@ -110,9 +111,9 @@ class GameState {
     bool shouldEndTurn = false;
 
     // Before going through States checking, check if there is any explosion to remove from the painters
-    if (currentExplosion != null) if (currentExplosion.hasEnded()) {
-      this.removeExplosion(currentExplosion);
-      currentExplosion = null;
+    if (currentAnimations != null) if (currentAnimations.hasEnded()) {
+      this.removeAnimation(currentAnimations);
+      currentAnimations = null;
     }
 
     switch (currentState) {
@@ -167,7 +168,7 @@ class GameState {
         this.camera.centerOn(currentWeapon.projectile.getPosition());
 
         // check if the projectile is out of bounds
-        if (!level.isInsideBounds(currentWeapon.projectile.hitbox)) {
+        if (!level.isInsideBounds(currentWeapon.projectile)) {
           resetStopWatch();
 
           this.removeProjectile(currentWeapon.projectile);
@@ -177,10 +178,21 @@ class GameState {
         }
 
         // Stop stopWatch if non detonating projectile
-        if (currentWeapon.detonationDelay == null) {
+        if (!(currentWeapon.projectile is Detonable)) {
           resetStopWatch();
 
-          //TODO set a variable and methode "explose" on collision
+          // Checking if a collidable projectile has
+          // intersect a hitbox (terrain or character)
+          if(world.checkCollidableProj())
+            currentWeapon.applyImpact(currentWeapon.projectile, players,
+                players[currentPlayer].updateStats, uiManager);
+
+          this.removeProjectile(currentWeapon.projectile);
+          currentWeapon = null;
+
+          switchState(GameStateMode.cinematic);
+
+          //TODO add animation
 
           break;
         }
@@ -193,15 +205,15 @@ class GameState {
               players[currentPlayer].updateStats, uiManager);
 
           // Send back an not movable entity with will play an explosion effect
-          currentExplosion = currentWeapon.projectile.returnExplosionInstance();
+          currentAnimations = currentWeapon.projectile.returnAnimationInstance();
 
           // Play audio file of explosion
-          currentExplosion.playSound();
+          currentAnimations.playSound();
 
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
 
-          this.addExplosion(currentExplosion);
+          this.addAnimation(currentAnimations);
 
           switchState(GameStateMode.cinematic);
         }
@@ -244,7 +256,7 @@ class GameState {
       for (int c = 0; c < players[p].length; c++) {
         //Check if the character is out of bounds
         // Don't use character.kill function to skip death animation
-        if (!level.isInsideBounds(players[p].getCharacter(c).hitbox)) {
+        if (!level.isInsideBounds(players[p].getCharacter(c))) {
           players[p].getCharacter(c).isDead = true;
           players[this.currentPlayer]
               .updateStats(TeamStat.killed, 1, teamTakingAttack: p);
@@ -334,11 +346,12 @@ class GameState {
     painter.removeElement(projectile.drawer);
   }
 
-  void addExplosion(Explosion explosion) {
+  // TODO put add and remove line for currentAnimations list
+  void addAnimation(MyAnimation explosion) {
     painter.addElement(explosion.drawer);
   }
 
-  void removeExplosion(Explosion explosion) {
+  void removeAnimation(MyAnimation explosion) {
     painter.removeElement(explosion.drawer);
   }
 

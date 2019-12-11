@@ -103,26 +103,32 @@ class ProjectileDrawer extends ImagedDrawer {
   }
 }
 
-class ExplosionDrawer extends ImagedDrawer {
-  Explosion explosion;
 
-  ExplosionDrawer(AssetId assetId, this.explosion,
+class AnimationDrawer extends ImagedDrawer {
+  MyAnimation animation;
+
+  AnimationDrawer(AssetId assetId, this.animation,
       {Size size = const Size(5, 5)})
       : super(size, assetId);
 
   @override
   void paint(
       Canvas canvas, Size screenSize, showHitBoxes, Offset cameraPosition) {
-    if (explosion.animationEnded) return;
 
-    if (gifInfo.curFrameIndex >= gifInfo.gif.length - 1) {
-      explosion.animationEnded = true;
+    // Specific loop for non Loop animation
+    if( !(animation is LoopAnimation) ){
+
+      if (animation.animationEnded) return;
+
+      if (gifInfo.curFrameIndex >= gifInfo.gif.length - 1) {
+        animation.animationEnded = true;
+      }
     }
 
     double left = GameUtils.relativeToAbsoluteDist(
-        explosion.getSpritePosition().dx, screenSize.height);
+        animation.getSpritePosition().dx, screenSize.height);
     double top = GameUtils.relativeToAbsoluteDist(
-        explosion.getSpritePosition().dy, screenSize.height);
+        animation.getSpritePosition().dy, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(

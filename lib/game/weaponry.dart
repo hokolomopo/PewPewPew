@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
@@ -13,6 +15,7 @@ import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
 import 'character.dart';
@@ -199,6 +202,12 @@ abstract class Weapon {
   //TODO decide if methods better in Weapon or corresponding Projectile
   // Should be an overridable function to get different behaviour for other weapon
 
+  /// Function to proceed all the end logic of a projectile (explosion sprite,
+  /// damage, painters, ...)
+  /// TODO put end logic in weapon instead of gameState
+  void proceedToEnd(Projectile projectile, List<Team> characters,
+      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter);
+
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
   void applyImpact(Projectile projectile, List<Team> characters,
@@ -274,6 +283,11 @@ class Fist extends Weapon {
 //    this.knockbackStrength = 10;
 //    this.detonationDelay = 1000;
   }
+
+  // TODO put end logic in weapon instead of gameState
+  void proceedToEnd(Projectile projectile, List<Team> characters,
+      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
+
 }
 
 class Colt extends Weapon {
@@ -302,6 +316,9 @@ class Colt extends Weapon {
 //
 //    this.detonationDelay = 5000;
   }
+
+  void proceedToEnd(Projectile projectile, List<Team> characters,
+      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 }
 
 abstract class Projectile extends MovingEntity {
@@ -361,19 +378,93 @@ abstract class Projectile extends MovingEntity {
     if (frictionFactor == 1) drawer.freezeAnimation();
   }
 
-  Explosion returnExplosionInstance() {
-    Size s = explosionSize;
-    if (s == null) s = Size(60, 60);
-
-    drawer.changeRelativeSize(s);
-
-    Offset pos = this.getPosition();
-    pos += Offset(-s.width / 2, -s.height / 2);
-    setPosition(pos);
-
-    return Explosion(pos, explosionAssetId, s, hitbox, explosionSound);
+  // Have to be override by children
+  MyAnimation returnAnimationInstance() {
+    return null;
   }
+
+  //Deprecated
+//  Explosion returnExplosionInstance() {
+//    Size s = explosionSize;
+//    if (s == null) s = Size(60, 60);
+//
+//    drawer.changeRelativeSize(s);
+//
+//    Offset pos = this.getPosition();
+//    pos += Offset(-s.width / 2, -s.height / 2);
+//    setPosition(pos);
+//
+//    return Explosion(pos, explosionAssetId, s, hitbox, explosionSound);
+//  }
+
+  ///Function to play a sound effect at the start of the launch
+  void playStartSound(){}
+
+  /// Function to proceed all the end logic of a projectile (explosion sprite,
+  /// damage, painters, ...)
+  void proceedToEnd(Projectile projectile, List<Team> characters,
+      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
+
 }
+
+/// Class to implement projectile which react a command (onTap for instance),
+/// While being launch
+/// (Arrow changing direction once on onTap, C4, leGrandMathy (une arme qui oneshot le char onTapped), ... )
+abstract class Controllable extends Projectile{
+
+  // Constructor not useful
+  Controllable(Offset position, Rectangle hitbox, Offset velocity, double weight,
+      int maxSpeed): super(position, hitbox, velocity, weight,
+      maxSpeed);
+
+//  Controllable.fromWeaponStat(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats) : super.fromWeaponStats(position, hitbox, weaponStats);
+
+
+  // Put to true corresponding listener in constructor or json of the projectile
+  // and override the corresponding methods
+  bool onTapListener = false;
+  bool onPressListener = false;
+  bool onPanListener = false;
+
+  void onTap(){}
+  void onPress(){}
+  void onPan(){}
+}
+
+/// Class to implement projectile which are explosives and have a detonation timer.
+/// (Bombs, ...)
+abstract class Detonable extends Projectile{
+  int detonationTime;
+  String explosionSound;
+
+  // TODO change following constructor copied from previous test projectile
+  Detonable(Offset position, Rectangle hitbox,
+      Offset velocity,
+      double weight,
+      int maxSpeed)
+      : super(position, hitbox, velocity, weight, maxSpeed) {
+    this.drawer = ProjectileDrawer(AssetId.projectile_dhs, this);
+    this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
+    this.explosionSound = "explosion.mp3";
+    this.explosionSize = Size(60, 60);
+    this.actualOrientation = 0.0;
+  }
+
+
+  MyAnimation returnAnimationInstance();
+
+}
+
+/// Mixin class for projectile which applyImpact when intersecting another
+/// hitbox or going out of bound
+/// (Arrow, Bombardement, ...)
+// TODO method in World check projectile collision, if not Collidable just return false,
+// else apply method
+abstract class Collidable {}
+
+/// Mixin class for projectile which are not influence by gravity, Linear
+/// (Bullets, Rays, Magic orbs, ...)
+abstract class Linear{}
 
 // TODO precise value in constructor body instead of arg (useful for tests)
 // Class Test for projectile
@@ -390,10 +481,9 @@ class Boulet extends Projectile {
   }
 }
 
-class ProjDHS extends Projectile {
-  final AssetId explosionAssetId = AssetId.explosion_dhs;
+class ProjDHS extends Detonable with Linear {
+  final AssetId explosionAssetID = AssetId.explosion_dhs;
 
-  // TODO put arg as optional
   ProjDHS(Offset position, Rectangle hitbox,
       {Offset velocity = const Offset(0, 0),
       double weight = 5.0,
@@ -405,27 +495,71 @@ class ProjDHS extends Projectile {
     this.explosionSize = Size(60, 60);
     this.actualOrientation = 0.0;
   }
+
+
+  get explosionAssetId{
+   return this.explosionAssetID;
+  }
+
+  @override
+  MyAnimation returnAnimationInstance() {
+    Size s = explosionSize;
+    if (s == null) s = Size(60, 60);
+
+    drawer.changeRelativeSize(s);
+
+    Offset pos = this.getPosition();
+    pos += Offset(-s.width / 2, -s.height / 2);
+    this.setPosition(pos);
+
+    return MyAnimation(pos, explosionAssetID, s, hitbox, explosionSound);
+  }
 }
 
-class Explosion extends Entity {
+/// Animation (Gif) limited in Time (counted in total frames)
+/// It can also play a sound effect
+class MyAnimation extends Entity {
   bool animationEnded = false;
-  String explosionSound;
+  String soundEffect;
 
-  Explosion(Offset position, AssetId assetId, Size size,
-      MutableRectangle hitbox, this.explosionSound)
+  MyAnimation(Offset position, AssetId assetId, Size size,
+      MutableRectangle hitbox, this.soundEffect)
       : super(position, hitbox) {
-    this.drawer = ExplosionDrawer(assetId, this, size: size);
+    this.drawer = AnimationDrawer(assetId, this, size: size);
   }
 
   void playSound() {
     SoundPlayer soundPlayer = MySoundPlayer.getInstance();
-    if (soundPlayer != null && explosionSound != null)
-      soundPlayer.playSoundEffect(explosionSound);
+    if (soundPlayer != null && soundEffect != null && soundEffect != "")
+      soundPlayer.playSoundEffect(soundEffect);
   }
 
   bool hasEnded() {
     return animationEnded;
   }
+}
+
+/// Specification of MyAnimation for loop Animation along side simple sound effect
+/// or loop sound effect
+/// A trigger has to be implemented to stop the loop animation and sound.
+
+class LoopAnimation extends MyAnimation {
+  // Ref to AudioPlayer assigned to AudioCache
+  AudioPlayer loopAudioPlayer;
+  String loopSoundEffect;
+
+  LoopAnimation(Offset position, AssetId assetId, Size size,
+      MutableRectangle hitbox, String soundEffect, this.loopSoundEffect)
+      : super(position, assetId, size, hitbox, soundEffect)
+  { this.drawer = AnimationDrawer(assetId, this, size: size); }
+
+  // to be sure to close the audioPlayer in background
+  void stopLoopSoundEffect() async{
+    // ...
+    this.loopAudioPlayer = null;
+  }
+  // TODO put if (audioplayer not null)
+  void startLoopSoundEffect(){}
 }
 
 class WeaponStats{

@@ -3,7 +3,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/terrain_drawer.dart';
+import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/json_utils.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 
 
 class Level {
@@ -24,14 +26,26 @@ class Level {
     spawnPoints.add(point);
   }
 
-  bool isInsideBounds(Rectangle other){
-    return _bounds.intersects(other) || _bounds.containsRectangle(other) || isAboveLevel(other);
+  bool isInsideBounds(Entity entity){
+
+    Rectangle other = entity.hitbox;
+
+    return _bounds.intersects(other) || _bounds.containsRectangle(other) || isAboveLevel(entity);
   }
 
   // Useful to not remove projectile early if they go up
-  bool isAboveLevel(Rectangle other) {
-    return other.top < _bounds.top  && _bounds.left < other.left + other.width &&
+  bool isAboveLevel(Entity entity) {
+    Rectangle other = entity.hitbox;
+    bool ret = other.top < _bounds.top &&
+        _bounds.left < other.left + other.width &&
         other.left < _bounds.left + _bounds.width;
+
+    // Special case for Linear projectile
+    // Have to be remove if above stage
+    if (ret && entity is Linear)
+      return false;
+
+    return ret;
   }
 
   Level.fromJson(Map<String, dynamic> json){
