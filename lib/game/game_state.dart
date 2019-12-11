@@ -23,7 +23,7 @@ enum GameStateMode {
   attacking,
   weapon_selection,
   projectile,
-  explosion, //TODO remove this state
+  waiting,
   cinematic,
   over
 }
@@ -75,7 +75,10 @@ class GameState {
   /// GameStateMode.projectile variables
   Stopwatch stopWatch = Stopwatch();
 
-  /// GameStateMode.explosion variables
+  /// GameStateMode.waiting variables
+  DateTime startWaitingTime;
+  double waitDuration = 0;//in millis
+
   List<MyAnimation> currentAnimations = List();
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
@@ -149,7 +152,7 @@ class GameState {
 
         //Stop the phase if the character has no stamina left
         if (currentChar.stamina == 0 && !currentChar.isAirborne()) {
-          switchState(GameStateMode.attacking);
+          switchState(GameStateMode.weapon_selection);
         }
 
         break;
@@ -186,7 +189,10 @@ class GameState {
         }
 
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
+        DateTime currentTime = DateTime.now();
+        if(currentTime.difference(this.startWaitingTime).inMilliseconds > this.waitDuration)
+          switchState(GameStateMode.char_selection);
         break;
       case GameStateMode.cinematic:
         // If the last attack has knocked back someone, film until everyone stop moving
@@ -209,9 +215,11 @@ class GameState {
         if (isSomeoneMoving && !isSomeoneMovingOnScreen)
           camera.centerOn(movingCharacter.getPosition());
 
-        // If no one is moving, go to next player
-        else if (!isSomeoneMoving && !isSomeoneDying)
-          switchState(GameStateMode.char_selection);
+        // If no one is moving, go to next player after waiting a bit
+        else if (!isSomeoneMoving && !isSomeoneDying) {
+          this.waitDuration = 1000;
+          switchState(GameStateMode.waiting);
+        }
 
         break;
       case GameStateMode.over:
@@ -377,9 +385,6 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-        // TODO: Handle this case.
-        // For development only
-//        switchState(GameStateMode.moving);
         break;
 
       case GameStateMode.projectile:
@@ -388,22 +393,22 @@ class GameState {
       case GameStateMode.weapon_selection:
         Arsenal currentArsenal = getCurrentCharacter().currentArsenal;
         Weapon selectedWeapon = currentArsenal.getWeaponAt(tapPosition);
+
+        // We selected a weapon
         if (selectedWeapon != null) {
           currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
-          if(currentWeapon == null)
-            print("wtf currentWeapon = currentArsenal.currentSelection ");
-          // TODO correctly assign projectile to weapon (certainly in overridable method)
-//          Offset pos = getCurrentCharacter().getPosition();
-//          Offset hit = Offset(5, 5);
-//          ProjDHS projDHS = new ProjDHS(
-//              pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
-//          currentWeapon.projectile = projDHS;
 
           switchState(GameStateMode.attacking);
         }
+
+        else if(GameUtils.euclideanDistance(tapPosition, GameUtils.getRectangleCenter(getCurrentCharacter().hitbox))
+                      > 1.2 * currentArsenal.totalRadius){
+          switchState(GameStateMode.moving);
+        }
+
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
         break;
 
       case GameStateMode.projectile:
@@ -435,27 +440,25 @@ class GameState {
           currentChar.stop();
 
           characterJumping = true;
-          jumpDragStartPosition = dragPositionCamera;
+          jumpDragStartPosition = GameUtils.getRectangleCenter(currentChar.hitbox);
 
           uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         }
         break;
 
       case GameStateMode.attacking:
-        // TODO: Handle this case.
         // Should color it in red
-        if(currentWeapon == null){
-          print("PanStart, currentWeapon == null");
+        if(currentWeapon == null)
           return;
-        }
+
 
         currentWeapon.prepareFiring(currentChar.getPosition());
-        launchDragStartPosition = dragPositionCamera;
+        launchDragStartPosition = GameUtils.getRectangleCenter(currentChar.hitbox);
 
         uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
         break;
       case GameStateMode.cinematic:
         break;
@@ -506,7 +509,7 @@ class GameState {
           getCurrentCharacter().directionFaced = Character.LEFT;
 
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
         break;
       case GameStateMode.cinematic:
         break;
@@ -536,26 +539,28 @@ class GameState {
       case GameStateMode.attacking:
 
         uiManager.endJump();
-
         // If we ended the drag on the character, cancel the attack
-        if(currentChar != null && currentChar.hitbox.containsPoint(GameUtils.toPoint(launchDragEndPosition))){
-          switchState(GameStateMode.moving);
+        if(currentChar != null && GameUtils.extendRect(currentChar.hitbox, 10)
+            .containsPoint(GameUtils.toPoint(launchDragEndPosition))){
+          switchState(GameStateMode.weapon_selection);
         }
 
-        if (currentWeapon == null || currentWeapon.projectile == null) return;
-        Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
-                LaunchVectorNormalizer);
-        currentWeapon.ammunition -= 1;
-        this.addProjectile(p);
+        else {
+            if (currentWeapon == null || currentWeapon.projectile == null) return;
+            Projectile p = currentWeapon.fireProjectile(
+                (launchDragStartPosition - launchDragEndPosition) *
+                    LaunchVectorNormalizer);
+            currentWeapon.ammunition -= 1;
+            this.addProjectile(p);
 
-        if(p is ExplosiveProjectile)
-          stopWatch.start();
+            if (p is ExplosiveProjectile)
+              stopWatch.start();
 
 
-        switchState(GameStateMode.projectile);
+            switchState(GameStateMode.projectile);
+            }
         break;
-
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
         break;
       case GameStateMode.cinematic:
         break;
@@ -607,7 +612,7 @@ class GameState {
 
       case GameStateMode.projectile:
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
         break;
       case GameStateMode.cinematic:
         break;
@@ -642,6 +647,9 @@ class GameState {
   void startState(GameStateMode newState) {
     switch (newState) {
       case GameStateMode.char_selection:
+        if(players.length == 0)
+          return;
+
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
         uiManager.removeStaminaDrawer();
@@ -654,10 +662,9 @@ class GameState {
         this.characterJumping = false;
         this.jumpDragStartPosition = null;
         this.jumpDragEndPosition = null;
+        this.currentWeapon = null;
 
         uiManager.addStaminaDrawer(getCurrentCharacter());
-        break;
-      case GameStateMode.attacking:
         break;
 
       case GameStateMode.weapon_selection:
@@ -671,11 +678,17 @@ class GameState {
         }
 
         break;
+      case GameStateMode.attacking:
+        if(currentWeapon != null)
+          painter.addElement(currentWeapon.drawer);
+        break;
 
       case GameStateMode.projectile:
         uiManager.removeStaminaDrawer();
+
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.waiting:
+        this.startWaitingTime = DateTime.now();
         break;
       case GameStateMode.cinematic:
         break;
@@ -713,21 +726,22 @@ class GameState {
         if (!currentCharIsDead && getCurrentCharacter() != null)
           getCurrentCharacter().stop();
         break;
-      case GameStateMode.attacking:
-        break;
 
       case GameStateMode.weapon_selection:
         Arsenal curArsenal = getCurrentCharacter().currentArsenal;
-        for (Weapon weapon in curArsenal.arsenal) {
-          if (weapon != curArsenal.currentSelection) {
-            painter.removeElement(weapon.drawer);
-          }
-        }
-        break;
+        for (Weapon weapon in curArsenal.arsenal)
+          painter.removeElement(weapon.drawer);
 
-      case GameStateMode.projectile:
         break;
-      case GameStateMode.explosion:
+      case GameStateMode.attacking:
+        painter.removeElement(currentWeapon.drawer);
+        break;
+      case GameStateMode.projectile:
+        removeProjectile(this.currentWeapon.projectile);
+        currentWeapon = null;
+        break;
+      case GameStateMode.waiting:
+        startWaitingTime = null;
         break;
       case GameStateMode.cinematic:
         if(currentWeapon != null)

@@ -33,6 +33,9 @@ class Arsenal {
   List<Weapon> arsenal = List();
   Weapon currentSelection;
 
+  double totalRadius;
+
+
   Arsenal(Character owner){
     for(var entry in GameMain.availableWeapons.entries){
       WeaponStats stats = entry.value;
@@ -68,6 +71,8 @@ class Arsenal {
 
       curAngle += angleBetweenElem;
     }
+
+    totalRadius = selectionListRadius;
   }
 
   Weapon getWeaponAt(Offset position) {
@@ -104,7 +109,7 @@ abstract class Weapon {
 
   double detonationDelay;
 
-  int ammunition = -1;
+  double ammunition = -1;
 
   int knockbackStrength = 0;
 
@@ -158,7 +163,7 @@ abstract class Weapon {
     w.damage = weaponStats.damage;
     w.range = weaponStats.range;
     w.detonationDelay = weaponStats.detonationDelay;
-    w.ammunition = weaponStats.ammunition.floor();
+    w.ammunition = weaponStats.ammunition;
     w.knockbackStrength = weaponStats.knockbackStrength;
 
     return w;
@@ -217,12 +222,6 @@ abstract class Weapon {
     applyImpact(this.projectile, gameState.players,
         gameState.players[gameState.currentPlayer].updateStats,
         gameState.uiManager);
-
-    // Remove projectile from word and painters
-    //TODO callback to gameMain
-    gameState.removeProjectile(this.projectile);
-    gameState.painter.removeElement(gameState.currentWeapon.drawer);
-    gameState.currentWeapon = null;
 
     // Launch end animation (null => no animation)
     MyAnimation endAnimation = this.projectile.returnAnimationInstance();

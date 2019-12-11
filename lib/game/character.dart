@@ -22,7 +22,7 @@ class Character extends MovingEntity {
   static const int RIGHT = 1;
 
   static const double base_hp = 100;
-  static const double baseStamina = 10000;
+  static const double baseStamina = 200;
   static const double max_jump_speed = 50;
   static const double walk_speed = 20;
 

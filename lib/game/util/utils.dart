@@ -63,6 +63,12 @@ class GameUtils {
   static Offset getRectangleCenter(Rectangle r) {
     return Offset(r.left + r.width / 2, r.top + r.height / 2);
   }
+
+  ///Return the euclidean distance between two points
+  static double euclideanDistance(Offset o1, Offset o2){
+    return sqrt(pow(o1.dx - o2.dx, 2) + pow(o1.dy - o2.dy, 2));
+  }
+
 }
 
 // From https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
