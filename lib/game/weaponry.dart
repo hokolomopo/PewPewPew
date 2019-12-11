@@ -15,7 +15,7 @@ import 'package:info2051_2018/game/game_state.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
-import 'package:info2051_2018/game/weaponry_concrete_tmpname.dart';
+import 'package:info2051_2018/game/weapons.dart';
 import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
@@ -29,6 +29,7 @@ class Arsenal {
   static final double selectionElementLength = sqrt(2) * selectionElementRadius;
   static final Size selectionElementSize =
       Size(selectionElementLength, selectionElementLength);
+  static final double minDistanceBetweenElem = 1.1 * selectionElementRadius;
 
   List<Weapon> arsenal = List();
   Weapon currentSelection;
@@ -51,8 +52,8 @@ class Arsenal {
     // The formula does not work with a single element, as we can't put
     // any distance between an element and itself.
     double angleBetweenElem = min(pi, 2 * pi / arsenal.length);
-    double selectionListRadius = max(2.2 * selectionElementRadius,
-        1.1 * selectionElementRadius / sin(angleBetweenElem / 2));
+    double selectionListRadius = max(2*minDistanceBetweenElem,
+        minDistanceBetweenElem / sin(angleBetweenElem / 2));
     Offset charCenterPos = Offset(charHitBox.left + charHitBox.width / 2,
         charHitBox.top + charHitBox.height / 2);
 
@@ -109,7 +110,7 @@ abstract class Weapon {
 
   double detonationDelay;
 
-  double ammunition = -1;
+  double ammunition;
 
   int knockbackStrength = 0;
 

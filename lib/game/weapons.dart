@@ -107,8 +107,6 @@ class Shotgun extends Weapon {
     this.name = weaponName;
     this.projectileAssetId = AssetId.projectile_dhs;
   }
-
-
 }
 
 class Sniper extends Weapon {
@@ -120,8 +118,6 @@ class Sniper extends Weapon {
 
   Sniper(Character owner) : super(owner) {
     this.weaponCenterOffset = Offset(5, -2);
-
-
 
     this.weaponSize = relativeSize;
 

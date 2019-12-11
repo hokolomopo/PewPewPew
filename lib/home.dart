@@ -3,6 +3,7 @@ import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/main.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
+import 'package:info2051_2018/tutoriel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'shop.dart';
 
@@ -287,12 +288,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   child: Container(
                     child: _button("Tutorial", primary, Colors.white,
                         Colors.white, primary, 30.0, () {
-                      _tutorialConfirm(
-                          "Start tutorial?",
-                          "The tutorial is recommanded for new players",
-                          "Cancel",
-                          "Start");
-                    }),
+                          showDialog(
+                              context: context,
+                              builder: (_) => TutorialWidget()
+                          );
+                        }),
                     height: 50.0,
                   ),
                   padding: EdgeInsets.only(top: 10.0, left: 20.0, right: 20.0),

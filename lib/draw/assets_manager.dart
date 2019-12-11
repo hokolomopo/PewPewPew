@@ -7,7 +7,7 @@ import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
-import 'package:info2051_2018/game/weaponry_concrete_tmpname.dart';
+import 'package:info2051_2018/game/weapons.dart';
 
 enum AssetId {
   char_running,
@@ -70,42 +70,42 @@ class AssetsManager {
 
     AssetId.weapon_fist: Asset(
         AssetId.weapon_fist, _weaponAssetPrefix + "fist.png",
-        size: Size(5, 3)),
+        size: Fist.relativeSize),
     AssetId.weapon_fist_sel: Asset(
         AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_colt: Asset(
         AssetId.weapon_colt, _weaponAssetPrefix + "colt_45.png",
-        size: Size(5, 3)),
+        size: Colt.relativeSize),
     AssetId.weapon_colt_sel: Asset(
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_grenade: Asset(
         AssetId.weapon_grenade, _weaponAssetPrefix + "grenade2_nopin.png",
-        size: Size(5, 3)),
+        size: Grenade.relativeSize),
     AssetId.weapon_grenade_sel: Asset(
         AssetId.weapon_grenade_sel, _weaponAssetPrefix + "grenade2_nopin.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_railgun: Asset(
         AssetId.weapon_railgun, _weaponAssetPrefix + "future_gun.png",
-        size: Size(5, 3)),
+        size: Railgun.relativeSize),
     AssetId.weapon_railgun_sel: Asset(
         AssetId.weapon_railgun_sel, _weaponAssetPrefix + "future_gun.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_shotgun: Asset(
         AssetId.weapon_shotgun, _weaponAssetPrefix + "shotgun.png",
-        size: Size(5, 3)),
+        size: Shotgun.relativeSize),
     AssetId.weapon_shotgun_sel: Asset(
         AssetId.weapon_shotgun_sel, _weaponAssetPrefix + "shotgun.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_sniper: Asset(
         AssetId.weapon_sniper, _weaponAssetPrefix + "sniper.png",
-        size: Size(5, 3)),
+        size: Sniper.relativeSize),
     AssetId.weapon_sniper_sel: Asset(
         AssetId.weapon_sniper_sel, _weaponAssetPrefix + "sniper.png",
         size: Size(Arsenal.selectionElementSize.width, 4)),
@@ -238,6 +238,8 @@ class AssetsManager {
     Asset searched = Asset(assetId, null, size: size, team: team);
     return GifInfo(_loadedAssets[searched.getStringId()][size]);
   }
+
+  static double getHeightRatio(Size s) => s.height / s.width;
 }
 
 /// Information about a frame
