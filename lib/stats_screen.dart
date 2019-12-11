@@ -50,13 +50,11 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
     prefs.setInt(ShopList.moneySharedPrefKey, currentMoney + totalMoneyGain);
   }
 
-  SoundPlayer soundPlayer = MySoundPlayer.getInstance();
-  final _menuMusicName = "sample.mp3";
 
   @override
   void initState() {
     super.initState();
-    this.soundPlayer.playLoopMusic(_menuMusicName, volume: 1.0);
+    SoundPlayer.getInstance().playLoopMusic(SoundPlayer.menuMusicName, volume: 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -263,12 +261,12 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-//        soundPlayer.resume();
+        SoundPlayer.getInstance().resumeLoopMusic();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-//        soundPlayer.pause();
+        SoundPlayer.getInstance().pauseLoopMusic();
         break;
     }
   }

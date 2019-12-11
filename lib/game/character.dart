@@ -163,7 +163,7 @@ class Character extends MovingEntity {
 
     if (this.hp == 0) this.kill();
 
-    SoundPlayer soundPlayer = MySoundPlayer.getInstance();
+    SoundPlayer soundPlayer = SoundPlayer.getInstance();
 
     if(soundPlayer != null)
       soundPlayer.playSoundEffect(hurtSoundName, volume: 1.0);

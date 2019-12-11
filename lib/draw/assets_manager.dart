@@ -7,6 +7,7 @@ import 'package:info2051_2018/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/game/weaponry_concrete_tmpname.dart';
 
 enum AssetId {
   char_running,
@@ -22,6 +23,14 @@ enum AssetId {
   weapon_fist_sel,
   weapon_colt,
   weapon_colt_sel,
+  weapon_grenade,
+  weapon_grenade_sel,
+  weapon_railgun,
+  weapon_railgun_sel,
+  weapon_sniper,
+  weapon_sniper_sel,
+  weapon_shotgun,
+  weapon_shotgun_sel,
 }
 
 /// An image asset. The size is in relative game size
@@ -43,7 +52,7 @@ class Asset {
 class AssetsManager {
   static final String _charAssetPrefix = "assets/graphics/characters/char";
   static final String _weaponAssetPrefix = "assets/graphics/arsenal/weapons/";
-  static final String _explosionAssetPrefic = "assets/graphics/arsenal/explosions/";
+  static final String _explosionAssetPrefix = "assets/graphics/arsenal/explosions/";
 
   //TODO fix cat death gif
 
@@ -58,20 +67,51 @@ class AssetsManager {
     AssetId.ui_arrow: Asset(
         AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif",
         size: MarkerDrawer.markerArrowSize),
+
     AssetId.weapon_fist: Asset(
         AssetId.weapon_fist, _weaponAssetPrefix + "fist.png",
         size: Fist.relativeSize),
     AssetId.weapon_fist_sel: Asset(
         AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist.png",
         size: Arsenal.selectionElementSize),
+
     AssetId.weapon_colt: Asset(
         AssetId.weapon_colt, _weaponAssetPrefix + "colt_45.png",
         size: Colt.relativeSize),
     AssetId.weapon_colt_sel: Asset(
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
         size: Arsenal.selectionElementSize),
+
+    AssetId.weapon_grenade: Asset(
+        AssetId.weapon_grenade, _weaponAssetPrefix + "grenade2_nopin.png",
+        size: Colt.relativeSize),
+    AssetId.weapon_grenade_sel: Asset(
+        AssetId.weapon_grenade_sel, _weaponAssetPrefix + "grenade2_nopin.png",
+        size: Arsenal.selectionElementSize),
+
+    AssetId.weapon_railgun: Asset(
+        AssetId.weapon_railgun, _weaponAssetPrefix + "future_gun.png",
+        size: Colt.relativeSize),
+    AssetId.weapon_railgun_sel: Asset(
+        AssetId.weapon_railgun_sel, _weaponAssetPrefix + "future_gun.png",
+        size: Arsenal.selectionElementSize),
+
+    AssetId.weapon_shotgun: Asset(
+        AssetId.weapon_shotgun, _weaponAssetPrefix + "shotgun.png",
+        size: Colt.relativeSize),
+    AssetId.weapon_shotgun_sel: Asset(
+        AssetId.weapon_shotgun_sel, _weaponAssetPrefix + "shotgun.png",
+        size: Arsenal.selectionElementSize),
+
+    AssetId.weapon_sniper: Asset(
+        AssetId.weapon_sniper, _weaponAssetPrefix + "sniper.png",
+        size: Colt.relativeSize),
+    AssetId.weapon_sniper_sel: Asset(
+        AssetId.weapon_sniper_sel, _weaponAssetPrefix + "sniper.png",
+        size: Arsenal.selectionElementSize),
+
     AssetId.explosion_dhs:
-        Asset(AssetId.explosion_dhs, _explosionAssetPrefic + "explosion.gif"),
+        Asset(AssetId.explosion_dhs, _explosionAssetPrefix + "explosion.gif"),
   };
 
   Map<String, Size> _currentlyLoading = Map();

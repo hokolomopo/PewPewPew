@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/quickplay_widgets.dart';
+import 'package:info2051_2018/sound_player.dart';
 
 import 'game/game_main.dart';
 import 'route_arguments.dart';
 
 class Parameters extends StatefulWidget {
-  final void Function() parentAction;
-  final void Function() reloadHome;
 
-  const Parameters({Key key, this.parentAction, this.reloadHome}) : super(key: key);
+  const Parameters({Key key}) : super(key: key);
 
   @override
   ParametersState createState() {
@@ -195,7 +194,7 @@ class ParametersState extends State<Parameters> {
                         fontSize: 20.0)),
               ),
               onPressed: () {
-                widget.parentAction();
+                SoundPlayer.getInstance().playLoopMusic(SoundPlayer.gameMusicName, volume: 0.5);
                 //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
                 //ap.pause();
 

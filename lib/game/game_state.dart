@@ -178,7 +178,7 @@ class GameState {
         }
 
         // Stop stopWatch if non detonating projectile
-        if (!(currentWeapon.projectile is Detonable)) {
+        if (!(currentWeapon.projectile is ExplosiveProjectile)) {
           resetStopWatch();
 
           // Checking if a collidable projectile has
@@ -557,8 +557,7 @@ class GameState {
         // J.L
 
         if (currentWeapon == null || currentWeapon.projectile == null) return;
-        Projectile p = currentWeapon.fireProjectile(currentChar.getPosition(),
-            (launchDragStartPosition - launchDragEndPosition) *
+        Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
         this.addProjectile(p);
         uiManager.endJump();
@@ -644,10 +643,9 @@ class GameState {
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
         uiManager.removeStaminaDrawer();
-        //TODO uncomment this
-//        this.teamTurnText = uiManager.addText(
-//            teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
-//            duration: 3, fadeDuration: 3, ignoreCamera: true);
+        this.teamTurnText = uiManager.addText(
+            teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
+            duration: 3, fadeDuration: 3, ignoreCamera: true);
         break;
 
       case GameStateMode.moving:

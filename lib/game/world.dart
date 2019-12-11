@@ -48,7 +48,7 @@ class World{
 
   bool checkCollidableProj() {
     for (Projectile p in projectiles) {
-      if (!(p is Collidable))
+      if (!(p is CollidableProjectile))
         return false;
 
       // First check terrains

@@ -27,24 +27,13 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
-  SoundPlayer soundPlayer = MySoundPlayer.getInstance();
-  final _menuMusicName = "sample.mp3";
-  final _gameMusicName = "sample2.mp3";
 
 // Function for child to stop menu music
-  void _stopMusic() {
-    soundPlayer.playLoopMusic(_gameMusicName, volume : 0.7);
-  }
-
-  void _reload() {
-    Navigator.of(context).pop();
-    soundPlayer.playLoopMusic(_menuMusicName, volume : 1.0);
-  }
 
   @override
   void initState() {
     super.initState();
-    soundPlayer.playLoopMusic(_menuMusicName, volume: 1.0);
+    SoundPlayer.getInstance().playLoopMusic(SoundPlayer.menuMusicName, volume: 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -233,8 +222,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             ],
                           ),
                         ),
-                        Parameters(
-                            parentAction: _stopMusic, reloadHome: _reload)
+                        Parameters()
                       ],
                     ),
                   ),
@@ -366,12 +354,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        soundPlayer.resumeLoopMusic();
+        SoundPlayer.getInstance().resumeLoopMusic();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.suspending:
-        soundPlayer.pauseLoopMusic();
+        SoundPlayer.getInstance().pauseLoopMusic();
         break;
     }
   }

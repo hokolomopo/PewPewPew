@@ -17,6 +17,7 @@ import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/stats_screen.dart';
 
 import '../quickplay_widgets.dart';
+import '../sound_player.dart';
 import 'level.dart';
 
 class GameMain extends StatefulWidget {
@@ -39,7 +40,7 @@ class GameMain extends StatefulWidget {
       new _GameMainState(terrain, nbPlayers, nbCharacters);
 }
 
-class _GameMainState extends State<GameMain> {
+class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
   GameState state;
   int _callbackId;
   LevelPainter levelPainter;
@@ -198,4 +199,19 @@ class _GameMainState extends State<GameMain> {
     _unscheduleFrame();
     super.dispose();
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        SoundPlayer.getInstance().resumeLoopMusic();
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.suspending:
+        SoundPlayer.getInstance().pauseLoopMusic();
+        break;
+    }
+  }
+
 }

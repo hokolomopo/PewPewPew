@@ -149,7 +149,7 @@ class ShopListState extends State<ShopList> {
 
                 itemBuilder: (context, index) {
 
-                  bool sold = prefs.containsKey(items[index].weaponName);
+                  bool sold = prefs.containsKey(items[index].weaponName) || items[index].price == 0;
 
                   return CustomListItem(
                     sprite: Image(
@@ -315,7 +315,6 @@ class ShopListState extends State<ShopList> {
       highlightedBorderColor: Colors.white,
       borderSide: BorderSide(color: bordersColor, width: 2.0),
       highlightElevation: 10.0,
-      splashColor: splashColor,
       highlightColor: highlightColor,
       color: fillColor,
       shape: RoundedRectangleBorder(

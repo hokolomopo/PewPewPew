@@ -15,6 +15,7 @@ import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/game/weaponry_concrete_tmpname.dart';
 import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
@@ -41,17 +42,7 @@ class Arsenal {
     for(var entry in GameMain.availableWeapons.entries){
       WeaponStats stats = entry.value;
 
-      Weapon weapon;
-      switch(stats.weaponName){
-        case Fist.weaponName:
-          weapon = Fist(owner);
-          break;
-        case Colt.weaponName:
-          weapon = Colt(owner);
-          break;
-      }
-
-      weapon.initWeapon(stats);
+      Weapon weapon = Weapon.fromWeaponStats(owner, stats);
 
       arsenal.add(weapon);
     }
@@ -82,9 +73,6 @@ class Arsenal {
     }
   }
 
-//    void selectWeapon(Weapon selectedWeapon) {
-//    this.actualSelection = selectedWeapon;
-//    }
 
   Weapon getWeaponAt(Offset position) {
     for (Weapon weapon in arsenal) {
@@ -123,18 +111,42 @@ abstract class Weapon {
   // we initialise it here because we can't define abstract variables.
   final AssetId selectionAsset = AssetId.background;
 
-  void initWeapon(WeaponStats weaponStats){
-    this.damage = weaponStats.damage;
-    this.range = weaponStats.damage;
-    this.useProjectile = weaponStats.useProjectile;
-    this.isExplosive = weaponStats.isExplosive;
-    this.detonationDelay = weaponStats.detonationDelay;
-    this.ammunition = weaponStats.ammunition;
-    this.hasKnockback = weaponStats.hasKnockback;
-    this.knockbackStrength = weaponStats.knockbackStrength;
+
+  factory Weapon.fromWeaponStats(Character owner, WeaponStats weaponStats){
+    Weapon w;
+    switch(weaponStats.weaponName){
+      case Fist.weaponName:
+        w = Fist(owner);
+        break;
+      case Colt.weaponName:
+        w = Colt(owner);
+        break;
+      case Grenade.weaponName:
+        w = Grenade(owner);
+        break;
+      case Sniper.weaponName:
+        w = Sniper(owner);
+        break;
+      case Railgun.weaponName:
+        w = Railgun(owner);
+        break;
+      case Shotgun.weaponName:
+        w = Shotgun(owner);
+        break;
+    }
+    w.damage = weaponStats.damage;
+    w.range = weaponStats.damage;
+    w.useProjectile = weaponStats.useProjectile;
+    w.isExplosive = weaponStats.isExplosive;
+    w.detonationDelay = weaponStats.detonationDelay;
+    w.ammunition = weaponStats.ammunition;
+    w.hasKnockback = weaponStats.hasKnockback;
+    w.knockbackStrength = weaponStats.knockbackStrength;
+
+    return w;
   }
 
-  //TODO sprite
+  AssetId projectileAssetId;
   ImagedDrawer drawer;
   Character owner;
   Offset centerPos;
@@ -175,22 +187,15 @@ abstract class Weapon {
   }
 
   void prepareFiring(Offset position){
-    Map map = GameMain.availableWeapons;
     WeaponStats stats = GameMain.availableWeapons[this.name];
     MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
         stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
-    this.projectile = Projectile.fromWeaponStats(position, hitbox, GameMain.availableWeapons[this.name]);
+
+    this.projectile = Projectile.fromWeaponStats(Offset(position.dx, position.dy),
+        hitbox, projectileAssetId, GameMain.availableWeapons[this.name]);
   }
 
-  Projectile fireProjectile(Offset position, Offset direction) {
-    //TODO use this as return value when firing, and ass the returned projectile to the World()
-    //TODO GIVE an hitbox and position argument, or use the one of the gun idk
-//    WeaponStats stats = GameMain.availableWeapons[this.name];
-//
-//    MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
-//        stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
-//    Projectile projectile = Projectile.fromWeaponStats(position, hitbox, GameMain.availableWeapons[this.name]);
-//    this.projectile = projectile;
+  Projectile fireProjectile(Offset direction) {
     // TODO horizontal checks
     direction = this.projectile.getLaunchSpeed(direction);
 
@@ -261,72 +266,13 @@ abstract class Weapon {
   }
 
 }
-
-class Fist extends Weapon {
-  static const String weaponName = "Fist";
-
-  static final relativeSize = Weapon.relativeSize;
-
-  final AssetId selectionAsset = AssetId.weapon_fist_sel;
-
-  Fist(Character owner) : super(owner) {
-    this.drawer =
-        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
-    this.name = weaponName;
-//    this.useProjectile = false;
-//    this.hasKnockback = true;
-//    this.isExplosive = false;
-//
-//    this.ammunition = -1;
-//    this.range = 10;
-//    this.damage = 10;
-//    this.knockbackStrength = 10;
-//    this.detonationDelay = 1000;
-  }
-
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
-
-}
-
-class Colt extends Weapon {
-  static const String weaponName = "Colt";
-
-  static final relativeSize = Weapon.relativeSize;
-
-  final AssetId selectionAsset = AssetId.weapon_colt_sel;
-
-  //TODO best way to get static info for shop and else? cannot be in abstract class as static
-  // What info should it be
-  static List<num> infos = [];
-
-  Colt(Character owner) : super(owner) {
-    this.drawer =
-        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
-    this.name = weaponName;
-
-//    this.useProjectile = true;
-//    this.hasKnockback = true;
-//
-//    this.ammunition = 6;
-//    this.range = 60;
-//    this.damage = 30;
-//    this.knockbackStrength = 50;
-//
-//    this.detonationDelay = 5000;
-  }
-
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
-}
-
 abstract class Projectile extends MovingEntity {
-  //AssetId explosionAssetId;
+  AssetId explosionAssetId;
+  AssetId assetId;
+
   double weight;
   int maxSpeed;
-  double
-      frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
+  double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
   String explosionSound;
   Size explosionSize;
@@ -335,30 +281,25 @@ abstract class Projectile extends MovingEntity {
   // expressed in radian in a clockwise way
   double actualOrientation = -1; // < 0 means not rotation
 
-  get explosionAssetId;
-
-  factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats){
+  factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, AssetId projectileAsset, WeaponStats weaponStats){
     Projectile p;
-    switch(weaponStats.weaponName){
-      case Fist.weaponName:
-        p = Boulet(position, hitbox);
-        break;
-      case Colt.weaponName:
-        p = ProjDHS(position, hitbox);
-        break;
-    }
+    if(weaponStats.isExplosive)
+      p = ExplosiveProjectile(position, hitbox);
+    else
+      p = CollidableProjectile(position, hitbox);
+
+    p.assetId = projectileAsset;
     p.weight = weaponStats.projectileWeight;
     p.maxSpeed = weaponStats.projectileMaxSpeed;
     p.frictionFactor = weaponStats.projectileFrictionFactor;
     p.explosionSound = weaponStats.explosionSound;
     p.explosionSize = weaponStats.explosionSize;
+    p.drawer = ProjectileDrawer(projectileAsset, p, size:weaponStats.projectileHitboxSize);
 
     return p;
   }
 
-  Projectile(Offset position, Rectangle hitbox, Offset velocity, this.weight,
-      this.maxSpeed)
-      : super.withSpeed(position, hitbox, velocity, new Offset(0, 0));
+  Projectile(Offset position, Rectangle hitbox) : super(position, hitbox);
 
   ///Function that limit the speed of a launch based on maxSpeed
   Offset getLaunchSpeed(Offset direction) {
@@ -383,20 +324,6 @@ abstract class Projectile extends MovingEntity {
     return null;
   }
 
-  //Deprecated
-//  Explosion returnExplosionInstance() {
-//    Size s = explosionSize;
-//    if (s == null) s = Size(60, 60);
-//
-//    drawer.changeRelativeSize(s);
-//
-//    Offset pos = this.getPosition();
-//    pos += Offset(-s.width / 2, -s.height / 2);
-//    setPosition(pos);
-//
-//    return Explosion(pos, explosionAssetId, s, hitbox, explosionSound);
-//  }
-
   ///Function to play a sound effect at the start of the launch
   void playStartSound(){}
 
@@ -413,9 +340,7 @@ abstract class Projectile extends MovingEntity {
 abstract class Controllable extends Projectile{
 
   // Constructor not useful
-  Controllable(Offset position, Rectangle hitbox, Offset velocity, double weight,
-      int maxSpeed): super(position, hitbox, velocity, weight,
-      maxSpeed);
+  Controllable(Offset position, Rectangle hitbox): super(position, hitbox,);
 
 //  Controllable.fromWeaponStat(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats) : super.fromWeaponStats(position, hitbox, weaponStats);
 
@@ -433,76 +358,11 @@ abstract class Controllable extends Projectile{
 
 /// Class to implement projectile which are explosives and have a detonation timer.
 /// (Bombs, ...)
-abstract class Detonable extends Projectile{
-  int detonationTime;
-  String explosionSound;
-
+class ExplosiveProjectile extends Projectile{
   // TODO change following constructor copied from previous test projectile
-  Detonable(Offset position, Rectangle hitbox,
-      Offset velocity,
-      double weight,
-      int maxSpeed)
-      : super(position, hitbox, velocity, weight, maxSpeed) {
-    this.drawer = ProjectileDrawer(AssetId.projectile_dhs, this);
-    this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
-    this.explosionSound = "explosion.mp3";
-    this.explosionSize = Size(60, 60);
-    this.actualOrientation = 0.0;
-  }
+  ExplosiveProjectile(position, Rectangle hitbox): super(position, hitbox);
 
-
-  MyAnimation returnAnimationInstance();
-
-}
-
-/// Mixin class for projectile which applyImpact when intersecting another
-/// hitbox or going out of bound
-/// (Arrow, Bombardement, ...)
-// TODO method in World check projectile collision, if not Collidable just return false,
-// else apply method
-abstract class Collidable {}
-
-/// Mixin class for projectile which are not influence by gravity, Linear
-/// (Bullets, Rays, Magic orbs, ...)
-abstract class Linear{}
-
-// TODO precise value in constructor body instead of arg (useful for tests)
-// Class Test for projectile
-class Boulet extends Projectile {
-  final AssetId explosionAssetId = AssetId.explosion_dhs;
-
-  Boulet(Offset position, Rectangle hitbox,
-      {Offset velocity = const Offset(0, 0),
-      double weight = 10.0,
-      int maxSpeed = 3000})
-      : super(position, hitbox, velocity, weight, maxSpeed) {
-    this.drawer = ProjectileDrawer(AssetId.projectile_boulet, this);
-    this.frictionFactor = 0.02;
-  }
-}
-
-class ProjDHS extends Detonable with Linear {
-  final AssetId explosionAssetID = AssetId.explosion_dhs;
-
-  ProjDHS(Offset position, Rectangle hitbox,
-      {Offset velocity = const Offset(0, 0),
-      double weight = 5.0,
-      int maxSpeed = 3000})
-      : super(position, hitbox, velocity, weight, maxSpeed) {
-    this.drawer = ProjectileDrawer(AssetId.projectile_dhs, this);
-    this.frictionFactor = 1.toDouble(); // Will be stuck in the ground at impact
-    this.explosionSound = "explosion.mp3";
-    this.explosionSize = Size(60, 60);
-    this.actualOrientation = 0.0;
-  }
-
-
-  get explosionAssetId{
-   return this.explosionAssetID;
-  }
-
-  @override
-  MyAnimation returnAnimationInstance() {
+  MyAnimation returnAnimationInstance(){
     Size s = explosionSize;
     if (s == null) s = Size(60, 60);
 
@@ -512,9 +372,23 @@ class ProjDHS extends Detonable with Linear {
     pos += Offset(-s.width / 2, -s.height / 2);
     this.setPosition(pos);
 
-    return MyAnimation(pos, explosionAssetID, s, hitbox, explosionSound);
+    return MyAnimation(pos, explosionAssetId, s, hitbox, explosionSound);
   }
 }
+
+/// Mixin class for projectile which applyImpact when intersecting another
+/// hitbox or going out of bound
+/// (Arrow, Bombardement, ...)
+// TODO method in World check projectile collision, if not Collidable just return false,
+// else apply method
+class CollidableProjectile extends Projectile {
+  CollidableProjectile(position, Rectangle hitbox): super(position, hitbox);
+}
+
+/// Mixin class for projectile which are not influence by gravity, Linear
+/// (Bullets, Rays, Magic orbs, ...)
+abstract class Linear{}
+
 
 /// Animation (Gif) limited in Time (counted in total frames)
 /// It can also play a sound effect
@@ -529,7 +403,7 @@ class MyAnimation extends Entity {
   }
 
   void playSound() {
-    SoundPlayer soundPlayer = MySoundPlayer.getInstance();
+    SoundPlayer soundPlayer = SoundPlayer.getInstance();
     if (soundPlayer != null && soundEffect != null && soundEffect != "")
       soundPlayer.playSoundEffect(soundEffect);
   }
