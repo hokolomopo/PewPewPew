@@ -26,10 +26,6 @@ class Fist extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
-
 }
 
 class Colt extends Weapon {
@@ -45,8 +41,6 @@ class Colt extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 }
 
 class Railgun extends Weapon {
@@ -63,9 +57,6 @@ class Railgun extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 
 }
 
@@ -83,9 +74,6 @@ class Grenade extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 
 }
 
@@ -103,9 +91,6 @@ class Shotgun extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 
 }
 
@@ -123,8 +108,5 @@ class Sniper extends Weapon {
     this.projectileAssetId = AssetId.projectile_dhs;
   }
 
-  // TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
 
 }
