@@ -46,7 +46,9 @@ class World{
     }
   }
 
-  bool checkCollidableProj() {
+  // To be sure no problem at launch
+  // Exception for actual caractere
+  bool checkCollidableProj(Character actualCharacter) {
     for (Projectile p in projectiles) {
       if (!(p is CollidableProjectile))
         return false;
@@ -57,9 +59,12 @@ class World{
           return true;
 
       for (Character c in players)
-        if(c.hitbox.intersects(p.hitbox))
-          return true;
+        if(c != actualCharacter)
+          if(c.hitbox.intersects(p.hitbox))
+            return true;
     }
+
+    return false;
   }
   void moveEntity(MovingEntity entity, double timeElapsed){
 

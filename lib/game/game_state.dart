@@ -75,8 +75,7 @@ class GameState {
   Stopwatch stopWatch = Stopwatch();
 
   /// GameStateMode.explosion variables
-  // TODO make it a list of Animations
-  MyAnimation currentAnimations;
+  List<MyAnimation> currentAnimations;
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
@@ -110,11 +109,11 @@ class GameState {
 
     bool shouldEndTurn = false;
 
-    // Before going through States checking, check if there is any explosion to remove from the painters
-    if (currentAnimations != null) if (currentAnimations.hasEnded()) {
-      this.removeAnimation(currentAnimations);
-      currentAnimations = null;
-    }
+    // Before going through States checking, check if there is any explosion
+    // to remove from the painters
+    for (MyAnimation a in currentAnimations)
+      if (a.hasEnded())
+      this.removeAnimation(a);
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -154,9 +153,6 @@ class GameState {
 
         break;
       case GameStateMode.attacking:
-        // TODO: Handle this case.
-        // <JL> commenter pour travailler sur la phase attack
-        //switchState(GameStateMode.char_selection);
 
         break;
 
@@ -169,53 +165,23 @@ class GameState {
 
         // check if the projectile is out of bounds
         if (!level.isInsideBounds(currentWeapon.projectile)) {
+
           resetStopWatch();
-
           this.removeProjectile(currentWeapon.projectile);
-
           switchState(GameStateMode.cinematic);
-          break;
         }
 
-        // Stop stopWatch if non detonating projectile
-        if (!(currentWeapon.projectile is ExplosiveProjectile)) {
-          resetStopWatch();
-
+        // If non explosiveProjectile, then it is an collidable one
+        else if (!(currentWeapon.projectile is ExplosiveProjectile)) {
           // Checking if a collidable projectile has
           // intersect a hitbox (terrain or character)
-          if(world.checkCollidableProj())
-            currentWeapon.applyImpact(currentWeapon.projectile, players,
-                players[currentPlayer].updateStats, uiManager);
-
-          this.removeProjectile(currentWeapon.projectile);
-          currentWeapon = null;
-
-          switchState(GameStateMode.cinematic);
-
-          //TODO add animation
-
-          break;
+          if(world.checkCollidableProj(getCurrentCharacter()))
+            currentWeapon.proceedToEnd(this);
         }
-
-        // Time to detonate projectile
-        if (stopWatch.elapsedMilliseconds > currentWeapon.detonationDelay) {
+        // Check if time to detonate
+        else if (stopWatch.elapsedMilliseconds > currentWeapon.detonationDelay) {
           resetStopWatch();
-
-          currentWeapon.applyImpact(currentWeapon.projectile, players,
-              players[currentPlayer].updateStats, uiManager);
-
-          // Send back an not movable entity with will play an explosion effect
-          currentAnimations = currentWeapon.projectile.returnAnimationInstance();
-
-          // Play audio file of explosion
-          currentAnimations.playSound();
-
-          this.removeProjectile(currentWeapon.projectile);
-          currentWeapon = null;
-
-          this.addAnimation(currentAnimations);
-
-          switchState(GameStateMode.cinematic);
+          currentWeapon.proceedToEnd(this);
         }
 
         break;
@@ -347,12 +313,14 @@ class GameState {
   }
 
   // TODO put add and remove line for currentAnimations list
-  void addAnimation(MyAnimation explosion) {
-    painter.addElement(explosion.drawer);
+  void addAnimation(MyAnimation animation){
+    currentAnimations.add(animation);
+    painter.addElement(animation.drawer);
   }
 
-  void removeAnimation(MyAnimation explosion) {
-    painter.removeElement(explosion.drawer);
+  void removeAnimation(MyAnimation animation) {
+    currentAnimations.remove(animation);
+    painter.removeElement(animation.drawer);
   }
 
   void onTap(TapUpDetails details) {
@@ -560,10 +528,13 @@ class GameState {
         Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
         this.addProjectile(p);
+
+        if(p is ExplosiveProjectile)
+          stopWatch.start();
+
         uiManager.endJump();
-        switchState(GameStateMode.projectile);
-        stopWatch.start();
         uiManager.removeStaminaDrawer();
+        switchState(GameStateMode.projectile);
         break;
 
       case GameStateMode.explosion:

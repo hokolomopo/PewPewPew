@@ -11,6 +11,7 @@ import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/game_main.dart';
+import 'package:info2051_2018/game/game_state.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
@@ -204,8 +205,29 @@ abstract class Weapon {
   /// Function to proceed all the end logic of a projectile (explosion sprite,
   /// damage, painters, ...)
   /// TODO put end logic in weapon instead of gameState
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter);
+  void proceedToEnd(GameState gameState){
+
+    // Next state
+    gameState.switchState(GameStateMode.cinematic);
+
+    // Apply Damage and knockback
+    applyImpact(this.projectile, gameState.players,
+        gameState.players[gameState.currentPlayer].updateStats,
+        gameState.uiManager);
+
+    // Remove projectile from word and painters
+    gameState.removeProjectile(this.projectile);
+    gameState.currentWeapon = null;
+
+    // Launch end animation (null => no animation)
+    MyAnimation endAnimation = this.projectile.returnAnimationInstance();
+
+    if(endAnimation == null)
+      return;
+
+    endAnimation.addAndPlay(gameState);
+
+  }
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
@@ -404,6 +426,11 @@ class MyAnimation extends Entity {
   bool hasEnded() {
     return animationEnded;
   }
+
+  // Function to add the animation to world, display its images, and diffuse sound
+  void addAndPlay(GameState gameState) {
+    gameState.addAnimation(this);
+  }
 }
 
 /// Specification of MyAnimation for loop Animation along side simple sound effect
@@ -515,3 +542,4 @@ class WeaponStats{
   }
 
 }
+

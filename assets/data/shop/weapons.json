@@ -116,11 +116,7 @@
     "knockbackStrength": 10,
     "projectileWeight": 10.0,
     "projectileMaxSpeed": 3000,
-<<<<<<< Updated upstream
-    "projectileFrictionFactor": 1.0,
-=======
     "projectileFrictionFactor": 0.05,
->>>>>>> Stashed changes
     "weaponAsset": "assets/graphics/arsenal/weapons/fist.png",
     "explosionSound": "explosion.mp3",
     "explosionSizeX": 60.0,
