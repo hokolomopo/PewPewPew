@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
@@ -222,7 +219,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             ],
                           ),
                         ),
-                        Parameters()
+                        Parameters(),
                       ],
                     ),
                   ),
@@ -237,23 +234,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       });
     }
 
-    // Function to be pass to a future builder in order
-    // to pass variables to the shop list builder
-    Future<Set> getShopInfo() async {
-      Set ret = Set();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      //await prefs.clear(); // Debug line to reset the entire app preference
-
-      var tmp = await DefaultAssetBundle.of(context)
-          .loadString('assets/data/shop/weapons.json');
-
-      List<WeaponStats> weapons = WeaponStats.parseList(tmp.toString());
-      ret.add(weapons);
-      ret.add(prefs);
-      return ret;
-    }
-
     void _shopSheet() {
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
         return DecoratedBox(
@@ -263,22 +243,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               child: Column(
                 children: <Widget>[
                   Expanded(
-                    child: new FutureBuilder(
-                        future: getShopInfo(),
-                        builder: (context, snapshot) {
-                          List<WeaponStats> items;
-                          SharedPreferences prefs;
-                          if (snapshot.data != null) {
-                            items = snapshot.data.elementAt(0);
-                            prefs = snapshot.data.elementAt(1);
-                          }
-
-                          return (items != null && prefs != null)
-                              ? new ShopList(items: items, prefs: prefs)
-                              : new Center(
-                                  child: new CircularProgressIndicator(),
-                                );
-                        }),
+                    child: ShopList(),
                   ),
                 ],
               ),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/stats_screen.dart';
+
+import 'dart:async';
 
 import 'route_arguments.dart';
 
@@ -15,11 +18,9 @@ void main() {
 }
 
 class PewPewPew extends StatelessWidget {
-
 // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
     return new MaterialApp(
       title: 'Pew Pew Pew !!!',
       debugShowCheckedModeBanner: false,
@@ -63,5 +64,10 @@ class PewPewPew extends StatelessWidget {
         canvasColor: Colors.transparent,
       ),
     );
+  }
+
+  static Future<List<WeaponStats>> get weaponsInfo async {
+    return WeaponStats.parseList((await rootBundle
+        .loadString('assets/data/shop/weapons.json')));
   }
 }

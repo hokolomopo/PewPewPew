@@ -2,19 +2,14 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // json codec
 
 class ShopList extends StatefulWidget {
   static const String moneySharedPrefKey = "money";
 
-  // For Json reading : list of item and constructor
-  final List<WeaponStats> items;
-
-  // To track sold items
-  final SharedPreferences prefs;
-
-  ShopList({Key key, this.items, this.prefs}) : super(key: key);
+  ShopList({Key key}) : super(key: key);
 
   @override
   ShopListState createState() {
@@ -23,31 +18,44 @@ class ShopList extends StatefulWidget {
 }
 
 class ShopListState extends State<ShopList> {
-
-  var _money = 0;
+  int _money = 0;
   List<WeaponStats> items;
   SharedPreferences prefs;
 
   // To track actual sorting policy of the list
   int activeSort = 1; // Alphabetical sort first
 
+  setMoney(int newMoney) async {
+    this._money = newMoney;
+    await prefs.setInt(ShopList.moneySharedPrefKey, this._money);
+  }
+
   @override
   void initState() {
     super.initState();
-    items = widget.items;
-    prefs = widget.prefs;
-    if (prefs.containsKey(ShopList.moneySharedPrefKey))
-      _money = prefs.getInt(ShopList.moneySharedPrefKey);
-    else{
-      _money = 0;
-    }
+    getShopInfo();
   }
 
+  getShopInfo() async {
+    prefs = await SharedPreferences.getInstance();
+    //TODO remove
+    prefs.clear();
+    prefs.setInt(ShopList.moneySharedPrefKey, 10000);
+
+    if (prefs.containsKey(ShopList.moneySharedPrefKey))
+      _money = prefs.getInt(ShopList.moneySharedPrefKey);
+    else {
+      _money = 0;
+    }
+
+    items = await PewPewPew.weaponsInfo;
+
+    setState(() {});
+  }
 
   /// Function called when selling an item. Will reduce the money and set the item as sold
-  void _sellItem(int price, String item) async {
-    this._money -= price;
-    await this.prefs.setInt(ShopList.moneySharedPrefKey, this._money);
+  _sellItem(int price, String item) async {
+    await setMoney(_money - price);
     // Mark the item as SOLD
     await this.prefs.setInt(item, 0);
     // Set state applied here to be sure that changes were done before rebuilding the list
@@ -55,18 +63,17 @@ class ShopListState extends State<ShopList> {
   }
 
   /// Sort items by name
-  void _sortByName() {
+  _sortByName() {
     setState(() {
-        items.sort((a, b) {
-          return a.weaponName
-              .toLowerCase()
-              .compareTo(b.weaponName.toLowerCase()); // alphabetical reverse order
-        });
+      items.sort((a, b) {
+        return a.weaponName.toLowerCase().compareTo(
+            b.weaponName.toLowerCase()); // alphabetical reverse order
+      });
     });
   }
 
   /// Sort items by price
-  void _sortByPrice() {
+  _sortByPrice() {
     setState(() {
       items.sort((a, b) {
         // Check if the items are in an SOLD state or not
@@ -83,59 +90,64 @@ class ShopListState extends State<ShopList> {
   }
 
   /// Widget containing buttons to sort the shop
-  Widget _sortBox(BuildContext context){
-    return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              AutoSizeText(
-                "Sort by:",
-                style: TextStyle(color: Colors.white),
-              ),
-              ButtonBar(
-                alignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  _buttonOutline("Name", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByName),
-                  _buttonOutline("\$", Colors.white, Colors.white70, Colors.white70, Colors.deepPurple, Colors.white70, 20.0, _sortByPrice),
-                ],
-              )]
-    );
+  Widget _sortBox(BuildContext context) {
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      AutoSizeText(
+        "Sort by:",
+        style: TextStyle(color: Colors.white),
+      ),
+      ButtonBar(
+        alignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          _buttonOutline("Name", Colors.white, Colors.white70, Colors.white70,
+              Colors.deepPurple, Colors.white70, 20.0, _sortByName),
+          _buttonOutline("\$", Colors.white, Colors.white70, Colors.white70,
+              Colors.deepPurple, Colors.white70, 20.0, _sortByPrice),
+        ],
+      )
+    ]);
   }
 
   /// Widget displaying the money the user has
-  Widget _moneyContainer(BuildContext context){
+  Widget _moneyContainer(BuildContext context) {
     return Container(
-        height: MediaQuery.of(context).size.height * 0.06,
-        width: MediaQuery.of(context).size.width * 0.4,
-        child: DecoratedBox(
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                side: BorderSide(
-                  width: 2.0,
-                  color: Colors.white,
-                ),
-              ),
-              color: Colors.deepPurple,
-              shadows:  [BoxShadow(
-                color: Colors.grey.withOpacity(0.8),
-                spreadRadius: 2,
-                blurRadius: 3,
-                offset: Offset(0, 0), // changes position of shadow
-              )],
+      height: MediaQuery.of(context).size.height * 0.06,
+      width: MediaQuery.of(context).size.width * 0.4,
+      child: DecoratedBox(
+        decoration: ShapeDecoration(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            side: BorderSide(
+              width: 2.0,
+              color: Colors.white,
             ),
-            child: Center(
-                child : Padding(
-                    padding: EdgeInsets.only(top:7.0),
-                    child:Text(
-                      _money.toString() + "\$",
-                      style: TextStyle(color: Colors.white),
-            ))),
+          ),
+          color: Colors.deepPurple,
+          shadows: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.8),
+              spreadRadius: 2,
+              blurRadius: 3,
+              offset: Offset(0, 0), // changes position of shadow
+            )
+          ],
         ),
+        child: Center(
+            child: Padding(
+                padding: EdgeInsets.only(top: 7.0),
+                child: Text(
+                  _money.toString() + "\$",
+                  style: TextStyle(color: Colors.white),
+                ))),
+      ),
     );
   }
 
   /// List of items in the Shop
   Widget _shopList(BuildContext context) {
+    if (items == null || prefs == null) {
+      return CircularProgressIndicator();
+    }
     return Expanded(
         child: SingleChildScrollView(
             physics: AlwaysScrollableScrollPhysics(),
@@ -190,9 +202,13 @@ class ShopListState extends State<ShopList> {
             gradient: RadialGradient(
                 center: Alignment(0.0, 0.0),
                 radius: 3,
-                colors: [Colors.blue[800], Colors.blue[500], Colors.blue[400], Colors.blue[100]])
-        ),
-        child :Column(
+                colors: [
+              Colors.blue[800],
+              Colors.blue[500],
+              Colors.blue[400],
+              Colors.blue[100]
+            ])),
+        child: Column(
           children: <Widget>[
             Container(
               decoration: BoxDecoration(
@@ -234,16 +250,14 @@ class ShopListState extends State<ShopList> {
                     top: BorderSide(width: 3.0, color: Colors.white),
                   ),
                 ),
-                child: _sortBox(context)
-            )
+                child: _sortBox(context))
           ],
-        )
-    );
+        ));
   }
 
   /// Alert dialog to confirm a sale
-  void _confirmSaleAlertBox(String title, String mess,
-      BuildContext context, void function()) {
+  void _confirmSaleAlertBox(
+      String title, String mess, BuildContext context, void function()) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -257,13 +271,17 @@ class ShopListState extends State<ShopList> {
             ),
           ),
           title: new Text(title, style: TextStyle(color: Colors.white)),
-          content: new Text(mess, style: TextStyle(height: 1.5, color: Colors.white),),
+          content: new Text(
+            mess,
+            style: TextStyle(height: 1.5, color: Colors.white),
+          ),
           actions: <Widget>[
             new FlatButton(
               // Negative choice button
               child: new Text(
                 "No",
-                style: new TextStyle(fontWeight: FontWeight.normal, color: Colors.black),
+                style: new TextStyle(
+                    fontWeight: FontWeight.normal, color: Colors.black),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -273,7 +291,8 @@ class ShopListState extends State<ShopList> {
               // Positive choice button
               child: new Text(
                 "Yes",
-                style: new TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                style: new TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.black),
               ),
               onPressed: () {
                 function();
@@ -287,8 +306,7 @@ class ShopListState extends State<ShopList> {
   }
 
   /// Simple Alert dialog
-  void _simpleAlertDialog(String text, BuildContext context){
-
+  void _simpleAlertDialog(String text, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -301,16 +319,25 @@ class ShopListState extends State<ShopList> {
               color: Colors.blue[800],
             ),
           ),
-          content: new Text(text, style: TextStyle(height: 1.5, color: Colors.white),),
+          content: new Text(
+            text,
+            style: TextStyle(height: 1.5, color: Colors.white),
+          ),
         );
       },
     );
   }
 
   /// Button with an outline
-  Widget _buttonOutline(String text, Color textColor, Color bordersColor,
-      Color highlightColor, Color fillColor, Color splashColor, num borderRadius, void function()) {
-
+  Widget _buttonOutline(
+      String text,
+      Color textColor,
+      Color bordersColor,
+      Color highlightColor,
+      Color fillColor,
+      Color splashColor,
+      num borderRadius,
+      void function()) {
     return OutlineButton(
       highlightedBorderColor: Colors.white,
       borderSide: BorderSide(color: bordersColor, width: 2.0),
@@ -323,9 +350,7 @@ class ShopListState extends State<ShopList> {
       child: AutoSizeText(
         text,
         style: TextStyle(
-            height: 1.7,
-            fontWeight: FontWeight.bold,
-            color: textColor),
+            height: 1.7, fontWeight: FontWeight.bold, color: textColor),
       ),
       onPressed: () {
         function();
@@ -333,7 +358,6 @@ class ShopListState extends State<ShopList> {
     );
   }
 }
-
 
 /// Class for JSON representing shop items
 class Item {
@@ -356,17 +380,25 @@ class Item {
       // If the future reading operation is not done yet (connection waiting with initial data)
       return [];
     }
-    final parsed = json.decode(response.toString()).cast<Map<String, dynamic>>();
+    final parsed =
+        json.decode(response.toString()).cast<Map<String, dynamic>>();
     return parsed.map<Item>((json) => new Item.fromJson(json)).toList();
   }
-
 }
-
 
 /// Class for an item in the shop
 class CustomListItem extends StatelessWidget {
-  CustomListItem({Key key, this.sprite, this.name, this.price, this.damage,
-    this.radius, this.knockback, this.onTap, this.colors}) : super(key: key);
+  CustomListItem(
+      {Key key,
+      this.sprite,
+      this.name,
+      this.price,
+      this.damage,
+      this.radius,
+      this.knockback,
+      this.onTap,
+      this.colors})
+      : super(key: key);
 
   final Widget sprite;
   final String name;
@@ -395,25 +427,25 @@ class CustomListItem extends StatelessWidget {
                   ),
                 ),
                 gradient: RadialGradient(
-                    colors: [Colors.blue[200], Colors.blue[300]]
-                ),
-                shadows:  [BoxShadow(
-                  color: Colors.grey.withOpacity(0.3),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                  offset: Offset(0, 7), // changes position of shadow
-                )],
+                    colors: [Colors.blue[200], Colors.blue[300]]),
+                shadows: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 2,
+                    blurRadius: 3,
+                    offset: Offset(0, 7), // changes position of shadow
+                  )
+                ],
               ),
               child: DecoratedBox(
                 decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      side: BorderSide(
-                        width: 7.0,
-                        color: Colors.white,
-                      ),
-                    )
-                ),
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  side: BorderSide(
+                    width: 7.0,
+                    color: Colors.white,
+                  ),
+                )),
                 child: FractionallySizedBox(
                   heightFactor: 0.8,
                   widthFactor: 0.9,
@@ -426,7 +458,8 @@ class CustomListItem extends StatelessWidget {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(20.0, 8.0, 0.0, 0.0),
+                          padding:
+                              const EdgeInsets.fromLTRB(20.0, 8.0, 0.0, 0.0),
                           child: WeaponDescription(
                             name: name,
                             price: price,
@@ -439,8 +472,7 @@ class CustomListItem extends StatelessWidget {
                     ],
                   ),
                 ),
-              )
-          ),
+              )),
         ),
       ),
     );
@@ -534,4 +566,3 @@ class WeaponDescription extends StatelessWidget {
     );
   }
 }
-

@@ -25,8 +25,9 @@ class GameMain extends StatefulWidget {
 
   static Map<String, WeaponStats> availableWeapons = Map();
 
-  GameMain(this.terrain, this.nbPlayers, this.nbCharacters, List<WeaponStats> weapons){
-    for(WeaponStats stat in weapons)
+  GameMain(this.terrain, this.nbPlayers, this.nbCharacters,
+      List<WeaponStats> weapons) {
+    for (WeaponStats stat in weapons)
       availableWeapons.putIfAbsent(stat.weaponName, () => stat);
   }
 
@@ -51,11 +52,14 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
     level.color = HexColor(terrain.terrainColor);
 
     Camera camera = Camera(Offset(0, 0));
-    AssetsManager assetManager = AssetsManager(level.size, terrain.backgroundPath, nbPlayers);
-    this.levelPainter = LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
+    AssetsManager assetManager =
+        AssetsManager(level.size, terrain.backgroundPath, nbPlayers);
+    this.levelPainter =
+        LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
-    state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera, World(gravityForce:terrain.gravity));
+    state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera,
+        World(gravityForce: terrain.gravity));
 
     _scheduleFrame();
   }
@@ -75,7 +79,7 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
   void _update(Duration timestamp) {
     //TODO pause timer when quitting the app
     int timeElapsed =
-    lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
+        lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;
     timeElapsed = min(100, timeElapsed);
 
@@ -90,35 +94,29 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
 
   Future<bool> _mayExitGame() {
     return showDialog(
-      context: context,
-      builder: (context) =>
-      new AlertDialog(
-        title: Text("Quit game"),
-        content: Text("Quit game ?"),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text("No"),
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: Text("Quit game"),
+            content: Text("Quit game ?"),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text("No"),
+              ),
+              FlatButton(
+                onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                    context, Home.routeName, (Route<dynamic> route) => false),
+                child: Text("Yes"),
+              ),
+            ],
           ),
-          FlatButton(
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Home.routeName,
-                    (Route<dynamic> route) => false)
-            ,
-            child: Text("Yes"),
-          ),
-        ],
-      ),
-    ) ??
+        ) ??
         false;
   }
 
   @override
   Widget build(BuildContext context) {
-    GameMain.size = MediaQuery
-        .of(context)
-        .size;
+    GameMain.size = MediaQuery.of(context).size;
     levelPainter.screenSize = Home.screenSizeLandscape;
     levelPainter.assetsManager.init(Home.screenSizeLandscape);
 
@@ -126,9 +124,7 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
     if (state.currentState == GameStateMode.over) {
       onTapUp = (TapUpDetails details) {
         Navigator.pushNamedAndRemoveUntil(
-            context,
-            StatsScreen.routeName,
-                (Route<dynamic> route) => false,
+            context, StatsScreen.routeName, (Route<dynamic> route) => false,
             arguments: state.gameStats);
       };
     } else {
@@ -155,9 +151,7 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
           },
           child: levelPainter.level);
     } else {
-      gestureDetector = GestureDetector(
-          child: levelPainter.level
-      );
+      gestureDetector = GestureDetector(child: levelPainter.level);
     }
 
     return WillPopScope(

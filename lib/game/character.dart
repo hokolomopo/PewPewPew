@@ -57,7 +57,6 @@ class Character extends MovingEntity {
                 hitboxSize.height)) {
     this.spritePositionOffset = characterSpritePositionOffset;
     this.drawer = CharacterDrawer(AssetId.char_idle, this, team: this.team);
-    // TODO Initiate "correctly" arsenal
     this.currentArsenal = Arsenal(this);
   }
 

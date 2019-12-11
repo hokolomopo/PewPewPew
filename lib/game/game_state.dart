@@ -586,12 +586,15 @@ class GameState {
 
     print("OnLongPress : " + longPressPosition.toString());
 
+    print(currentState.toString());
+
     switch (currentState) {
       case GameStateMode.char_selection:
         break;
 
       case GameStateMode.moving:
       case GameStateMode.attacking:
+
         if (GameUtils.rectContains(currentChar.hitbox, longPressPosition)) {
           if (currentChar.isAirborne()) return;
           currentChar.stop();

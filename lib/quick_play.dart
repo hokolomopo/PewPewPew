@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/main.dart';
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/quickplay_widgets.dart';
 import 'package:info2051_2018/sound_player.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'game/game_main.dart';
 import 'route_arguments.dart';
@@ -14,9 +16,7 @@ class Parameters extends StatefulWidget {
   const Parameters({Key key}) : super(key: key);
 
   @override
-  ParametersState createState() {
-    return new ParametersState();
-  }
+  ParametersState createState() => ParametersState();
 }
 
 class ParametersState extends State<Parameters> {
@@ -29,9 +29,6 @@ class ParametersState extends State<Parameters> {
 
   @override
   Widget build(BuildContext context) {
-    if(_availableWeapons == null)
-      this._getWeaponsInfo();
-
     return _parameter(context);
   }
 
@@ -76,14 +73,16 @@ class ParametersState extends State<Parameters> {
   // Function to retrieve info on weapons in order
   // to pass it to the game
   void _getWeaponsInfo() async {
-
-    var tmp = await DefaultAssetBundle.of(context)
-        .loadString('assets/data/shop/weapons.json');
-
-    _availableWeapons = WeaponStats.parseList(tmp);
-
-    //TODO only take the one you bought
-
+    _availableWeapons = await PewPewPew.weaponsInfo;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<WeaponStats> toRemove = List();
+    for (WeaponStats weapon in _availableWeapons) {
+      if (!prefs.containsKey(weapon.weaponName)) {
+        toRemove.add(weapon);
+      }
+    }
+    _availableWeapons
+        .removeWhere((WeaponStats weapon) => toRemove.contains(weapon));
   }
 
   List<Widget> buildRadioList(
@@ -94,10 +93,8 @@ class ParametersState extends State<Parameters> {
       Function onChanged,
       List<int> values}) {
     List<Widget> list = List();
-    list.add(Expanded(
-        child: FittedBox(
-            fit: BoxFit.contain,
-            child: Text(title))));
+    list.add(
+        Expanded(child: FittedBox(fit: BoxFit.contain, child: Text(title))));
 
     for (int i = 0; i < texts.length; i++) {
       list.add(Expanded(
@@ -105,7 +102,7 @@ class ParametersState extends State<Parameters> {
         Text(texts[i]),
         Radio(
           activeColor: colors[i],
-          value: values == null ? i+1 : values[i],
+          value: values == null ? i + 1 : values[i],
           groupValue: groupValue,
           onChanged: onChanged,
         )
@@ -113,7 +110,6 @@ class ParametersState extends State<Parameters> {
     }
     return list;
   }
-
 
   Widget _parameter(BuildContext context) {
     return Column(
@@ -198,14 +194,13 @@ class ParametersState extends State<Parameters> {
                 //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
                 //ap.pause();
 
-                if(_terrain == null)
+                if (_terrain == null)
                   _simpleAlertDialog("Please select a level", context);
-                else{
-                  Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      GameMain.routeName,
+                else {
+                  Navigator.pushNamedAndRemoveUntil(context, GameMain.routeName,
                       (Route<dynamic> route) => false,
-                      arguments: MainGameArguments(_terrain, _nbPlayer, _nbWorms, this._availableWeapons));
+                      arguments: MainGameArguments(_terrain, _nbPlayer,
+                          _nbWorms, this._availableWeapons));
                 }
               },
             ),
@@ -218,15 +213,23 @@ class ParametersState extends State<Parameters> {
   }
 
   /// Simple Alert dialog
-  void _simpleAlertDialog(String text, BuildContext context){
+  void _simpleAlertDialog(String text, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: new Text(text, style: TextStyle(height: 1.5, color: Colors.black),),
+          content: new Text(
+            text,
+            style: TextStyle(height: 1.5, color: Colors.black),
+          ),
         );
       },
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _getWeaponsInfo();
+  }
 }

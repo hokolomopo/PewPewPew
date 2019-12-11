@@ -9,7 +9,6 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
-import 'package:info2051_2018/draw/weapon_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/ui_manager.dart';
@@ -20,11 +19,6 @@ import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
 import 'character.dart';
-
-// TODO Use this structure to centralise info
-final List<List<String>> _weaponryData = [
-  ["proj", "hello"]
-];
 
 class Arsenal {
   static final double selectionElementRadius = sqrt(
@@ -50,7 +44,9 @@ class Arsenal {
 
 
   showWeaponSelection(MutableRectangle charHitBox) {
-    double angleBetweenElem = 2 * pi / arsenal.length;
+    // The formula does not work with a single element, as we can't put
+    // any distance between an element and itself.
+    double angleBetweenElem = min(pi, 2 * pi / arsenal.length);
     double selectionListRadius = max(2.2 * selectionElementRadius,
         1.1 * selectionElementRadius / sin(angleBetweenElem / 2));
     Offset charCenterPos = Offset(charHitBox.left + charHitBox.width / 2,
@@ -72,7 +68,6 @@ class Arsenal {
       curAngle += angleBetweenElem;
     }
   }
-
 
   Weapon getWeaponAt(Offset position) {
     for (Weapon weapon in arsenal) {
@@ -110,7 +105,6 @@ abstract class Weapon {
   // This variable should be initialised properly in the children, however
   // we initialise it here because we can't define abstract variables.
   final AssetId selectionAsset = AssetId.background;
-
 
   factory Weapon.fromWeaponStats(Character owner, WeaponStats weaponStats){
     Weapon w;
@@ -388,7 +382,6 @@ class CollidableProjectile extends Projectile {
 /// Mixin class for projectile which are not influence by gravity, Linear
 /// (Bullets, Rays, Magic orbs, ...)
 abstract class Linear{}
-
 
 /// Animation (Gif) limited in Time (counted in total frames)
 /// It can also play a sound effect
