@@ -81,7 +81,6 @@ class GameState {
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera) {
-
     uiManager = UiManager(painter);
 
     level.spawnPoints.shuffle();
@@ -108,15 +107,14 @@ class GameState {
   void update(double timeElapsed) {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
-    
+
     bool shouldEndTurn = false;
 
     // Before going through States checking, check if there is any explosion to remove from the painters
-    if (currentExplosion != null)
-      if (currentExplosion.hasEnded()) {
-        this.removeExplosion(currentExplosion);
-        currentExplosion = null;
-      }
+    if (currentExplosion != null) if (currentExplosion.hasEnded()) {
+      this.removeExplosion(currentExplosion);
+      currentExplosion = null;
+    }
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -163,7 +161,6 @@ class GameState {
         break;
 
       case GameStateMode.weapon_selection:
-        // TODO: Handle this case.
         break;
 
       case GameStateMode.projectile:
@@ -171,26 +168,19 @@ class GameState {
         this.camera.centerOn(currentWeapon.projectile.getPosition());
 
         // check if the projectile is out of bounds
-        if(!level.isInsideBounds(currentWeapon.projectile.hitbox)){
-          if (stopWatch.isRunning) {
-            stopWatch.stop();
-            stopWatch.reset();
-          }
+        if (!level.isInsideBounds(currentWeapon.projectile.hitbox)) {
+          resetStopWatch();
 
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
 
           switchState(GameStateMode.cinematic);
-
           break;
         }
 
         // Stop stopWatch if non detonating projectile
         if (currentWeapon.detonationTime == null) {
-          if (stopWatch.isRunning) {
-            stopWatch.stop();
-            stopWatch.reset();
-          }
+          resetStopWatch();
 
           //TODO set a variable and methode "explose" on collision
 
@@ -199,18 +189,16 @@ class GameState {
 
         // Time to detonate projectile
         if (stopWatch.elapsedMilliseconds > currentWeapon.detonationTime) {
-          stopWatch.stop();
-          stopWatch.reset();
+          resetStopWatch();
 
-          currentWeapon.applyImpact(
-              currentWeapon.projectile, players, players[currentPlayer].updateStats);
+          currentWeapon.applyImpact(currentWeapon.projectile, players,
+              players[currentPlayer].updateStats, uiManager);
 
           // Send back an not movable entity with will play an explosion effect
           currentExplosion = currentWeapon.projectile.returnExplosionInstance();
 
-          // Play audio file of explosion in //
+          // Play audio file of explosion
           currentExplosion.playSound();
-
 
           this.removeProjectile(currentWeapon.projectile);
           currentWeapon = null;
@@ -222,7 +210,6 @@ class GameState {
 
         break;
       case GameStateMode.explosion:
-
         break;
       case GameStateMode.cinematic:
         // If the last attack has knocked back someone, film until everyone stop moving
@@ -230,25 +217,23 @@ class GameState {
         bool isSomeoneMovingOnScreen = false;
         bool isSomeoneDying = false;
         Character movingCharacter;
-        for(Team v in players) {
-          for (Character c in v.characters){
-            if(c.isDying || c.isDead)
-              isSomeoneDying = true;
+        for (Team v in players) {
+          for (Character c in v.characters) {
+            if (c.isDying || c.isDead) isSomeoneDying = true;
             if (c.isMoving()) {
-              if (camera.isDisplayed(c.hitbox))
-                isSomeoneMovingOnScreen = true;
+              if (camera.isDisplayed(c.hitbox)) isSomeoneMovingOnScreen = true;
               isSomeoneMoving = true;
               movingCharacter = c;
             }
-            }
+          }
         }
 
         // If the character moving is not on screen, mode the camera to him
-        if(isSomeoneMoving && !isSomeoneMovingOnScreen)
+        if (isSomeoneMoving && !isSomeoneMovingOnScreen)
           camera.centerOn(movingCharacter.getPosition());
 
         // If no one is moving, go to next player
-        else if(!isSomeoneMoving && !isSomeoneDying)
+        else if (!isSomeoneMoving && !isSomeoneDying)
           switchState(GameStateMode.char_selection);
 
         break;
@@ -263,7 +248,8 @@ class GameState {
         // Don't use character.kill function to skip death animation
         if (!level.isInsideBounds(players[p].getCharacter(c).hitbox)) {
           players[p].getCharacter(c).isDead = true;
-          players[this.currentPlayer].updateStats(TeamStat.killed, 1, teamTakingAttack: p);
+          players[this.currentPlayer]
+              .updateStats(TeamStat.killed, 1, teamTakingAttack: p);
         }
 
         // Check if the character is dead
@@ -330,8 +316,7 @@ class GameState {
     this.computeStats(players[playerID]);
 
     players.removeAt(playerID);
-    if (currentPlayer > playerID)
-      currentPlayer--;
+    if (currentPlayer > playerID) currentPlayer--;
   }
 
   Character getCurrentCharacter() {
@@ -372,7 +357,8 @@ class GameState {
       case GameStateMode.char_selection:
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
-              GameUtils.extendRect(players[currentPlayer].getCharacter(i).hitbox, 10),
+              GameUtils.extendRect(
+                  players[currentPlayer].getCharacter(i).hitbox, 10),
               tapPosition)) {
             currentCharacter = i;
 
@@ -429,8 +415,7 @@ class GameState {
           Offset pos = getCurrentCharacter().getPosition();
           Offset hit = Offset(5, 5);
           ProjDHS projDHS = new ProjDHS(
-              pos,
-              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
+              pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
           currentWeapon.projectile = projDHS;
 
           switchState(GameStateMode.attacking);
@@ -516,8 +501,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        if(currentWeapon == null || currentWeapon.projectile == null)
-          return;
+        if (currentWeapon == null || currentWeapon.projectile == null) return;
         Offset tmp = currentWeapon.projectile.getLaunchSpeed(
             (dragPositionCamera - launchDragStartPosition) *
                 LaunchVectorNormalizer);
@@ -554,8 +538,7 @@ class GameState {
         // TODO: Handle this case.
         // J.L
 
-        if(currentWeapon == null || currentWeapon.projectile == null)
-          return;
+        if (currentWeapon == null || currentWeapon.projectile == null) return;
         this.addProjectile(currentWeapon.projectile);
         currentWeapon.fireProjectile(
             (launchDragStartPosition - launchDragEndPosition) *
@@ -595,19 +578,6 @@ class GameState {
         if (GameUtils.rectContains(currentChar.hitbox, longPressPosition)) {
           if (currentChar.isAirborne()) return;
           currentChar.stop();
-
-          // For the moment skip the selection to implement the rest
-          // TODO modify to take into account selection step
-          /*Weapon selectedWeapon = currentChar.currentArsenal.arsenal[1];
-          currentChar.currentArsenal.selectWeapon(selectedWeapon);
-          currentWeapon = currentChar.currentArsenal.currentSelection;
-          Offset pos = currentChar.getPosition();
-          Offset hit = Offset(5, 5);
-          ProjDHS boulet = new ProjDHS(
-              pos,
-              MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
-
-          currentWeapon.projectile = boulet;*/
 
           switchState(GameStateMode.weapon_selection);
         }
@@ -692,16 +662,19 @@ class GameState {
         break;
       case GameStateMode.over:
         // Compute stats for last team
-        if(players.length == 1) {
+        if (players.length == 1) {
           this.computeStats(players[0]);
           gameStats.winningTeam = players[0].teamName;
 
           uiManager.addText(
               "Team " + players[0].teamName + " won !\nTouch to continue",
-              TextPositions.center, 50, duration: 3, ignoreCamera: true);
+              TextPositions.center,
+              50,
+              duration: 3,
+              ignoreCamera: true);
         }
         // No players left, it's a tie
-        else{
+        else {
           uiManager.addText(
               "Game over!\nTouch to continue", TextPositions.center, 50,
               duration: 3, ignoreCamera: true);
@@ -743,11 +716,15 @@ class GameState {
     }
   }
 
-
   /// Compute the stats of a team and save it
   /// Should be called when a team is eliminated
-  void computeStats(Team t){
+  void computeStats(Team t) {
     Map<TeamStat, double> teamStats = t.computeStats();
     gameStats.statistics.putIfAbsent(t.teamName, () => teamStats);
+  }
+
+  resetStopWatch() {
+    stopWatch.stop();
+    stopWatch.reset();
   }
 }

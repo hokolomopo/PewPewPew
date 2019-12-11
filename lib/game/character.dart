@@ -33,6 +33,8 @@ class Character extends MovingEntity {
 
   static const String hurtSoundName = "hurtSound.mp3";
 
+  static const Offset dmgTextOffset = Offset(0, -12);
+
   double hp = base_hp;
   int team;
   Arsenal currentArsenal;
