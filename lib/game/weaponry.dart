@@ -304,7 +304,8 @@ class Colt extends Weapon {
   }
 }
 
-class Projectile extends MovingEntity {
+abstract class Projectile extends MovingEntity {
+  //AssetId explosionAssetId;
   double weight;
   int maxSpeed;
   double
@@ -317,6 +318,7 @@ class Projectile extends MovingEntity {
   // expressed in radian in a clockwise way
   double actualOrientation = -1; // < 0 means not rotation
 
+  get explosionAssetId;
 
   factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats){
     Projectile p;
@@ -359,15 +361,25 @@ class Projectile extends MovingEntity {
     if (frictionFactor == 1) drawer.freezeAnimation();
   }
 
-  // Have to be override by children
   Explosion returnExplosionInstance() {
-    return null;
+    Size s = explosionSize;
+    if (s == null) s = Size(60, 60);
+
+    drawer.changeRelativeSize(s);
+
+    Offset pos = this.getPosition();
+    pos += Offset(-s.width / 2, -s.height / 2);
+    setPosition(pos);
+
+    return Explosion(pos, explosionAssetId, s, hitbox, explosionSound);
   }
 }
 
 // TODO precise value in constructor body instead of arg (useful for tests)
 // Class Test for projectile
 class Boulet extends Projectile {
+  final AssetId explosionAssetId = AssetId.explosion_dhs;
+
   Boulet(Offset position, Rectangle hitbox,
       {Offset velocity = const Offset(0, 0),
       double weight = 10.0,
@@ -379,7 +391,7 @@ class Boulet extends Projectile {
 }
 
 class ProjDHS extends Projectile {
-  final AssetId explosionAssetID = AssetId.explosion_dhs;
+  final AssetId explosionAssetId = AssetId.explosion_dhs;
 
   // TODO put arg as optional
   ProjDHS(Offset position, Rectangle hitbox,
@@ -392,20 +404,6 @@ class ProjDHS extends Projectile {
     this.explosionSound = "explosion.mp3";
     this.explosionSize = Size(60, 60);
     this.actualOrientation = 0.0;
-  }
-
-  @override
-  Explosion returnExplosionInstance() {
-    Size s = explosionSize;
-    if (s == null) s = Size(60, 60);
-
-    drawer.changeRelativeSize(s);
-
-    Offset pos = this.getPosition();
-    pos += Offset(-s.width / 2, -s.height / 2);
-    this.setPosition(pos);
-
-    return Explosion(pos, explosionAssetID, s, hitbox, explosionSound);
   }
 }
 
