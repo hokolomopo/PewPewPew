@@ -29,11 +29,9 @@ class World{
     for(Character c in players){
       c.updateAnimation();
 
-      if(c.isMoving()){
-        c.addAcceleration(gravity);
-        c.accelerate();
-        moveEntity(c, timeElapsed);
-      }
+      c.addAcceleration(gravity);
+      c.accelerate();
+      moveEntity(c, timeElapsed);
     }
 
     for(Projectile p in projectiles){

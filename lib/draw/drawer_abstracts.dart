@@ -1,6 +1,9 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'assets_manager.dart';
 
@@ -11,6 +14,8 @@ abstract class ImagedDrawer extends CustomDrawer {
   AssetsManager assetsManager;
   GifInfo gifInfo;
   bool changeGif = true;
+
+  double angle = 0;
 
   set relativeSize(Size newSize) {
     if (newSize != _relativeSize) {
@@ -56,6 +61,7 @@ abstract class ImagedDrawer extends CustomDrawer {
     gifInfo = null;
   }
 
+  /// Flip an image and then draw it on the canvas
   void drawFlippedImage(Canvas canvas, ui.Image image, Rect imgDims, {Paint paint}) {
     if (paint == null)
       paint = Paint();
@@ -68,6 +74,35 @@ abstract class ImagedDrawer extends CustomDrawer {
 
     canvas.restore();
   }
+
+
+  ///Draw a image after a rotation, at a given position and you may give
+  /// it an offset to add the the position of the rotated image
+  void drawRotatedImage(ui.Image image, Canvas canvas, Offset rotationCenter, Offset position, double angle,
+      {Paint paint, Offset offset=const Offset(0,0), flipped:false}) {
+
+    if (paint == null)
+      paint = Paint();
+
+    if(angle == null)
+      angle = 0;
+
+    canvas.save();
+    canvas.translate(rotationCenter.dx, rotationCenter.dy);
+
+    canvas.rotate(angle);
+
+    //canvas.drawCircle(Offset(0,0), 10, debugShowHitBoxesPaint);
+
+    if(!flipped)
+      canvas.drawImage(image, Offset(position.dx - rotationCenter.dx + offset.dx, position.dy - rotationCenter.dy + offset.dy), Paint());
+    else
+      drawFlippedImage(canvas, fetchNextFrame(), Rect.fromLTWH(position.dx - rotationCenter.dx - offset.dx,
+          position.dy - rotationCenter.dy + offset.dy, actualSize.width, actualSize.height));
+
+    canvas.restore();
+  }
+
 
 }
 

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -390,6 +391,8 @@ class GameState {
         if (selectedWeapon != null) {
           currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
+          if(currentWeapon == null)
+            print("wtf currentWeapon = currentArsenal.currentSelection ");
           // TODO correctly assign projectile to weapon (certainly in overridable method)
 //          Offset pos = getCurrentCharacter().getPosition();
 //          Offset hit = Offset(5, 5);
@@ -490,14 +493,18 @@ class GameState {
         if (currentWeapon == null || currentWeapon.projectile == null)
           return;
 
+        // Compute the launch vector and the angle of launching
         Offset launchVector = dragPositionCamera - launchDragStartPosition;
         Offset tmp = currentWeapon.projectile.getLaunchSpeed(launchVector * LaunchVectorNormalizer);
+        currentWeapon.drawer.angle = atan(launchVector.dy / launchVector.dx);
         uiManager.updateJump(tmp);
 
+        // Change the character orientation following the direction of aiming
         if(launchVector.dx < 0)
           getCurrentCharacter().directionFaced = Character.RIGHT;
         else
           getCurrentCharacter().directionFaced = Character.LEFT;
+
         break;
       case GameStateMode.explosion:
         break;
@@ -527,8 +534,13 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-        // TODO: Handle this case.
-        // J.L
+
+        uiManager.endJump();
+
+        // If we ended the drag on the character, cancel the attack
+        if(currentChar != null && currentChar.hitbox.containsPoint(GameUtils.toPoint(launchDragEndPosition))){
+          switchState(GameStateMode.moving);
+        }
 
         if (currentWeapon == null || currentWeapon.projectile == null) return;
         Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
@@ -538,8 +550,7 @@ class GameState {
         if(p is ExplosiveProjectile)
           stopWatch.start();
 
-        uiManager.endJump();
-        uiManager.removeStaminaDrawer();
+
         switchState(GameStateMode.projectile);
         break;
 
@@ -643,7 +654,6 @@ class GameState {
         this.jumpDragStartPosition = null;
         this.jumpDragEndPosition = null;
 
-        getCurrentCharacter().refillStamina();
         uiManager.addStaminaDrawer(getCurrentCharacter());
         break;
       case GameStateMode.attacking:
@@ -662,6 +672,7 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        uiManager.removeStaminaDrawer();
         break;
       case GameStateMode.explosion:
         break;
@@ -694,6 +705,7 @@ class GameState {
     switch (oldState) {
       case GameStateMode.char_selection:
         uiManager.removeText(this.teamTurnText);
+        getCurrentCharacter().refillStamina();
         break;
       case GameStateMode.moving:
         uiManager.removeMarker();
@@ -713,13 +725,14 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
-        if(currentWeapon != null)
-          painter.removeElement(currentWeapon.drawer);
-        currentWeapon = null;
         break;
       case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
+        if(currentWeapon != null)
+          painter.removeElement(currentWeapon.drawer);
+        currentWeapon = null;
+        print("Set currentWeapon to null");
         break;
       case GameStateMode.over:
         break;

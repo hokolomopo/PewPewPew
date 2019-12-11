@@ -223,7 +223,9 @@ abstract class Weapon {
         gameState.uiManager);
 
     // Remove projectile from word and painters
+    //TODO callback to gameMain
     gameState.removeProjectile(this.projectile);
+    gameState.painter.removeElement(gameState.currentWeapon.drawer);
     gameState.currentWeapon = null;
 
     // Launch end animation (null => no animation)

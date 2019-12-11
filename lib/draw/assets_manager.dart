@@ -58,7 +58,7 @@ class AssetsManager {
 
   /// Default assets of the game
   final Map<AssetId, Asset> assets = {
-    //TODO put size for projectiles
+    //TODO put good sizes for weapons
     AssetId.background: Asset(AssetId.background, null),
     AssetId.projectile_boulet: Asset(AssetId.projectile_boulet,
         "assets/graphics/arsenal/projectiles/red_arc.gif"),

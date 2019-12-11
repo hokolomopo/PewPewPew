@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'assets_manager.dart';
@@ -48,6 +50,7 @@ class CharacterDrawer extends ImagedDrawer {
       canvas.drawImage(sprite, Offset(left, top), Paint());
     else
       drawFlippedImage(canvas, sprite, Rect.fromLTWH(left, top, width, height), paint: Paint());
+
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
     Color lifeColor = character.getTeamColor();
