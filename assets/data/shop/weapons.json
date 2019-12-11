@@ -27,7 +27,7 @@
     "isExplosive": true,
     "detonationDelay": 5000.0,
     "range": 60,
-    "ammunition": 6,
+    "ammunition": 1,
     "hasKnockback": true,
     "knockbackStrength": 5000,
     "projectileWeight": 10.0,

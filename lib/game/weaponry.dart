@@ -73,7 +73,7 @@ class Arsenal {
   Weapon getWeaponAt(Offset position) {
     for (Weapon weapon in arsenal) {
       if (GameUtils.circleContains(
-          weapon.centerPos, selectionElementRadius, position)) {
+          weapon.centerPos, selectionElementRadius, position) && (weapon.ammunition ?? 1) > 0 ) {
         return weapon;
       }
     }

@@ -527,12 +527,12 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-        // TODO: Handle this case.
-        // J.L
-
         if (currentWeapon == null || currentWeapon.projectile == null) return;
         Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
+        if (currentWeapon.ammunition != null) {
+          currentWeapon.ammunition -= 1;
+        }
         this.addProjectile(p);
 
         if(p is ExplosiveProjectile)
