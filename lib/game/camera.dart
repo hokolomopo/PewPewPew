@@ -5,6 +5,10 @@ import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 class Camera{
+  static const double CameraSpeed = 1;
+  static const double dampeningFactor = 10;
+  static const double inertiaFactor = 2;
+
   /// Position of the top left corner of the camera
   Offset position;
 
@@ -14,7 +18,36 @@ class Camera{
   /// no input is needed) and as a dev tool.
   Offset zoom;
 
+  Offset inertia = Offset(0, 0);
+  bool isTouching = true;
+
   Camera(this.position, {this.zoom : const Offset(1,1)});
+
+  void update(double elapsedTime){
+    if(!isTouching) {
+      this.position += inertia * elapsedTime;
+
+    }
+    inertia *= 0.95;
+
+  }
+
+  void dragOf(Offset vector){
+    position += vector * CameraSpeed;
+    inertia += Offset(pow(vector.dx, inertiaFactor) * vector.dx.sign, pow(vector.dy, inertiaFactor) * vector.dy.sign);
+  }
+
+  void resetInertia(){
+    this.inertia = Offset(0,0);
+  }
+
+  void stopX(){
+    inertia = Offset(0, inertia.dy);
+  }
+
+  void stopY(){
+    inertia = Offset(inertia.dx, 0);
+  }
 
   ///Center the camera on the given position
   void centerOn(Offset center){
