@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'game/util/team.dart';
 import 'shop.dart';
 
+import 'dart:math';
+
 class StatsScreen extends StatefulWidget {
   static const routeName = '/Stats';
 
@@ -18,30 +20,32 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
-  static const Map<TeamStat, double> _moneyByStat = {
-    TeamStat.damage_dealt:10,
-    TeamStat.damage_taken:-1,
-    TeamStat.alive:5000,
-    TeamStat.killed:10000,
-    TeamStat.self_killed:-7000,
-    TeamStat.damage_self_dealt:-1,
+  static const Map<TeamStat, int> _moneyByStat = {
+    TeamStat.damage_dealt: 10,
+    TeamStat.damage_taken: -1,
+    TeamStat.alive: 100,
+    TeamStat.killed: 200,
+    TeamStat.self_killed: -350,
+    TeamStat.damage_self_dealt: -1,
   };
 
   int totalMoneyGain;
-  _StatsScreenState(GameStats stats){
+
+  _StatsScreenState(GameStats stats) {
     totalMoneyGain = 0;
-    for(TeamStat stat in TeamStat.values)
-      totalMoneyGain += (_moneyByStat[stat] * stats.statistics[stats.winningTeam][stat]).floor();
-    totalMoneyGain = totalMoneyGain < 0 ? 0 : totalMoneyGain;
+    for (TeamStat stat in TeamStat.values)
+      totalMoneyGain +=
+          (_moneyByStat[stat] * stats.statistics[stats.winningTeam][stat].floor());
+    totalMoneyGain = max(0, totalMoneyGain);
 
     saveMoney();
   }
 
-  void saveMoney() async{
+  void saveMoney() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     int currentMoney = 0;
-    if(prefs.containsKey(ShopList.moneySharedPrefKey))
+    if (prefs.containsKey(ShopList.moneySharedPrefKey))
       currentMoney = prefs.getInt(ShopList.moneySharedPrefKey);
     prefs.setInt(ShopList.moneySharedPrefKey, currentMoney + totalMoneyGain);
   }
@@ -52,14 +56,12 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    this.soundPlayer.playLoopMusic(_menuMusicName, volume : 1.0);
+    this.soundPlayer.playLoopMusic(_menuMusicName, volume: 1.0);
     WidgetsBinding.instance.addObserver(this);
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     //button widget
     Widget continueButton() {
       return RaisedButton(
@@ -69,11 +71,11 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
         elevation: 3.0,
         color: Colors.blue[200],
         shape: RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(30.0),
-            side: BorderSide(
-              width: 1.0,
-              color: Colors.black.withOpacity(0.5),
-            ),
+          borderRadius: new BorderRadius.circular(30.0),
+          side: BorderSide(
+            width: 1.0,
+            color: Colors.black.withOpacity(0.5),
+          ),
         ),
         child: FittedBox(
           fit: BoxFit.contain,
@@ -91,9 +93,9 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
       );
     }
 
-    Widget buildTextRow({TeamStat stat, divider:true}){
+    Widget buildTextRow({TeamStat stat, divider: true}) {
       String msg;
-      switch(stat){
+      switch (stat) {
         case TeamStat.damage_dealt:
           msg = "Damage dealt : ";
           break;
@@ -114,6 +116,8 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
           break;
       }
 
+      int curStat = widget.gameStats
+          .statistics[widget.gameStats.winningTeam][stat].floor();
 
       return Container(
         child: Column(
@@ -123,16 +127,26 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Text(msg + widget.gameStats.statistics[widget.gameStats.winningTeam][stat].floor().toString(),
-                    style: TextStyle(fontSize: 10, color: Colors.black.withOpacity(0.5)),
+                  Text(
+                    msg +
+                        curStat
+                            .toString(),
+                    style: TextStyle(
+                        fontSize: 10, color: Colors.black.withOpacity(0.5)),
                   ),
-                  Text((_moneyByStat[stat] * widget.gameStats.statistics[widget.gameStats.winningTeam][stat]).floor().toString() + "\$",
+                  Text(
+                    (_moneyByStat[stat] *
+                                curStat)
+                            .toString() +
+                        "\$",
                     style: TextStyle(fontSize: 12, color: Colors.black),
                   )
                 ],
               ),
             ),
-            divider ? Divider(color: Colors.black.withOpacity(0.3)) : SizedBox.shrink()
+            divider
+                ? Divider(color: Colors.black.withOpacity(0.3))
+                : SizedBox.shrink()
           ],
         ),
       );
@@ -151,7 +165,8 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
         ),
         Scaffold(
           body: Padding(
-              padding: EdgeInsets.only(top: screenHeight / 15, left: 30.0, right: 30.0),
+              padding: EdgeInsets.only(
+                  top: screenHeight / 15, left: 30.0, right: 30.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -160,59 +175,78 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
                     child: DecoratedBox(
                         decoration: ShapeDecoration(
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0)),
                             side: BorderSide(
                               width: 1.0,
                               color: Colors.black.withOpacity(0.5),
                             ),
                           ),
                           gradient: RadialGradient(
-                              colors: [Colors.blue[200], Colors.blue[300]]
-                          ),
-                          shadows:  [BoxShadow(
-                            color: Colors.black.withOpacity(0.4),
-                            spreadRadius: 2,
-                            blurRadius: 3,
-                            offset: Offset(2, 4),
-                          )],
+                              colors: [Colors.blue[200], Colors.blue[300]]),
+                          shadows: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              spreadRadius: 2,
+                              blurRadius: 3,
+                              offset: Offset(2, 4),
+                            )
+                          ],
                         ),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 1.0),
+                          padding: EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 1.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
                               Text(
-                                "Winning Team : \n Team " + widget.gameStats.winningTeam,
-                                style: TextStyle(color: Colors.black, fontSize: 15, height: 1.5),
+                                "Winning Team : \n Team " +
+                                    widget.gameStats.winningTeam,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    height: 1.5),
                               ),
-                              Divider(color:  Colors.black.withOpacity(0.6), height: 30.0, thickness: 3.0,),
+                              Divider(
+                                color: Colors.black.withOpacity(0.6),
+                                height: 30.0,
+                                thickness: 3.0,
+                              ),
                               buildTextRow(stat: TeamStat.damage_dealt),
                               buildTextRow(stat: TeamStat.damage_self_dealt),
                               buildTextRow(stat: TeamStat.damage_taken),
                               buildTextRow(stat: TeamStat.killed),
                               buildTextRow(stat: TeamStat.self_killed),
-                              buildTextRow(stat: TeamStat.alive, divider: false),
-                              Divider(color:  Colors.black.withOpacity(0.5), height: 20.0, thickness: 3.0,),
+                              buildTextRow(
+                                  stat: TeamStat.alive, divider: false),
+                              Divider(
+                                color: Colors.black.withOpacity(0.5),
+                                height: 20.0,
+                                thickness: 3.0,
+                              ),
                               Padding(
-                                padding: EdgeInsets.only(bottom: 10.0),
-                                child : Center(
-                                  child: Text(
-                                    "Total : " + totalMoneyGain.toString() + "\$",
-                                    style: TextStyle(color: Colors.black, fontSize: 15, height: 1.5),
-                                  ),
-                                )
-                              )
+                                  padding: EdgeInsets.only(bottom: 10.0),
+                                  child: Center(
+                                    child: Text(
+                                      "Total : " +
+                                          totalMoneyGain.toString() +
+                                          "\$",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          height: 1.5),
+                                    ),
+                                  ))
                             ],
                           ),
-                        )
-                    ),
+                        )),
                   ),
                   continueButton(),
-                  Padding(padding: EdgeInsets.only(bottom: 5.0),)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5.0),
+                  )
                 ],
-              )
-          ),
-
+              )),
         )
       ],
     );

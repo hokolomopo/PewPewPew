@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/drawer_abstracts.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
+import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/draw/weapon_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/game_main.dart';
+import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/sound_player.dart';
@@ -96,7 +99,6 @@ class Arsenal {
   }
 }
 
-
 abstract class Weapon {
   static final Size relativeSize = Size(5, 3);
 
@@ -183,47 +185,55 @@ abstract class Weapon {
   }
 
   //TODO decide if methods better in Weapon or corresponding Projectile
-  // Should be an overdrivable function to get different behaviour for other weapon
+  // Should be an overridable function to get different behaviour for other weapon
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
-  void applyImpact(Projectile p, List<Team> characters,
-      Function statUpdater) {
-    for (var i = 0; i < characters.length; i++) {
-      for (var j = 0; j < characters[i].length; j++) {
+  void applyImpact(Projectile projectile, List<Team> characters,
+      Function statUpdater, UiManager uiManager) {
+    Character curChar;
+    for (int i = 0; i < characters.length; i++) {
+      for (int j = 0; j < characters[i].length; j++) {
+        curChar = characters[i].getCharacter(j);
         // apply a circular HitBox
 
-        var dist = (p.getPosition() -
-                characters[i].getCharacter(j).getPosition())
-            .distance;
+        double dist =
+            (projectile.getPosition() - curChar.getPosition()).distance;
 
-        if (dist < range) {
+        if (dist <= range) {
           // Apply damage reduce according to dist [33% - 100%]
-          double effectiveDamage = damage.toDouble() * (0.32 + (range - dist) / (3 * range));
+          double effectiveDamage =
+              damage.toDouble() * (1.0 + 2.0 * (range - dist) / range) / 3.0;
 
           // Update stats
-          double damageDealt =
-              min(effectiveDamage, characters[i].getCharacter(j).hp);
+          double damageDealt = min(effectiveDamage, curChar.hp);
+
+          uiManager.addText(
+              "-" + damageDealt.ceil().toString(), TextPositions.custom, 25,
+              customPosition: curChar.getPosition() + Character.dmgTextOffset,
+              duration: 3,
+              fadeDuration: 2,
+              color: Colors.red);
+
           statUpdater(TeamStat.damage_dealt, damageDealt, teamTakingAttack: i);
-          if (characters[i].getCharacter(j).hp == 0)
+
+          if (curChar.hp == 0)
             statUpdater(TeamStat.killed, 1, teamTakingAttack: i);
 
-          characters[i].getCharacter(j).removeHp(effectiveDamage);
+          curChar.removeHp(damageDealt);
 
           // Apply a vector field for knockback
-          Offset projection =
-              characters[i].getCharacter(j).getPosition() -
-                  p.getPosition();
+          Offset projection = curChar.getPosition() - projectile.getPosition();
 
           // Normalize offset
-          projection /= projection.distance;
+          projection /= projection.dx + projection.dy;
 
-          // The closest to the center of detonation the stronger the knockback
+          // The closer to the center of detonation the stronger the knockback
           // Factor from 0% to 100%
           projection *= (range - dist) / range;
           // Applied factor for knockback strengh
           projection *= knockbackStrength.toDouble();
-          characters[i].getCharacter(j).addVelocity(projection);
+          curChar.addVelocity(projection);
         }
       }
     }
@@ -333,9 +343,9 @@ class Projectile extends MovingEntity {
 // Class Test for projectile
 class Boulet extends Projectile {
   Boulet(Offset position, Rectangle hitbox,
-  {Offset velocity = const Offset(0, 0),
-  double weight = 10.0,
-  int maxSpeed = 3000})
+      {Offset velocity = const Offset(0, 0),
+      double weight = 10.0,
+      int maxSpeed = 3000})
       : super(position, hitbox, velocity, weight, maxSpeed) {
     this.drawer = ProjectileDrawer(AssetId.projectile_boulet, this);
     this.frictionFactor = 0.02;
@@ -369,8 +379,7 @@ class ProjDHS extends Projectile {
     pos += Offset(-s.width / 2, -s.height / 2);
     this.setPosition(pos);
 
-    return Explosion(
-        pos, explosionAssetID, s, hitbox, explosionSound);
+    return Explosion(pos, explosionAssetID, s, hitbox, explosionSound);
   }
 }
 
@@ -383,7 +392,6 @@ class Explosion extends Entity {
       : super(position, hitbox) {
     this.drawer = ExplosionDrawer(assetId, this, size: size);
   }
-
 
   void playSound() {
     SoundPlayer soundPlayer = MySoundPlayer.getInstance();

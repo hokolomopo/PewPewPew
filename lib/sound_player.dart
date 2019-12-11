@@ -1,7 +1,6 @@
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-
 // TODO all sound assets should be compress in small mp3 to keep a reasonnable size for the cache
 
 class MySoundPlayer {

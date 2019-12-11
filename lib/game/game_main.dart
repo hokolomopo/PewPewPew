@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -49,7 +50,6 @@ class _GameMainState extends State<GameMain> {
     level.color = HexColor(terrain.terrainColor);
 
     Camera camera = Camera(Offset(0, 0));
-
     AssetsManager assetManager = AssetsManager(level.size, terrain.backgroundPath, nbPlayers);
     this.levelPainter = LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
@@ -76,6 +76,7 @@ class _GameMainState extends State<GameMain> {
     int timeElapsed =
     lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;
+    timeElapsed = min(100, timeElapsed);
 
     if (levelPainter.gameStarted) {
       state.update(timeElapsed.toDouble() / 1000);
