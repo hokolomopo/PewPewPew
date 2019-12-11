@@ -80,7 +80,6 @@ class GameState {
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
-
     uiManager = UiManager(painter);
 
     level.spawnPoints.shuffle();
@@ -112,9 +111,13 @@ class GameState {
 
     // Before going through States checking, check if there is any explosion
     // to remove from the painters
-    for (MyAnimation a in currentAnimations)
-      if (a.hasEnded())
-      this.removeAnimation(a);
+    List<MyAnimation> toRemove = List();
+    for (MyAnimation anim in currentAnimations)
+      if (anim.hasEnded()) toRemove.add(anim);
+
+    for (MyAnimation anim in toRemove) {
+      removeAnimation(anim);
+    }
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -154,7 +157,6 @@ class GameState {
 
         break;
       case GameStateMode.attacking:
-
         break;
 
       case GameStateMode.weapon_selection:
@@ -166,7 +168,6 @@ class GameState {
 
         // check if the projectile is out of bounds
         if (!level.isInsideBounds(currentWeapon.projectile)) {
-
           resetStopWatch();
           this.removeProjectile(currentWeapon.projectile);
           switchState(GameStateMode.cinematic);
@@ -176,11 +177,12 @@ class GameState {
         else if (!(currentWeapon.projectile is ExplosiveProjectile)) {
           // Checking if a collidable projectile has
           // intersect a hitbox (terrain or character)
-          if(world.checkCollidableProj(getCurrentCharacter()))
+          if (world.checkCollidableProj(getCurrentCharacter()))
             currentWeapon.proceedToEnd(this);
         }
         // Check if time to detonate
-        else if (stopWatch.elapsedMilliseconds > currentWeapon.detonationDelay) {
+        else if (stopWatch.elapsedMilliseconds >
+            currentWeapon.detonationDelay) {
           resetStopWatch();
           currentWeapon.proceedToEnd(this);
         }
@@ -314,7 +316,7 @@ class GameState {
   }
 
   // TODO put add and remove line for currentAnimations list
-  void addAnimation(MyAnimation animation){
+  void addAnimation(MyAnimation animation) {
     currentAnimations.add(animation);
     painter.addElement(animation.drawer);
   }
@@ -391,7 +393,7 @@ class GameState {
         if (selectedWeapon != null) {
           currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
-          if(currentWeapon == null)
+          if (currentWeapon == null)
             print("wtf currentWeapon = currentArsenal.currentSelection ");
           // TODO correctly assign projectile to weapon (certainly in overridable method)
 //          Offset pos = getCurrentCharacter().getPosition();
@@ -444,7 +446,7 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // Should color it in red
-        if(currentWeapon == null){
+        if (currentWeapon == null) {
           print("PanStart, currentWeapon == null");
           return;
         }
@@ -490,17 +492,17 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        if (currentWeapon == null || currentWeapon.projectile == null)
-          return;
+        if (currentWeapon == null || currentWeapon.projectile == null) return;
 
         // Compute the launch vector and the angle of launching
         Offset launchVector = dragPositionCamera - launchDragStartPosition;
-        Offset tmp = currentWeapon.projectile.getLaunchSpeed(launchVector * LaunchVectorNormalizer);
+        Offset tmp = currentWeapon.projectile
+            .getLaunchSpeed(launchVector * LaunchVectorNormalizer);
         currentWeapon.drawer.angle = atan(launchVector.dy / launchVector.dx);
         uiManager.updateJump(tmp);
 
         // Change the character orientation following the direction of aiming
-        if(launchVector.dx < 0)
+        if (launchVector.dx < 0)
           getCurrentCharacter().directionFaced = Character.RIGHT;
         else
           getCurrentCharacter().directionFaced = Character.LEFT;
@@ -534,23 +536,23 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-
         uiManager.endJump();
 
         // If we ended the drag on the character, cancel the attack
-        if(currentChar != null && currentChar.hitbox.containsPoint(GameUtils.toPoint(launchDragEndPosition))){
+        if (currentChar != null &&
+            currentChar.hitbox
+                .containsPoint(GameUtils.toPoint(launchDragEndPosition))) {
           switchState(GameStateMode.moving);
         }
 
         if (currentWeapon == null || currentWeapon.projectile == null) return;
-        Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
+        Projectile p = currentWeapon.fireProjectile(
+            (launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
         currentWeapon.ammunition -= 1;
         this.addProjectile(p);
 
-        if(p is ExplosiveProjectile)
-          stopWatch.start();
-
+        if (p is ExplosiveProjectile) stopWatch.start();
 
         switchState(GameStateMode.projectile);
         break;
@@ -583,7 +585,8 @@ class GameState {
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
               GameUtils.extendRect(
-                  players[currentPlayer].getCharacter(i).hitbox, 10), longPressPosition)) {
+                  players[currentPlayer].getCharacter(i).hitbox, 10),
+              longPressPosition)) {
             currentCharacter = i;
 
             switchState(GameStateMode.moving);
@@ -593,8 +596,8 @@ class GameState {
 
       case GameStateMode.moving:
       case GameStateMode.attacking:
-
-        if (GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 10), longPressPosition)) {
+        if (GameUtils.rectContains(
+            GameUtils.extendRect(currentChar.hitbox, 10), longPressPosition)) {
           if (currentChar.isAirborne()) return;
           currentChar.stop();
 
@@ -730,8 +733,7 @@ class GameState {
       case GameStateMode.explosion:
         break;
       case GameStateMode.cinematic:
-        if(currentWeapon != null)
-          painter.removeElement(currentWeapon.drawer);
+        if (currentWeapon != null) painter.removeElement(currentWeapon.drawer);
         currentWeapon = null;
         print("Set currentWeapon to null");
         break;

@@ -24,10 +24,6 @@ class CharacterDrawer extends ImagedDrawer {
         character.getSpritePosition().dx, screenSize.height);
     double top = GameUtils.relativeToAbsoluteDist(
         character.getSpritePosition().dy, screenSize.height);
-    double width = GameUtils.relativeToAbsoluteDist(
-        Character.spriteSize.width, screenSize.height);
-    double height = GameUtils.relativeToAbsoluteDist(
-        Character.spriteSize.height, screenSize.height);
 
     if (showHitBoxes) {
       canvas.drawRect(
@@ -49,7 +45,7 @@ class CharacterDrawer extends ImagedDrawer {
     if(character.directionFaced == Character.RIGHT)
       canvas.drawImage(sprite, Offset(left, top), Paint());
     else
-      drawFlippedImage(canvas, sprite, Rect.fromLTWH(left, top, width, height), paint: Paint());
+      drawFlippedImage(canvas, sprite, Offset(left, top), paint: Paint());
 
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;
