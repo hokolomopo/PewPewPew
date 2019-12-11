@@ -114,7 +114,7 @@ abstract class Weapon {
 
   int knockbackStrength = 0;
 
-  Projectile projectile;
+  List<Projectile> projectiles = List();
 
   Size weaponSize;
   Offset weaponCenterOffset = Offset(0,0);
@@ -166,6 +166,7 @@ abstract class Weapon {
     w.detonationDelay = weaponStats.detonationDelay;
     w.ammunition = weaponStats.ammunition;
     w.knockbackStrength = weaponStats.knockbackStrength;
+    w.projectileAssetId = AssetId.projectile_dhs;
 
     return w;
   }
@@ -190,54 +191,58 @@ abstract class Weapon {
     drawer.relativeSize = weaponSize;
   }
 
+  // TODO Override these 2 functions to get multiple projectile behavior
+  // Example ShortGun => 3 projectile same initial pos with offset in direction
   void prepareFiring(Offset position){
     WeaponStats stats = GameMain.availableWeapons[this.name];
     MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
         stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
 
-    this.projectile = Projectile.fromWeaponStats(Offset(position.dx, position.dy),
-        hitbox, projectileAssetId, GameMain.availableWeapons[this.name]);
+    this.projectiles.add( Projectile.fromWeaponStats(Offset(position.dx, position.dy),
+        hitbox, projectileAssetId, GameMain.availableWeapons[this.name]) );
   }
 
-  Projectile fireProjectile(Offset direction) {
-    // TODO horizontal checks
-    direction = this.projectile.getLaunchSpeed(direction);
+  List<Projectile> fireProjectile(Offset direction) {
 
-    this.projectile.velocity += direction;
+    if(projectiles.length == 0){
+      print("projectile.fireProjectile has no projectile to throw");
+      return null;
+    }
 
-    return projectile;
+    direction = projectiles.first.getLaunchSpeed(direction);
+
+    for (Projectile p in projectiles)
+    p.velocity += direction;
+
+    return projectiles;
   }
 
   //TODO decide if methods better in Weapon or corresponding Projectile
   // Should be an overridable function to get different behaviour for other weapon
 
-  /// Function to proceed all the end logic of a projectile (explosion sprite,
-  /// damage, painters, ...)
-  /// TODO put end logic in weapon instead of gameState
-  void proceedToEnd(GameState gameState){
-
-    // Next state
-    gameState.switchState(GameStateMode.cinematic);
-
-    // Apply Damage and knockback
-    applyImpact(this.projectile, gameState.players,
-        gameState.players[gameState.currentPlayer].updateStats,
-        gameState.uiManager);
-
-    // Launch end animation (null => no animation)
-    MyAnimation endAnimation = this.projectile.returnAnimationInstance();
-
-    if(endAnimation == null)
-      return;
-
-    endAnimation.addAndPlay(gameState);
-
-  }
+//  /// Function to proceed all the end logic of a projectile (explosion sprite,
+//  /// damage, painters, ...)
+//  /// TODO put end logic in weapon instead of gameState
+//  void proceedToEnd(GameState gameState){
+//
+//    // Next state
+//    gameState.switchState(GameStateMode.cinematic);
+//
+//
+//    // Remove projectile from word and painters
+//    //TODO callback to gameMain
+//    gameState.removeProjectile(this.projectile);
+//    gameState.painter.removeElement(gameState.currentWeapon.drawer);
+//    gameState.currentWeapon = null;
+//
+//
+//  }
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
-  void applyImpact(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager) {
+  /// Sends back a Map representing injured char and with which intensity
+  Map<Character, double> applyImpact(Projectile projectile, List<Team> characters) {
+    Map<Character, double> ret = Map();
     Character curChar;
     for (int i = 0; i < characters.length; i++) {
       for (int j = 0; j < characters[i].length; j++) {
@@ -247,6 +252,7 @@ abstract class Weapon {
         double dist =
             (projectile.getPosition() - curChar.getPosition()).distance;
 
+        // If actual character was touched
         if (dist <= range) {
           // Apply damage reduce according to dist [33% - 100%]
           double effectiveDamage =
@@ -254,19 +260,6 @@ abstract class Weapon {
 
           // Update stats
           double damageDealt = min(effectiveDamage, curChar.hp);
-
-          uiManager.addText(
-              "-" + damageDealt.ceil().toString(), TextPositions.custom, 25,
-              customPosition: curChar.getPosition() + Character.dmgTextOffset,
-              duration: 3,
-              fadeDuration: 2,
-              color: Colors.red);
-
-          statUpdater(TeamStat.damage_dealt, damageDealt, teamTakingAttack: i);
-
-          if (curChar.hp == 0)
-            statUpdater(TeamStat.killed, 1, teamTakingAttack: i);
-
           curChar.removeHp(damageDealt);
 
           // Apply a vector field for knockback
@@ -284,9 +277,15 @@ abstract class Weapon {
           // Applied factor for knockback strengh
           projection *= knockbackStrength.toDouble();
           curChar.addVelocity(projection);
+
+          // Add to return value
+          ret[curChar] = damageDealt;
         }
       }
     }
+
+    return ret;
+
   }
 
 }
@@ -300,9 +299,12 @@ abstract class Projectile extends MovingEntity {
   double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
   bool explodeOnImpact = false;
+  double detonationDelay = 1;
 
   String explosionSound;
   Size explosionSize;
+
+  Stopwatch timer = Stopwatch();
 
   // For projectile which need orientation [Like arrows]
   // expressed in radian in a clockwise way
@@ -325,6 +327,7 @@ abstract class Projectile extends MovingEntity {
     p.drawer = ProjectileDrawer(projectileAsset, p, size:weaponStats.projectileHitboxSize);
     p.actualOrientation = weaponStats.projectileEnableOrientation.toDouble();
     p.explodeOnImpact = weaponStats.explodeOnImpact;
+    p.detonationDelay = weaponStats.detonationDelay;
 
     return p;
   }
@@ -357,10 +360,16 @@ abstract class Projectile extends MovingEntity {
   ///Function to play a sound effect at the start of the launch
   void playStartSound(){}
 
-  /// Function to proceed all the end logic of a projectile (explosion sprite,
-  /// damage, painters, ...)
-  void proceedToEnd(Projectile projectile, List<Team> characters,
-      Function statUpdater, UiManager uiManager, World world, LevelPainter levelPainter){}
+  /// Function to check if projectile has ended, or not
+  /// If it does, create explosion animation
+  bool checkTTL(){
+    return timer.elapsedMilliseconds > detonationDelay;
+  }
+
+  resetStopWatch() {
+    timer.stop();
+    timer.reset();
+  }
 
 }
 
@@ -441,10 +450,6 @@ class MyAnimation extends Entity {
     return animationEnded;
   }
 
-  // Function to add the animation to world, display its images, and diffuse sound
-  void addAndPlay(GameState gameState) {
-    gameState.addAnimation(this);
-  }
 }
 
 /// Specification of MyAnimation for loop Animation along side simple sound effect

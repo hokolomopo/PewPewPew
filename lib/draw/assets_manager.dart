@@ -31,7 +31,35 @@ enum AssetId {
   weapon_sniper_sel,
   weapon_shotgun,
   weapon_shotgun_sel,
+  error
 }
+
+//class AssetIdMapper{
+//
+//  static final Map<String, AssetId> = {
+//  char_running
+//  char_idle
+//  char_jumping
+//  char_death
+//  background
+//  projectile_boulet
+//  projectile_dhs
+//  explosion_dhs
+//  ui_arrow
+//  weapon_fist
+//  weapon_fist_sel
+//  weapon_colt
+//  weapon_colt_sel
+//  weapon_grenade
+//  weapon_grenade_sel
+//  weapon_railgun
+//  weapon_railgun_sel
+//  weapon_sniper
+//  weapon_sniper_sel
+//  weapon_shotgun
+//  weapon_shotgun_sel
+//  }
+//}
 
 /// An image asset. The size is in relative game size
 class Asset {

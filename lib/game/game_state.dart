@@ -54,6 +54,8 @@ class GameState {
   int currentPlayer = 0;
   int currentCharacter = 0;
 
+  List<Projectile> projectiles = new List();
+
   ///GameStateMode.char_selection variables
   TextFader teamTurnText;
   Offset cameraDragStartLocation;
@@ -74,6 +76,7 @@ class GameState {
 
   /// GameStateMode.projectile variables
   Stopwatch stopWatch = Stopwatch();
+  Projectile cameraFocus;
 
   /// GameStateMode.waiting variables
   DateTime startWaitingTime;
@@ -106,6 +109,30 @@ class GameState {
     switchState(GameStateMode.char_selection);
   }
 
+  void displayAndRecordDamage(Map<Character, double> damages){
+
+    for (Character curChar in damages.keys) {
+
+      double damageDealt = damages[curChar];
+
+      uiManager.addText(
+          "-" + damageDealt.ceil().toString(), TextPositions.custom, 25,
+          customPosition: curChar.getPosition() + Character.dmgTextOffset,
+          duration: 3,
+          fadeDuration: 2,
+          color: Colors.red);
+
+      players[currentPlayer].updateStats(TeamStat.damage_dealt, damageDealt, teamTakingAttack: curChar.team);
+
+      if (curChar.hp == 0)
+        players[currentPlayer].updateStats(TeamStat.killed, 1, teamTakingAttack: curChar.team);
+    }
+
+  }
+
+
+
+
   void update(double timeElapsed) {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
@@ -121,6 +148,32 @@ class GameState {
     for (MyAnimation anim in toRemove) {
       removeAnimation(anim);
     }
+
+    // Check if current projectile are still alive
+    List<Projectile> toRemoveProj = List();
+    for(Projectile p in projectiles){
+
+      // Check if out of bound
+      if (!level.isInsideBounds(p))
+        toRemoveProj.add(p);
+
+      // Checking if a collidable projectile has
+      // intersect a hitbox (terrain or character)
+      if (world.checkCollidableProj(getCurrentCharacter()) || p.checkTTL()){
+        Map<Character, double> damages= currentWeapon.applyImpact(p, players);
+        displayAndRecordDamage(damages);
+
+        MyAnimation endAnimation = p.returnAnimationInstance();
+        if(endAnimation == null)
+          addAnimation(endAnimation);
+        toRemoveProj.add(p);
+      }
+    }
+
+    for(Projectile p in toRemoveProj){
+      removeProjectile(p);
+    }
+
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -167,28 +220,11 @@ class GameState {
 
       case GameStateMode.projectile:
         // center camera on projectile
-        this.camera.centerOn(currentWeapon.projectile.getPosition());
-
-        // check if the projectile is out of bounds
-        if (!level.isInsideBounds(currentWeapon.projectile)) {
-          resetStopWatch();
-          this.removeProjectile(currentWeapon.projectile);
+        // TODO choose which projectile to follow
+        if(cameraFocus != null)
+          this.camera.centerOn(cameraFocus.getPosition());
+        else
           switchState(GameStateMode.cinematic);
-        }
-
-        // If non explosiveProjectile, then it is an collidable one
-        else if (!(currentWeapon.projectile is ExplosiveProjectile)) {
-          // Checking if a collidable projectile has
-          // intersect a hitbox (terrain or character)
-          if (world.checkCollidableProj(getCurrentCharacter()))
-            currentWeapon.proceedToEnd(this);
-        }
-        // Check if time to detonate
-        else if (stopWatch.elapsedMilliseconds >
-            currentWeapon.detonationDelay) {
-          resetStopWatch();
-          currentWeapon.proceedToEnd(this);
-        }
 
         break;
       case GameStateMode.waiting:
@@ -314,11 +350,13 @@ class GameState {
   }
 
   void addProjectile(Projectile projectile) {
+    projectiles.add(projectile);
     world.addProjectile(projectile);
     painter.addElement(projectile.drawer);
   }
 
   void removeProjectile(Projectile projectile) {
+    projectiles.remove(projectile);
     world.removeProjectile(projectile);
     painter.removeElement(projectile.drawer);
   }
@@ -449,7 +487,7 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-        // Should color it in red
+
         if (currentWeapon == null)
           return;
 
@@ -494,11 +532,11 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        if (currentWeapon == null || currentWeapon.projectile == null) return;
+        if (currentWeapon == null || currentWeapon.projectiles == null) return;
 
         // Compute the launch vector and the angle of launching
         Offset launchVector = dragPositionCamera - launchDragStartPosition;
-        Offset tmp = currentWeapon.projectile
+        Offset tmp = currentWeapon.projectiles.first
             .getLaunchSpeed(launchVector * LaunchVectorNormalizer);
         currentWeapon.drawer.angle = atan(launchVector.dy / launchVector.dx);
         uiManager.updateJump(tmp);
@@ -546,16 +584,23 @@ class GameState {
         }
 
         else {
-            if (currentWeapon == null || currentWeapon.projectile == null) return;
-            Projectile p = currentWeapon.fireProjectile(
+            if (currentWeapon == null || currentWeapon.projectiles == null) return;
+
+            for(Projectile p in currentWeapon.fireProjectile(
                 (launchDragStartPosition - launchDragEndPosition) *
-                    LaunchVectorNormalizer);
+                    LaunchVectorNormalizer)){
+
+
+              this.addProjectile(p);
+
+              if (p is ExplosiveProjectile)
+                p.timer.start();
+            }
+
             currentWeapon.ammunition -= 1;
-            this.addProjectile(p);
 
-            if (p is ExplosiveProjectile)
-              stopWatch.start();
-
+            // Decide that 1st proj will be the camera focus
+            cameraFocus = projectiles.first;
 
             switchState(GameStateMode.projectile);
             }
@@ -739,7 +784,8 @@ class GameState {
         painter.removeElement(currentWeapon.drawer);
         break;
       case GameStateMode.projectile:
-        removeProjectile(this.currentWeapon.projectile);
+        for (Projectile p in currentWeapon.projectiles)
+          removeProjectile(p);
         currentWeapon = null;
         break;
       case GameStateMode.waiting:
@@ -762,8 +808,5 @@ class GameState {
     gameStats.statistics.putIfAbsent(t.teamName, () => teamStats);
   }
 
-  resetStopWatch() {
-    stopWatch.stop();
-    stopWatch.reset();
-  }
+
 }
