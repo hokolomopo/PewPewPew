@@ -203,7 +203,7 @@ class Fist extends Weapon {
 
   Fist(Character owner) : super(owner) {
     this.drawer =
-        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
+        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize, owner.getTeamColor());
     this.useProjectile = false;
     this.hasKnockback = true;
 
@@ -226,7 +226,7 @@ class Colt extends Weapon {
 
   Colt(Character owner) : super(owner) {
     this.drawer =
-        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
+        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize, owner.getTeamColor());
     this.useProjectile = true;
     this.hasKnockback = true;
 

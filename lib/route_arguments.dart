@@ -1,10 +1,10 @@
 
-import 'game/util/game_statistics.dart';
+import 'package:info2051_2018/quickplay_widgets.dart';
 
 class MainGameArguments{
-  final String levelJson;
   final int nbPlayers;
   final int nbCharacters;
+  final Terrain terrain;
 
-  MainGameArguments(this.levelJson, this.nbPlayers, this.nbCharacters);
+  MainGameArguments(this.terrain, this.nbPlayers, this.nbCharacters);
 }

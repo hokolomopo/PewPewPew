@@ -10,24 +10,27 @@ import 'package:info2051_2018/draw/background.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/game_state.dart';
+import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/stats_screen.dart';
 
+import '../quickplay_widgets.dart';
 import 'level.dart';
 
 class GameMain extends StatefulWidget {
   static const routeName = '/GameMain';
 
-  GameMain(this.levelJson, this.nbPlayers, this.nbCharacters);
+  GameMain(this.terrain, this.nbPlayers, this.nbCharacters);
 
-  final String levelJson;
+  final Terrain terrain;
   final int nbPlayers;
   final int nbCharacters;
   static Size size;
 
   @override
   _GameMainState createState() =>
-      new _GameMainState(levelJson, nbPlayers, nbCharacters);
+      new _GameMainState(terrain, nbPlayers, nbCharacters);
 }
 
 class _GameMainState extends State<GameMain> {
@@ -36,16 +39,16 @@ class _GameMainState extends State<GameMain> {
   LevelPainter levelPainter;
   Duration lastTimeStamp;
 
-  _GameMainState(String levelJson, int nbPlayers, int nbCharacters) {
-    Level level = Level.fromJson(jsonDecode(levelJson));
+  _GameMainState(Terrain terrain, int nbPlayers, int nbCharacters) {
+    Level level = Level.fromJson(jsonDecode(terrain.levelObject));
+    level.color = HexColor(terrain.terrainColor);
 
     Camera camera = Camera(Offset(0, 0));
-
-    AssetsManager assetManager = AssetsManager(level.size, nbPlayers);
-    this.levelPainter = LevelPainter(camera, level.size, assetManager);
+    AssetsManager assetManager = AssetsManager(level.size, terrain.backgroundPath, nbPlayers);
+    this.levelPainter = LevelPainter(camera, level.size, assetManager, showHitBoxes: true);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
-    state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera);
+    state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera, World(gravityForce:terrain.gravity));
 
     _scheduleFrame();
   }

@@ -5,15 +5,21 @@ import 'package:flutter/material.dart';
 class Terrain {
   final String name;
   final String imgName;
-  String levelObject;
+  final String levelObject;
+  final String backgroundPath;
+  final String terrainColor;
+  final double gravity;
 
-  Terrain({this.name, this.imgName, this.levelObject});
+  Terrain({this.name, this.imgName, this.levelObject, this.backgroundPath, this.terrainColor, this.gravity});
 
   factory Terrain.fromJson(Map<String, dynamic> json) {
     return new Terrain(
       name: json['name'] as String,
       imgName: json['imgName'] as String,
       levelObject: json['levelObject'] as String,
+      backgroundPath: json['backgroundPath'] as String,
+      terrainColor: json['terrainColor'] as String,
+      gravity: json['gravity'] as double,
     );
   }
 }
@@ -50,7 +56,7 @@ class TerrainScrollableList extends StatelessWidget {
       selectionBorder =  Border.all(color: Colors.red, width: 3.0);
 
     return Container(
-      width: 200,
+      width: 300,
       height: 200,
       decoration: BoxDecoration(
           border: selectionBorder,
@@ -70,9 +76,26 @@ class TerrainScrollableList extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: EdgeInsets.all(10.0),
-                  child: AutoSizeText(
-                    terrain.name,
-                    maxLines: 1,
+                  child: Stack(
+                    children: <Widget>[
+                      // Stroked text as border.
+                      Text(
+                        terrain.name,
+                        style: TextStyle(
+                          foreground: Paint()
+                            ..style = PaintingStyle.stroke
+                            ..strokeWidth = 6
+                            ..color = Colors.black,
+                        ),
+                      ),
+                      // Solid text as fill.
+                      Text(
+                        terrain.name,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

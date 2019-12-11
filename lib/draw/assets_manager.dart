@@ -50,8 +50,7 @@ class AssetsManager {
   /// Default assets of the game
   final Map<AssetId, Asset> assets = {
     //TODO put size for projectiles
-    AssetId.background: Asset(AssetId.background,
-        "assets/graphics/backgrounds/default_background.png"),
+    AssetId.background: Asset(AssetId.background, null),
     AssetId.projectile_boulet: Asset(AssetId.projectile_boulet,
         "assets/graphics/arsenal/projectiles/red_arc.gif"),
     AssetId.projectile_dhs: Asset(AssetId.projectile_dhs,
@@ -81,8 +80,9 @@ class AssetsManager {
   Size _screenSize;
   int _numberOfPlayers;
 
-  AssetsManager(Size levelSize, this._numberOfPlayers) {
+  AssetsManager(Size levelSize, String backgroundPath, this._numberOfPlayers) {
     assets[AssetId.background].size = levelSize;
+    assets[AssetId.background].path = backgroundPath;
   }
 
   /// Initialize the asset manager with the size of the screen. This must be called

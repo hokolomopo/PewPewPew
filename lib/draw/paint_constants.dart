@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 
-final Paint terrainFillPaint = Paint()
-  ..color = Colors.green
-  ..style = PaintingStyle.fill;
-
 final Paint terrainStrokePaint = Paint()
   ..color = Colors.white
   ..strokeWidth = 5
   ..style = PaintingStyle.stroke;
 
-const defaultBackgroundPath =
-    "assets/graphics/backgrounds/default_background.png";
 
 final Paint lifeBarStrokePaint = Paint()
   ..color = Colors.black

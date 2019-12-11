@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/level.dart';
 import 'dart:math';
 
-import 'package:info2051_2018/game/terrain.dart';
 
 /// Computes the euclidean distance between a point and a rectangle.
 ///

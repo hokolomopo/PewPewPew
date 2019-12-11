@@ -8,8 +8,9 @@ import 'package:info2051_2018/game/weaponry.dart';
 
 class WeaponDrawer extends ImagedDrawer {
   Weapon weapon;
+  Color teamColor;
 
-  WeaponDrawer(AssetId id, this.weapon, Size relativeSize)
+  WeaponDrawer(AssetId id, this.weapon, Size relativeSize, this.teamColor)
       : super(relativeSize, id);
 
   @override
