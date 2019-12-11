@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/weaponry.dart';
+import 'package:info2051_2018/main.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'shop.dart';
 
 class Home extends StatefulWidget {
@@ -32,6 +35,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     SoundPlayer.getInstance().playLoopMusic(SoundPlayer.menuMusicName, volume: 1.0);
     WidgetsBinding.instance.addObserver(this);
+    _addDefaultWeapons();
   }
 
   @override
@@ -308,9 +312,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     );
   }
 
+  _addDefaultWeapons() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<WeaponStats> weapons = await PewPewPew.weaponsInfo;
+    for (WeaponStats weapon in weapons) {
+      if (weapon.price == 0) {
+        prefs.setInt(weapon.weaponName, 0);
+      }
+    }
+  }
+
   @override
   void dispose() {
-//    soundPlayer.release();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

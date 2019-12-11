@@ -101,5 +101,5 @@ flutter:
     - assets/graphics/arsenal/projectiles/
     - assets/graphics/arsenal/weapons/
     - assets/graphics/arsenal/explosions/
-    - assets/sounds/menu/
-    - assets/sounds/game/
+    - assets/sounds/noise/
+    - assets/sounds/music/

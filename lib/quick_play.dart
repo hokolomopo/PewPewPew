@@ -191,8 +191,6 @@ class ParametersState extends State<Parameters> {
               ),
               onPressed: () {
                 SoundPlayer.getInstance().playLoopMusic(SoundPlayer.gameMusicName, volume: 0.5);
-                //SoundPlayer ap = widget.createElement().ancestorWidgetOfExactType(SoundPlayer);
-                //ap.pause();
 
                 if (_terrain == null)
                   _simpleAlertDialog("Please select a level", context);

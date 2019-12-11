@@ -23,12 +23,12 @@ class SoundPlayer {
   final List<String> noiseFileNames = ['hurtSound.mp3', 'explosion.mp3'];
 
   SoundPlayer._() {
-    this.audioCache = AudioCache(prefix: "sounds/game/");
+    this.audioCache = AudioCache(prefix: "sounds/noise/");
     this.audioCache.loadAll(noiseFileNames);
 
     this.musicPlayer = AudioPlayer(mode: PlayerMode.MEDIA_PLAYER);
     this.musicCache =
-        AudioCache(prefix: "sounds/menu/", fixedPlayer: musicPlayer);
+        AudioCache(prefix: "sounds/music/", fixedPlayer: musicPlayer);
   }
 
   void playSoundEffect(String fileName, {double volume = 1.0}) {
@@ -49,6 +49,10 @@ class SoundPlayer {
 
   void resumeLoopMusic(){
     this.musicPlayer.resume();
+  }
+
+  release() {
+    this.musicPlayer.release();
   }
 
 }

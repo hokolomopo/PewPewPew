@@ -38,9 +38,6 @@ class ShopListState extends State<ShopList> {
 
   getShopInfo() async {
     prefs = await SharedPreferences.getInstance();
-    //TODO remove
-    prefs.clear();
-    prefs.setInt(ShopList.moneySharedPrefKey, 10000);
 
     if (prefs.containsKey(ShopList.moneySharedPrefKey))
       _money = prefs.getInt(ShopList.moneySharedPrefKey);
@@ -161,7 +158,7 @@ class ShopListState extends State<ShopList> {
 
                 itemBuilder: (context, index) {
 
-                  bool sold = prefs.containsKey(items[index].weaponName) || items[index].price == 0;
+                  bool sold = prefs.containsKey(items[index].weaponName);
 
                   return CustomListItem(
                     sprite: Image(
