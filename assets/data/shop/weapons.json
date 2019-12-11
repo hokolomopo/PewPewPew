@@ -16,6 +16,8 @@
     "explosionSound": "explosion.mp3",
     "explosionSizeX": 60.0,
     "explosionSizeY": 60.0,
+    "projectileHitboxSizeX": 5.0,
+    "projectileHitboxSizeY": 5.0,
     "price": 500
   },
   {
@@ -35,6 +37,8 @@
     "explosionSound": "explosion.mp3",
     "explosionSizeX": 60.0,
     "explosionSizeY": 60.0,
+    "projectileHitboxSizeX": 5.0,
+    "projectileHitboxSizeY": 5.0,
     "price": 500
   }
 ]

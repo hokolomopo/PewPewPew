@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -411,11 +410,11 @@ class GameState {
           currentArsenal.selectWeapon(selectedWeapon);
           currentWeapon = currentArsenal.currentSelection;
           // TODO correctly assign projectile to weapon (certainly in overridable method)
-          Offset pos = getCurrentCharacter().getPosition();
-          Offset hit = Offset(5, 5);
-          ProjDHS projDHS = new ProjDHS(
-              pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
-          currentWeapon.projectile = projDHS;
+//          Offset pos = getCurrentCharacter().getPosition();
+//          Offset hit = Offset(5, 5);
+//          ProjDHS projDHS = new ProjDHS(
+//              pos, MutableRectangle(pos.dx, pos.dy, hit.dx, hit.dy));
+//          currentWeapon.projectile = projDHS;
 
           switchState(GameStateMode.attacking);
         }
@@ -461,7 +460,14 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         // Should color it in red
+        if(currentWeapon == null){
+          print("PanStart, currentWeapon == null");
+          return;
+        }
+
+        currentWeapon.prepareFiring(currentChar.getPosition());
         launchDragStartPosition = dragPositionCamera;
+
         uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
         break;
 
@@ -538,10 +544,10 @@ class GameState {
         // J.L
 
         if (currentWeapon == null || currentWeapon.projectile == null) return;
-        this.addProjectile(currentWeapon.projectile);
-        currentWeapon.fireProjectile(
+        Projectile p = currentWeapon.fireProjectile(currentChar.getPosition(),
             (launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
+        this.addProjectile(p);
         uiManager.endJump();
         switchState(GameStateMode.projectile);
         stopWatch.start();

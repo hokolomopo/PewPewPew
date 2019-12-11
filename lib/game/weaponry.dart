@@ -171,11 +171,23 @@ abstract class Weapon {
     drawer.relativeSize = relativeSize;
   }
 
-  Projectile fireProjectile(Offset direction) {
+  void prepareFiring(Offset position){
+    Map map = GameMain.availableWeapons;
+    WeaponStats stats = GameMain.availableWeapons[this.name];
+    MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
+        stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
+    this.projectile = Projectile.fromWeaponStats(position, hitbox, GameMain.availableWeapons[this.name]);
+  }
+
+  Projectile fireProjectile(Offset position, Offset direction) {
     //TODO use this as return value when firing, and ass the returned projectile to the World()
     //TODO GIVE an hitbox and position argument, or use the one of the gun idk
-    Projectile projectile = Projectile.fromWeaponStats(null, null, GameMain.availableWeapons[this.name]);
-
+//    WeaponStats stats = GameMain.availableWeapons[this.name];
+//
+//    MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
+//        stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
+//    Projectile projectile = Projectile.fromWeaponStats(position, hitbox, GameMain.availableWeapons[this.name]);
+//    this.projectile = projectile;
     // TODO horizontal checks
     direction = this.projectile.getLaunchSpeed(direction);
 
@@ -251,6 +263,7 @@ class Fist extends Weapon {
   Fist(Character owner) : super(owner) {
     this.drawer =
         WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
+    this.name = weaponName;
 //    this.useProjectile = false;
 //    this.hasKnockback = true;
 //    this.isExplosive = false;
@@ -277,6 +290,8 @@ class Colt extends Weapon {
   Colt(Character owner) : super(owner) {
     this.drawer =
         WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
+    this.name = weaponName;
+
 //    this.useProjectile = true;
 //    this.hasKnockback = true;
 //
@@ -303,12 +318,23 @@ class Projectile extends MovingEntity {
   double actualOrientation = -1; // < 0 means not rotation
 
 
-  Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats) : super(position, hitbox){
-    this.weight = weaponStats.projectileWeight;
-    this.maxSpeed = weaponStats.projectileMaxSpeed;
-    this.frictionFactor = weaponStats.projectileFrictionFactor;
-    this.explosionSound = weaponStats.explosionSound;
-    this.explosionSize = weaponStats.explosionSize;
+  factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats){
+    Projectile p;
+    switch(weaponStats.weaponName){
+      case Fist.weaponName:
+        p = Boulet(position, hitbox);
+        break;
+      case Colt.weaponName:
+        p = ProjDHS(position, hitbox);
+        break;
+    }
+    p.weight = weaponStats.projectileWeight;
+    p.maxSpeed = weaponStats.projectileMaxSpeed;
+    p.frictionFactor = weaponStats.projectileFrictionFactor;
+    p.explosionSound = weaponStats.explosionSound;
+    p.explosionSize = weaponStats.explosionSize;
+
+    return p;
   }
 
   Projectile(Offset position, Rectangle hitbox, Offset velocity, this.weight,
@@ -427,6 +453,7 @@ class WeaponStats{
   String weaponAsset;
   String explosionSound;
   Size explosionSize;
+  Size projectileHitboxSize;
 
   int price;
 
@@ -448,7 +475,8 @@ class WeaponStats{
     this.weaponAsset = json['weaponAsset'] as String;
     this.explosionSound = json['explosionSound'] as String;
     this.explosionSize = Size(json['explosionSizeX'] as double, json['explosionSizeY'] as double);
-    this.price = json['weaponAsset'] as int;
+    this.price = json['price'] as int;
+    this.projectileHitboxSize = Size(json['projectileHitboxSizeX'] as double, json['projectileHitboxSizeY'] as double);
   }
 
   Map<String, dynamic> toJson() {
@@ -470,6 +498,8 @@ class WeaponStats{
       'explosionSizeX': explosionSize.width,
       'explosionSizeY': explosionSize.height,
       'price': price,
+      'projectileHitboxSizeX': projectileHitboxSize.width,
+      'projectileHitboxSizeY': projectileHitboxSize.height,
     };
   }
 
