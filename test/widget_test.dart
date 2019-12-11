@@ -1,29 +1,44 @@
-// This is a basic Flutter widget test.
-// To perform an interaction with a widget in your test, use the WidgetTester utility that Flutter
-// provides. For example, you can send tap and scroll gestures. You can also use WidgetTester to
-// find child widgets in the widget tree, read text, and verify that the values of widget properties
-// are correct.
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
+import 'dart:ui';
 
-import 'package:info2051_2018/main.dart';
+import 'package:info2051_2018/game/weaponry.dart';
+
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(new PewPewPew());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  JsonEncoder encoder = new JsonEncoder.withIndent('  ');
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  List l = List();
+  WeaponStats stats = WeaponStats();
+  stats.weaponName = "Colt";
+  stats.damage = 30;
+  stats.useProjectile = true;
+  stats.isExplosive = true;
+  stats.detonationDelay = 5000;
+  stats.range = 60;
+  stats.ammunition = 6;
+  stats.hasKnockback = true;
+  stats.knockbackStrength = 5000;
+  stats.projectileWeight = 10.0;
+  stats.projectileMaxSpeed = 3000;
+  stats.projectileFrictionFactor = 0.02;
+  stats.weaponAsset = "assets/graphics/arsenal/weapons/colt_45.png";
+  stats.explosionSound = "explosion.mp3";
+  stats.explosionSize = Size(60, 60);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+  l.add(stats);
+  l.add(stats);
+
+  String json = encoder.convert(l);
+  print(json);
+
+  JsonDecoder decoder = JsonDecoder();
+  List l2 = List();
+  List decoded = decoder.convert(json);
+
+  for(var v in decoded)
+    l2.add(WeaponStats.fromJson(v));
+
+  int x = 2;
 }

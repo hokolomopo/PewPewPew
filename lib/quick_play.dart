@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'dart:convert'; // json codec
 import 'package:info2051_2018/quickplay_widgets.dart';
 
@@ -23,9 +24,15 @@ class ParametersState extends State<Parameters> {
   int _nbPlayer = 2; // nb of player in game
   int _nbWorms = 1; // nb of Worms per team
   Terrain _terrain; // identification of the selected map to instantiate
+  List<WeaponStats> _availableWeapons;
+
+  ParametersState();
 
   @override
   Widget build(BuildContext context) {
+    if(_availableWeapons == null)
+      this._getWeaponsInfo();
+
     return _parameter(context);
   }
 
@@ -65,6 +72,19 @@ class ParametersState extends State<Parameters> {
         .loadString('assets/data/quickplay/terrains.json');
 
     return parseJson(tmp.toString());
+  }
+
+  // Function to retrieve info on weapons in order
+  // to pass it to the game
+  void _getWeaponsInfo() async {
+
+    var tmp = await DefaultAssetBundle.of(context)
+        .loadString('assets/data/shop/weapons.json');
+
+    _availableWeapons = WeaponStats.parseList(tmp);
+
+    //TODO only take the one you bought
+
   }
 
   List<Widget> buildRadioList(
@@ -186,7 +206,7 @@ class ParametersState extends State<Parameters> {
                       context,
                       GameMain.routeName,
                       (Route<dynamic> route) => false,
-                      arguments: MainGameArguments(_terrain, _nbPlayer, _nbWorms));
+                      arguments: MainGameArguments(_terrain, _nbPlayer, _nbWorms, this._availableWeapons));
                 }
               },
             ),

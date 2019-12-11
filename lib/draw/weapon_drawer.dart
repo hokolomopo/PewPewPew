@@ -8,9 +8,8 @@ import 'package:info2051_2018/game/weaponry.dart';
 
 class WeaponDrawer extends ImagedDrawer {
   Weapon weapon;
-  Color teamColor;
 
-  WeaponDrawer(AssetId id, this.weapon, Size relativeSize, this.teamColor)
+  WeaponDrawer(AssetId id, this.weapon, Size relativeSize)
       : super(relativeSize, id);
 
   @override
@@ -20,6 +19,7 @@ class WeaponDrawer extends ImagedDrawer {
     Color teamColor = owner.getTeamColor();
     Offset imgPos;
 
+    // Draw weapon in weapon selection menu
     if (weapon.inSelection) {
       canvas.drawCircle(
           GameUtils.relativeToAbsoluteOffset(

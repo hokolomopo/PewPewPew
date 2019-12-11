@@ -177,7 +177,6 @@ class GameState {
           }
 
           this.removeProjectile(currentWeapon.projectile);
-          currentWeapon = null;
 
           switchState(GameStateMode.cinematic);
 
@@ -185,7 +184,7 @@ class GameState {
         }
 
         // Stop stopWatch if non detonating projectile
-        if (currentWeapon.detonationTime == null) {
+        if (currentWeapon.detonationDelay == null) {
           if (stopWatch.isRunning) {
             stopWatch.stop();
             stopWatch.reset();
@@ -197,7 +196,7 @@ class GameState {
         }
 
         // Time to detonate projectile
-        if (stopWatch.elapsedMilliseconds > currentWeapon.detonationTime) {
+        if (stopWatch.elapsedMilliseconds > currentWeapon.detonationDelay) {
           stopWatch.stop();
           stopWatch.reset();
 
@@ -733,6 +732,9 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        if(currentWeapon != null)
+          painter.removeElement(currentWeapon.drawer);
+        currentWeapon = null;
         break;
       case GameStateMode.explosion:
         break;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:info2051_2018/quick_play.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -257,10 +258,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       //await prefs.clear(); // Debug line to reset the entire app preference
 
       var tmp = await DefaultAssetBundle.of(context)
-          .loadString('assets/data/shop/items.json');
+          .loadString('assets/data/shop/weapons.json');
 
-      List<Item> items = Item.parseJsonItemList(tmp.toString());
-      ret.add(items);
+      List<WeaponStats> weapons = WeaponStats.parseList(tmp.toString());
+      ret.add(weapons);
       ret.add(prefs);
       return ret;
     }
@@ -277,7 +278,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     child: new FutureBuilder(
                         future: getShopInfo(),
                         builder: (context, snapshot) {
-                          List<Item> items;
+                          List<WeaponStats> items;
                           SharedPreferences prefs;
                           if (snapshot.data != null) {
                             items = snapshot.data.elementAt(0);

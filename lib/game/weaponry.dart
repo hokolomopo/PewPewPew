@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
@@ -6,6 +7,7 @@ import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
 import 'package:info2051_2018/draw/weapon_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
+import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/sound_player.dart';
@@ -26,10 +28,29 @@ class Arsenal {
   static final Size selectionElementSize =
       Size(selectionElementLength, selectionElementLength);
 
-  List<Weapon> arsenal;
+  List<Weapon> arsenal = List();
   Weapon currentSelection;
 
-  Arsenal(this.arsenal);
+  Arsenal(Character owner){
+    for(var entry in GameMain.availableWeapons.entries){
+      WeaponStats stats = entry.value;
+
+      Weapon weapon;
+      switch(stats.weaponName){
+        case Fist.weaponName:
+          weapon = Fist(owner);
+          break;
+        case Colt.weaponName:
+          weapon = Colt(owner);
+          break;
+      }
+
+      weapon.initWeapon(stats);
+
+      arsenal.add(weapon);
+    }
+  }
+
 
   showWeaponSelection(MutableRectangle charHitBox) {
     double angleBetweenElem = 2 * pi / arsenal.length;
@@ -97,6 +118,17 @@ abstract class Weapon {
   // we initialise it here because we can't define abstract variables.
   final AssetId selectionAsset = AssetId.background;
 
+  void initWeapon(WeaponStats weaponStats){
+    this.damage = weaponStats.damage;
+    this.range = weaponStats.damage;
+    this.useProjectile = weaponStats.useProjectile;
+    this.isExplosive = weaponStats.isExplosive;
+    this.detonationDelay = weaponStats.detonationDelay;
+    this.ammunition = weaponStats.ammunition;
+    this.hasKnockback = weaponStats.hasKnockback;
+    this.knockbackStrength = weaponStats.knockbackStrength;
+  }
+
   //TODO sprite
   ImagedDrawer drawer;
   Character owner;
@@ -104,16 +136,22 @@ abstract class Weapon {
   Offset topLeftPos;
   bool inSelection;
 
-  bool useProjectile;
-  bool hasKnockback;
+  String name;
 
-  int range;
   int damage;
-  int detonationTime;
+  int range;
+
+  bool useProjectile;
+
+  bool isExplosive;
+  double detonationDelay;
 
   int ammunition = -1;
+
+  bool hasKnockback;
   int knockbackStrength = 0;
 
+  //TODO remove this
   Projectile projectile;
 
   Weapon(this.owner);
@@ -131,11 +169,17 @@ abstract class Weapon {
     drawer.relativeSize = relativeSize;
   }
 
-  fireProjectile(Offset direction) {
+  Projectile fireProjectile(Offset direction) {
+    //TODO use this as return value when firing, and ass the returned projectile to the World()
+    //TODO GIVE an hitbox and position argument, or use the one of the gun idk
+    Projectile projectile = Projectile.fromWeaponStats(null, null, GameMain.availableWeapons[this.name]);
+
     // TODO horizontal checks
     direction = this.projectile.getLaunchSpeed(direction);
 
     this.projectile.velocity += direction;
+
+    return projectile;
   }
 
   //TODO decide if methods better in Weapon or corresponding Projectile
@@ -184,28 +228,34 @@ abstract class Weapon {
       }
     }
   }
+
 }
 
 class Fist extends Weapon {
+  static const String weaponName = "Fist";
+
   static final relativeSize = Weapon.relativeSize;
 
   final AssetId selectionAsset = AssetId.weapon_fist_sel;
 
   Fist(Character owner) : super(owner) {
     this.drawer =
-        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize, owner.getTeamColor());
-    this.useProjectile = false;
-    this.hasKnockback = true;
-
-    this.ammunition = -1;
-    this.range = 10;
-    this.damage = 10;
-    this.knockbackStrength = 10;
-    this.detonationTime = 1000;
+        WeaponDrawer(AssetId.weapon_fist_sel, this, Weapon.relativeSize);
+//    this.useProjectile = false;
+//    this.hasKnockback = true;
+//    this.isExplosive = false;
+//
+//    this.ammunition = -1;
+//    this.range = 10;
+//    this.damage = 10;
+//    this.knockbackStrength = 10;
+//    this.detonationDelay = 1000;
   }
 }
 
 class Colt extends Weapon {
+  static const String weaponName = "Colt";
+
   static final relativeSize = Weapon.relativeSize;
 
   final AssetId selectionAsset = AssetId.weapon_colt_sel;
@@ -216,16 +266,16 @@ class Colt extends Weapon {
 
   Colt(Character owner) : super(owner) {
     this.drawer =
-        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize, owner.getTeamColor());
-    this.useProjectile = true;
-    this.hasKnockback = true;
-
-    this.ammunition = 6;
-    this.range = 60;
-    this.damage = 30;
-    this.knockbackStrength = 50;
-
-    this.detonationTime = 5000;
+        WeaponDrawer(AssetId.weapon_colt_sel, this, Weapon.relativeSize);
+//    this.useProjectile = true;
+//    this.hasKnockback = true;
+//
+//    this.ammunition = 6;
+//    this.range = 60;
+//    this.damage = 30;
+//    this.knockbackStrength = 50;
+//
+//    this.detonationDelay = 5000;
   }
 }
 
@@ -241,6 +291,15 @@ class Projectile extends MovingEntity {
   // For projectile which need orientation [Like arrows]
   // expressed in radian in a clockwise way
   double actualOrientation = -1; // < 0 means not rotation
+
+
+  Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, WeaponStats weaponStats) : super(position, hitbox){
+    this.weight = weaponStats.projectileWeight;
+    this.maxSpeed = weaponStats.projectileMaxSpeed;
+    this.frictionFactor = weaponStats.projectileFrictionFactor;
+    this.explosionSound = weaponStats.explosionSound;
+    this.explosionSize = weaponStats.explosionSize;
+  }
 
   Projectile(Offset position, Rectangle hitbox, Offset velocity, this.weight,
       this.maxSpeed)
@@ -335,4 +394,87 @@ class Explosion extends Entity {
   bool hasEnded() {
     return animationEnded;
   }
+}
+
+class WeaponStats{
+  String weaponName;
+
+  int damage;
+  int range;
+
+  bool useProjectile;
+
+  bool isExplosive;
+  double detonationDelay;
+
+  int ammunition = -1;
+
+  bool hasKnockback;
+  int knockbackStrength = 0;
+
+  double projectileWeight;
+  int projectileMaxSpeed;
+  double projectileFrictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
+
+  String weaponAsset;
+  String explosionSound;
+  Size explosionSize;
+
+  int price;
+
+  WeaponStats();
+
+  WeaponStats.fromJson(Map<String, dynamic> json) {
+    this.weaponName = json['weaponName'] as String;
+    this.damage = json['damage'] as int;
+    this.useProjectile = json['useProjectile'] as bool;
+    this.isExplosive = json['isExplosive'] as bool;
+    this.detonationDelay = json['detonationDelay'] as double;
+    this.range = json['range'] as int;
+    this.ammunition = json['ammunition'] as int;
+    this.hasKnockback = json['hasKnockback'] as bool;
+    this.knockbackStrength = json['knockbackStrength'] as int;
+    this.projectileWeight = json['projectileWeight'] as double;
+    this.projectileMaxSpeed = json['projectileMaxSpeed'] as int;
+    this.projectileFrictionFactor = json['projectileFrictionFactor'] as double;
+    this.weaponAsset = json['weaponAsset'] as String;
+    this.explosionSound = json['explosionSound'] as String;
+    this.explosionSize = Size(json['explosionSizeX'] as double, json['explosionSizeY'] as double);
+    this.price = json['weaponAsset'] as int;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'weaponName': weaponName,
+      'damage': damage,
+      'useProjectile': useProjectile,
+      'isExplosive': isExplosive,
+      'detonationDelay': detonationDelay,
+      'range': range,
+      'ammunition': ammunition,
+      'hasKnockback': hasKnockback,
+      'knockbackStrength': knockbackStrength,
+      'projectileWeight': projectileWeight,
+      'projectileMaxSpeed': projectileMaxSpeed,
+      'projectileFrictionFactor': projectileFrictionFactor,
+      'weaponAsset': weaponAsset,
+      'explosionSound': explosionSound,
+      'explosionSizeX': explosionSize.width,
+      'explosionSizeY': explosionSize.height,
+      'price': price,
+    };
+  }
+
+  static List<WeaponStats> parseList(String json){
+    List<WeaponStats> l = List();
+
+    JsonDecoder decoder = JsonDecoder();
+    List decoded = decoder.convert(json);
+
+    for(var v in decoded)
+      l.add(WeaponStats.fromJson(v));
+
+    return l;
+  }
+
 }

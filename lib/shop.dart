@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // json codec
 
@@ -8,7 +9,7 @@ class ShopList extends StatefulWidget {
   static const String moneySharedPrefKey = "money";
 
   // For Json reading : list of item and constructor
-  final List<Item> items;
+  final List<WeaponStats> items;
 
   // To track sold items
   final SharedPreferences prefs;
@@ -24,7 +25,7 @@ class ShopList extends StatefulWidget {
 class ShopListState extends State<ShopList> {
 
   var _money = 0;
-  List<Item> items;
+  List<WeaponStats> items;
   SharedPreferences prefs;
 
   // To track actual sorting policy of the list
@@ -57,9 +58,9 @@ class ShopListState extends State<ShopList> {
   void _sortByName() {
     setState(() {
         items.sort((a, b) {
-          return a.name
+          return a.weaponName
               .toLowerCase()
-              .compareTo(b.name.toLowerCase()); // alphabetical reverse order
+              .compareTo(b.weaponName.toLowerCase()); // alphabetical reverse order
         });
     });
   }
@@ -69,11 +70,11 @@ class ShopListState extends State<ShopList> {
     setState(() {
       items.sort((a, b) {
         // Check if the items are in an SOLD state or not
-        if (prefs.containsKey(a.name) && prefs.containsKey(b.name))
+        if (prefs.containsKey(a.weaponName) && prefs.containsKey(b.weaponName))
           return 0;
-        else if (prefs.containsKey(a.name))
+        else if (prefs.containsKey(a.weaponName))
           return -1;
-        else if (prefs.containsKey(b.name))
+        else if (prefs.containsKey(b.weaponName))
           return 1;
         else
           return a.price - b.price; // For lowest to highest sorting
@@ -148,17 +149,16 @@ class ShopListState extends State<ShopList> {
 
                 itemBuilder: (context, index) {
 
-                  bool sold = prefs.containsKey(items[index].name);
+                  bool sold = prefs.containsKey(items[index].weaponName);
 
                   return CustomListItem(
                     sprite: Image(
-                        image: AssetImage('assets/graphics/shop/' +
-                            items[index].imgName)),
-                    name: items[index].name,
+                        image: AssetImage(items[index].weaponAsset)),
+                    name: items[index].weaponName,
                     price: sold ? "SOLD" : items[index].price.toString() + "\$",
-                    damage: "damage",
-                    radius: "radius",
-                    knockback: "knockback",
+                    damage: items[index].damage.toString(),
+                    radius: items[index].explosionSize.width.toString(),
+                    knockback: items[index].knockbackStrength.toString(),
                     onTap: () {
                       if(sold)
                         _simpleAlertDialog("Item Already Sold", context);
@@ -167,12 +167,12 @@ class ShopListState extends State<ShopList> {
                       else{
                         _confirmSaleAlertBox(
                           "Buy Item?",
-                          "Do you want to buy \"" + items[index].name + "\" for " +
+                          "Do you want to buy \"" + items[index].weaponName + "\" for " +
                               items[index].price.toString() + "\$?",
                           context,
                               () {
                             _sellItem(
-                                items[index].price, items[index].name);
+                                items[index].price, items[index].weaponName);
                           },
                         );
                       }

@@ -10,6 +10,7 @@ import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/game_state.dart';
 import 'package:info2051_2018/game/util/utils.dart';
+import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/home.dart';
 import 'package:info2051_2018/stats_screen.dart';
@@ -20,7 +21,12 @@ import 'level.dart';
 class GameMain extends StatefulWidget {
   static const routeName = '/GameMain';
 
-  GameMain(this.terrain, this.nbPlayers, this.nbCharacters);
+  static Map<String, WeaponStats> availableWeapons = Map();
+
+  GameMain(this.terrain, this.nbPlayers, this.nbCharacters, List<WeaponStats> weapons){
+    for(WeaponStats stat in weapons)
+      availableWeapons.putIfAbsent(stat.weaponName, () => stat);
+  }
 
   final Terrain terrain;
   final int nbPlayers;

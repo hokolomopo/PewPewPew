@@ -92,7 +92,7 @@ flutter:
           - asset: assets/fonts/Grobold.ttf
 
   assets:
-    - assets/data/shop/items.json
+    - assets/data/shop/
     - assets/data/quickplay/terrains.json
     - assets/graphics/backgrounds/
     - assets/graphics/characters/

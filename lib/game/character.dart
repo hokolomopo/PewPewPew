@@ -56,7 +56,7 @@ class Character extends MovingEntity {
     this.spritePositionOffset = characterSpritePositionOffset;
     this.drawer = CharacterDrawer(AssetId.char_idle, this, team: this.team);
     // TODO Initiate "correctly" arsenal
-    this.currentArsenal = Arsenal([Fist(this), Colt(this)]);
+    this.currentArsenal = Arsenal(this);
   }
 
   void jump(Offset direction) {
