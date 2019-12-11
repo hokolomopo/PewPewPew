@@ -35,26 +35,33 @@ class World{
     }
 
     for(Projectile p in projectiles){
-      // Linear trajectory projectile aren't affect by gravity
-      if(!(p is Linear) ){
-        p.addAcceleration(gravity);
-        p.accelerate();
-      }
+      p.addAcceleration(gravity);
+      p.accelerate();
       moveEntity(p, timeElapsed);
     }
   }
 
   // To be sure no problem at launch
-  // Exception for actual caractere
+  // Exception for actual caracter
   bool checkCollidableProj(Character actualCharacter) {
     for (Projectile p in projectiles) {
-      if (!(p is CollidableProjectile))
+      if (!p.explodeOnImpact)
         return false;
 
       // First check terrains
-      for (TerrainBlock t in terrain)
-        if (t.hitBox.intersects(p.hitbox))
+      // Careful to backtrack mecanism
+      // Make hitbox wider
+      for (TerrainBlock t in terrain){
+        // 10% scale up is a good value
+        double scale = 0.1;
+        double left = p.hitbox.left - scale * p.hitbox.width / 2;
+        double top =  p.hitbox.top - scale * p.hitbox.width / 2;
+        double width = p.hitbox.width + scale * p.hitbox.width;
+        double height = p.hitbox.height + scale * p.hitbox.height;
+        Rectangle hitbox = Rectangle(left, top, width, height);
+        if (t.hitBox.intersects(hitbox))
           return true;
+      }
 
       for (Character c in players)
         if(c != actualCharacter)
