@@ -42,8 +42,9 @@ class Level {
 
     // Special case for Linear projectile
     // Have to be remove if above stage
-    if (ret && entity is Linear)
-      return false;
+    if (ret && entity is Projectile)
+      if(entity.weight == 0)
+        return false;
 
     return ret;
   }

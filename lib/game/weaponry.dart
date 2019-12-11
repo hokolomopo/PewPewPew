@@ -86,8 +86,34 @@ class Arsenal {
   }
 }
 
+
 abstract class Weapon {
   static final Size relativeSize = Size(5, 3);
+
+  AssetId projectileAssetId;
+  ImagedDrawer drawer;
+  Character owner;
+  Offset centerPos;
+  Offset topLeftPos;
+  bool inSelection;
+
+  String name;
+
+  int damage;
+  int range;
+
+  double detonationDelay;
+
+  int ammunition = -1;
+
+  int knockbackStrength = 0;
+
+  Projectile projectile;
+
+  Size weaponSize;
+  Offset weaponCenterOffset = Offset(0,0);
+
+  Weapon(this.owner);
 
   static Offset getOffsetRightOfChar(Size relativeSize) {
     return Offset(Character.hitboxSize.width,
@@ -130,45 +156,15 @@ abstract class Weapon {
         break;
     }
     w.damage = weaponStats.damage;
-    w.range = weaponStats.damage;
-    w.useProjectile = weaponStats.useProjectile;
-    w.isExplosive = weaponStats.isExplosive;
+    w.range = weaponStats.range;
     w.detonationDelay = weaponStats.detonationDelay;
     w.ammunition = weaponStats.ammunition;
-    w.hasKnockback = weaponStats.hasKnockback;
     w.knockbackStrength = weaponStats.knockbackStrength;
 
     return w;
   }
 
-  AssetId projectileAssetId;
-  ImagedDrawer drawer;
-  Character owner;
-  Offset centerPos;
-  Offset topLeftPos;
-  bool inSelection;
 
-  String name;
-
-  int damage;
-  int range;
-
-  bool useProjectile;
-
-  bool isExplosive;
-  double detonationDelay;
-
-  double ammunition;
-
-  bool hasKnockback;
-  int knockbackStrength = 0;
-
-  Projectile projectile;
-
-  Size weaponSize;
-  Offset weaponCenterOffset = Offset(0,0);
-
-  Weapon(this.owner);
 
   showSelection(Offset centerPos, Offset topLeftPos) {
     this.centerPos = centerPos;
@@ -274,6 +270,9 @@ abstract class Weapon {
           // Apply a vector field for knockback
           Offset projection = curChar.getPosition() - projectile.getPosition();
 
+          //Make sure the jump is not totally horizontal for ease of collision detection
+          if (projection.dy == 0) projection += Offset(0, 0.1);
+
           // Normalize offset
           projection /= projection.dx + projection.dy;
 
@@ -298,27 +297,32 @@ abstract class Projectile extends MovingEntity {
   int maxSpeed;
   double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
+  bool explodeOnImpact = false;
+
   String explosionSound;
   Size explosionSize;
 
   // For projectile which need orientation [Like arrows]
   // expressed in radian in a clockwise way
-  double actualOrientation = -1; // < 0 means not rotation
+  double actualOrientation = -1; // < 0 means no rotation
 
   factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, AssetId projectileAsset, WeaponStats weaponStats){
     Projectile p;
     if(weaponStats.isExplosive)
       p = ExplosiveProjectile(position, hitbox);
     else
-      p = CollidableProjectile(position, hitbox);
+      p = BaseProjectile(position, hitbox);
 
     p.assetId = projectileAsset;
     p.weight = weaponStats.projectileWeight;
     p.maxSpeed = weaponStats.projectileMaxSpeed;
     p.frictionFactor = weaponStats.projectileFrictionFactor;
     p.explosionSound = weaponStats.explosionSound;
+    p.explosionAssetId = AssetId.explosion_dhs;//weaponStats.explosionAsset; //TODO String to enum type
     p.explosionSize = weaponStats.explosionSize;
     p.drawer = ProjectileDrawer(projectileAsset, p, size:weaponStats.projectileHitboxSize);
+    p.actualOrientation = weaponStats.projectileEnableOrientation.toDouble();
+    p.explodeOnImpact = weaponStats.explodeOnImpact;
 
     return p;
   }
@@ -360,8 +364,10 @@ abstract class Projectile extends MovingEntity {
 
 /// Class to implement projectile which react a command (onTap for instance),
 /// While being launch
-/// (Arrow changing direction once on onTap, C4, leGrandMathy (une arme qui oneshot le char onTapped), ... )
+/// (Arrow changing direction once on onTap, C4, ...)
 abstract class Controllable extends Projectile{
+
+  static const String projectileName = "Controllable";
 
   // Constructor not useful
   Controllable(Offset position, Rectangle hitbox): super(position, hitbox,);
@@ -386,6 +392,7 @@ class ExplosiveProjectile extends Projectile{
   // TODO change following constructor copied from previous test projectile
   ExplosiveProjectile(position, Rectangle hitbox): super(position, hitbox);
 
+  @override
   MyAnimation returnAnimationInstance(){
     Size s = explosionSize;
     if (s == null) s = Size(60, 60);
@@ -405,13 +412,10 @@ class ExplosiveProjectile extends Projectile{
 /// (Arrow, Bombardement, ...)
 // TODO method in World check projectile collision, if not Collidable just return false,
 // else apply method
-class CollidableProjectile extends Projectile {
-  CollidableProjectile(position, Rectangle hitbox): super(position, hitbox);
-}
+class BaseProjectile extends Projectile {
 
-/// Mixin class for projectile which are not influence by gravity, Linear
-/// (Bullets, Rays, Magic orbs, ...)
-abstract class Linear{}
+  BaseProjectile(position, Rectangle hitbox): super(position, hitbox);
+}
 
 /// Animation (Gif) limited in Time (counted in total frames)
 /// It can also play a sound effect
@@ -464,6 +468,7 @@ class LoopAnimation extends MyAnimation {
   void startLoopSoundEffect(){}
 }
 
+/// Class to load parameters of the weapons from a json
 class WeaponStats{
   String weaponName;
 
@@ -473,6 +478,7 @@ class WeaponStats{
   bool useProjectile;
 
   bool isExplosive;
+  bool explodeOnImpact;
   double detonationDelay;
 
   double ammunition;
@@ -485,9 +491,12 @@ class WeaponStats{
   double projectileFrictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
   String weaponAsset;
+  String explosionAsset;
   String explosionSound;
   Size explosionSize;
   Size projectileHitboxSize;
+
+  int projectileEnableOrientation;
 
   int price;
 
@@ -508,10 +517,13 @@ class WeaponStats{
     this.projectileMaxSpeed = json['projectileMaxSpeed'] as int;
     this.projectileFrictionFactor = json['projectileFrictionFactor'] as double;
     this.weaponAsset = json['weaponAsset'] as String;
+    this.explosionAsset = json['explosionAsset'] as String;
     this.explosionSound = json['explosionSound'] as String;
     this.explosionSize = Size(json['explosionSizeX'] as double, json['explosionSizeY'] as double);
     this.price = json['price'] as int;
     this.projectileHitboxSize = Size(json['projectileHitboxSizeX'] as double, json['projectileHitboxSizeY'] as double);
+    this.projectileEnableOrientation = json['projectileOrientationEnable'] as int;
+    this.explodeOnImpact = json['explodeOnImpact'] as bool;
   }
 
   Map<String, dynamic> toJson() {
