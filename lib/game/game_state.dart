@@ -37,9 +37,6 @@ class GameState {
   /// Ratio between the size of a drag event and the length of the resulting jump
   static const double LaunchVectorNormalizer = 5;
 
-  ///Speed of the camera when dragging
-  static const double CameraSpeed = 1;
-
   GameStateMode currentState = GameStateMode.char_selection;
 
   List<Team> players = new List();
@@ -136,6 +133,7 @@ class GameState {
   void update(double timeElapsed) {
     world.updateWorld(timeElapsed);
     uiManager.updateUi(timeElapsed);
+    camera.update(timeElapsed);
 
     bool shouldEndTurn = false;
 
@@ -383,6 +381,8 @@ class GameState {
 
     switch (currentState) {
       case GameStateMode.char_selection:
+        this.camera.resetInertia();
+
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(
               GameUtils.extendRect(
@@ -469,6 +469,8 @@ class GameState {
     switch (currentState) {
       case GameStateMode.char_selection:
         this.cameraDragStartLocation = dragPosition;
+        this.camera.resetInertia();
+        this.camera.isTouching = true;
         break;
 
       case GameStateMode.moving:
@@ -515,8 +517,7 @@ class GameState {
 
     switch (currentState) {
       case GameStateMode.char_selection:
-        camera.position +=
-            (this.cameraDragStartLocation - dragPosition) * CameraSpeed;
+        camera.dragOf((this.cameraDragStartLocation - dragPosition));
         this.cameraDragStartLocation = dragPosition;
         break;
 
@@ -564,6 +565,8 @@ class GameState {
 
     switch (currentState) {
       case GameStateMode.char_selection:
+        this.camera.isTouching = false;
+
         break;
 
       case GameStateMode.moving:
@@ -629,6 +632,8 @@ class GameState {
 
     switch (currentState) {
       case GameStateMode.char_selection:
+        this.camera.resetInertia();
+
         //Select the taped player
         for (int i = 0; i < players[currentPlayer].length; i++)
           if (GameUtils.rectContains(

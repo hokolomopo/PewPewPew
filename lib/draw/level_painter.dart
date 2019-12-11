@@ -130,6 +130,11 @@ class _LevelPainterAux extends CustomPainter {
   else if (fixedY + screenSize.height > absoluteLevelSize.dy)
     fixedY = absoluteLevelSize.dy - screenSize.height;
 
+  if(fixedX != absoluteCameraPosition.dx)
+    camera.stopX();
+  if(fixedY != absoluteCameraPosition.dy)
+    camera.stopY();
+
   absoluteCameraPosition = Offset(fixedX, fixedY);
   camera.position = GameUtils.absoluteToRelativeOffset(
       absoluteCameraPosition, screenSize.height);

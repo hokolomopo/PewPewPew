@@ -71,6 +71,7 @@ class World{
 
     return false;
   }
+
   void moveEntity(MovingEntity entity, double timeElapsed){
 
     //Move in X axis
