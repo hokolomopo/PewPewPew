@@ -75,7 +75,7 @@ class GameState {
   Stopwatch stopWatch = Stopwatch();
 
   /// GameStateMode.explosion variables
-  List<MyAnimation> currentAnimations;
+  List<MyAnimation> currentAnimations = List();
 
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
@@ -487,11 +487,17 @@ class GameState {
       case GameStateMode.attacking:
         // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
-        if (currentWeapon == null || currentWeapon.projectile == null) return;
-        Offset tmp = currentWeapon.projectile.getLaunchSpeed(
-            (dragPositionCamera - launchDragStartPosition) *
-                LaunchVectorNormalizer);
+        if (currentWeapon == null || currentWeapon.projectile == null)
+          return;
+
+        Offset launchVector = dragPositionCamera - launchDragStartPosition;
+        Offset tmp = currentWeapon.projectile.getLaunchSpeed(launchVector * LaunchVectorNormalizer);
         uiManager.updateJump(tmp);
+
+        if(launchVector.dx < 0)
+          getCurrentCharacter().directionFaced = Character.RIGHT;
+        else
+          getCurrentCharacter().directionFaced = Character.LEFT;
         break;
       case GameStateMode.explosion:
         break;
@@ -561,12 +567,22 @@ class GameState {
 
     switch (currentState) {
       case GameStateMode.char_selection:
+        //Select the taped player
+        for (int i = 0; i < players[currentPlayer].length; i++)
+          if (GameUtils.rectContains(
+              GameUtils.extendRect(
+                  players[currentPlayer].getCharacter(i).hitbox, 10), longPressPosition)) {
+            currentCharacter = i;
+
+            switchState(GameStateMode.moving);
+            break;
+          }
         break;
 
       case GameStateMode.moving:
       case GameStateMode.attacking:
 
-        if (GameUtils.rectContains(currentChar.hitbox, longPressPosition)) {
+        if (GameUtils.rectContains(GameUtils.extendRect(currentChar.hitbox, 10), longPressPosition)) {
           if (currentChar.isAirborne()) return;
           currentChar.stop();
 

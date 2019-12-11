@@ -23,7 +23,7 @@ import 'character.dart';
 
 class Arsenal {
   static final double selectionElementRadius = sqrt(
-          pow(Character.hitboxSize.width, 2) +
+          pow(Character.hitboxSize.width * 2, 2) +
               pow(Character.hitboxSize.height, 2)) /
       2;
   static final double selectionElementLength = sqrt(2) * selectionElementRadius;
@@ -163,8 +163,10 @@ abstract class Weapon {
   bool hasKnockback;
   int knockbackStrength = 0;
 
-  //TODO remove this
   Projectile projectile;
+
+  Size weaponSize;
+  Offset weaponCenterOffset = Offset(0,0);
 
   Weapon(this.owner);
 
@@ -172,13 +174,18 @@ abstract class Weapon {
     this.centerPos = centerPos;
     this.topLeftPos = topLeftPos;
     inSelection = true;
-    drawer.relativeSize = Arsenal.selectionElementSize;
-    drawer.gif = selectionAsset;
+
+
+    // Center the weapon if it's not a square sprite
+    double heightRatio = weaponSize.height / weaponSize.width;
+    drawer.relativeSize = Size(Arsenal.selectionElementSize.width,
+        Arsenal.selectionElementSize.height * heightRatio);
+    this.topLeftPos += Offset(0, Arsenal.selectionElementSize.height * ((1 - heightRatio) / 2));
   }
 
   selected() {
     inSelection = false;
-    drawer.relativeSize = relativeSize;
+    drawer.relativeSize = weaponSize;
   }
 
   void prepareFiring(Offset position){
@@ -282,6 +289,7 @@ abstract class Weapon {
   }
 
 }
+
 abstract class Projectile extends MovingEntity {
   AssetId explosionAssetId;
   AssetId assetId;

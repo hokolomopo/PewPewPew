@@ -70,45 +70,45 @@ class AssetsManager {
 
     AssetId.weapon_fist: Asset(
         AssetId.weapon_fist, _weaponAssetPrefix + "fist.png",
-        size: Fist.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_fist_sel: Asset(
         AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_colt: Asset(
         AssetId.weapon_colt, _weaponAssetPrefix + "colt_45.png",
-        size: Colt.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_colt_sel: Asset(
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_grenade: Asset(
         AssetId.weapon_grenade, _weaponAssetPrefix + "grenade2_nopin.png",
-        size: Colt.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_grenade_sel: Asset(
         AssetId.weapon_grenade_sel, _weaponAssetPrefix + "grenade2_nopin.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_railgun: Asset(
         AssetId.weapon_railgun, _weaponAssetPrefix + "future_gun.png",
-        size: Colt.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_railgun_sel: Asset(
         AssetId.weapon_railgun_sel, _weaponAssetPrefix + "future_gun.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_shotgun: Asset(
         AssetId.weapon_shotgun, _weaponAssetPrefix + "shotgun.png",
-        size: Colt.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_shotgun_sel: Asset(
         AssetId.weapon_shotgun_sel, _weaponAssetPrefix + "shotgun.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
 
     AssetId.weapon_sniper: Asset(
         AssetId.weapon_sniper, _weaponAssetPrefix + "sniper.png",
-        size: Colt.relativeSize),
+        size: Size(5, 3)),
     AssetId.weapon_sniper_sel: Asset(
         AssetId.weapon_sniper_sel, _weaponAssetPrefix + "sniper.png",
-        size: Arsenal.selectionElementSize),
+        size: Size(Arsenal.selectionElementSize.width, 4)),
 
     AssetId.explosion_dhs:
         Asset(AssetId.explosion_dhs, _explosionAssetPrefix + "explosion.gif"),

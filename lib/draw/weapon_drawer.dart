@@ -19,6 +19,7 @@ class WeaponDrawer extends ImagedDrawer {
     Color teamColor = owner.getTeamColor();
     Offset imgPos;
 
+
     // Draw weapon in weapon selection menu
     if (weapon.inSelection) {
       canvas.drawCircle(
@@ -29,7 +30,10 @@ class WeaponDrawer extends ImagedDrawer {
           Paint()..color = teamColor);
 
       imgPos = weapon.topLeftPos;
-    } else {
+    }
+
+    //Weapon in the hand of the character
+    else {
       Offset characterTopLeftPos = Offset(owner.hitbox.left, owner.hitbox.top);
       int dirFaced = weapon.owner.directionFaced;
       imgPos = characterTopLeftPos +
@@ -38,10 +42,18 @@ class WeaponDrawer extends ImagedDrawer {
 
     Offset absoluteImgPos =
         GameUtils.relativeToAbsoluteOffset(imgPos, screenSize.height);
+    Offset absoluteWeaponShift =
+        GameUtils.relativeToAbsoluteOffset(weapon.weaponCenterOffset, screenSize.height);
 
     if (weapon.owner.directionFaced == Character.RIGHT) {
+      //Shift the weapon position to be in the hand of the character
+      if(!weapon.inSelection)
+        absoluteImgPos -= absoluteWeaponShift;
       canvas.drawImage(fetchNextFrame(), absoluteImgPos, Paint());
     } else {
+      //Shift the weapon position to be in the hand of the character
+      if(!weapon.inSelection)
+        absoluteImgPos -= Offset(-absoluteWeaponShift.dx, absoluteWeaponShift.dy);
       drawFlippedImage(
           canvas,
           fetchNextFrame(),
