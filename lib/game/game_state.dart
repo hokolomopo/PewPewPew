@@ -530,9 +530,7 @@ class GameState {
         if (currentWeapon == null || currentWeapon.projectile == null) return;
         Projectile p = currentWeapon.fireProjectile((launchDragStartPosition - launchDragEndPosition) *
                 LaunchVectorNormalizer);
-        if (currentWeapon.ammunition != null) {
-          currentWeapon.ammunition -= 1;
-        }
+        currentWeapon.ammunition -= 1;
         this.addProjectile(p);
 
         if(p is ExplosiveProjectile)

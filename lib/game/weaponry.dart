@@ -73,7 +73,7 @@ class Arsenal {
   Weapon getWeaponAt(Offset position) {
     for (Weapon weapon in arsenal) {
       if (GameUtils.circleContains(
-          weapon.centerPos, selectionElementRadius, position) && (weapon.ammunition ?? 1) > 0 ) {
+          weapon.centerPos, selectionElementRadius, position) && weapon.ammunition > 0) {
         return weapon;
       }
     }
@@ -158,7 +158,7 @@ abstract class Weapon {
   bool isExplosive;
   double detonationDelay;
 
-  int ammunition = -1;
+  double ammunition;
 
   bool hasKnockback;
   int knockbackStrength = 0;
@@ -475,7 +475,7 @@ class WeaponStats{
   bool isExplosive;
   double detonationDelay;
 
-  int ammunition = -1;
+  double ammunition;
 
   bool hasKnockback;
   int knockbackStrength = 0;
@@ -500,7 +500,8 @@ class WeaponStats{
     this.isExplosive = json['isExplosive'] as bool;
     this.detonationDelay = json['detonationDelay'] as double;
     this.range = json['range'] as int;
-    this.ammunition = json['ammunition'] as int;
+    int ammoTmp = json['ammunition'] as int;
+    this.ammunition = ammoTmp == null ? double.infinity : ammoTmp.toDouble();
     this.hasKnockback = json['hasKnockback'] as bool;
     this.knockbackStrength = json['knockbackStrength'] as int;
     this.projectileWeight = json['projectileWeight'] as double;
@@ -521,7 +522,7 @@ class WeaponStats{
       'isExplosive': isExplosive,
       'detonationDelay': detonationDelay,
       'range': range,
-      'ammunition': ammunition,
+      'ammunition': ammunition == double.infinity ? null : ammunition.toInt(),
       'hasKnockback': hasKnockback,
       'knockbackStrength': knockbackStrength,
       'projectileWeight': projectileWeight,

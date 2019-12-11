@@ -29,7 +29,7 @@ class WeaponDrawer extends ImagedDrawer {
     // Draw weapon in weapon selection menu
     if (weapon.inSelection) {
       Color circleColor;
-      if ((weapon.ammunition ?? 1) > 0) {
+      if (weapon.ammunition > 0) {
         circleColor = teamColor;
       } else {
         circleColor = outOfAmmoColor;
@@ -74,7 +74,7 @@ class WeaponDrawer extends ImagedDrawer {
               actualSize.height));
     }
 
-    if (weapon.inSelection && weapon.ammunition != null) {
+    if (weapon.inSelection && weapon.ammunition != double.infinity) {
       Offset ammunitionCenterPos = weapon.centerPos +
           Offset(0, Arsenal.selectionElementRadius - ammunitionRadius);
 
@@ -84,7 +84,7 @@ class WeaponDrawer extends ImagedDrawer {
           GameUtils.relativeToAbsoluteDist(ammunitionRadius, screenSize.height),
           Paint()..color = ammoColor);
 
-      TextDrawer(weapon.ammunition.toString(), TextPositions.custom, ammoFontSize,
+      TextDrawer(weapon.ammunition.toInt().toString(), TextPositions.custom, ammoFontSize,
           customPosition: ammunitionCenterPos + ammoTextOffset,
           color: Colors.black)
           .paint(canvas, screenSize, showHitBoxes, cameraPosition);
