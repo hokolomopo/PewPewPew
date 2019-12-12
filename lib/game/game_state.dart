@@ -35,7 +35,7 @@ class GameState {
   static const double JumpVectorNormalizer = 2;
 
   /// Ratio between the size of a drag event and the length of the resulting jump
-  static const double LaunchVectorNormalizer = 5;
+  static const double LaunchVectorNormalizer = 4;
 
   GameStateMode currentState = GameStateMode.char_selection;
 
@@ -205,8 +205,6 @@ class GameState {
           if (world.checkCollidableProj(getCurrentCharacter()) || p.checkTTL()){
             Map<Character, double> damages= currentWeapon.applyImpact(p, players);
             displayAndRecordDamage(damages);
-            p.stop();
-
 
             MyAnimation endAnimation = p.returnAnimationInstance();
             if(endAnimation != null)
@@ -538,7 +536,6 @@ class GameState {
         break;
 
       case GameStateMode.attacking:
-        // TODO: Handle this case.
         launchDragEndPosition = dragPositionCamera;
         if (currentWeapon == null || currentWeapon.projectiles == null) return;
 
@@ -588,7 +585,7 @@ class GameState {
       case GameStateMode.attacking:
         uiManager.endJump();
         // If we ended the drag on the character, cancel the attack
-        if(currentChar != null && GameUtils.extendRect(currentChar.hitbox, 5)
+        if(currentChar != null && GameUtils.extendRect(currentChar.hitbox, 3)
             .containsPoint(GameUtils.toPoint(launchDragEndPosition))){
           switchState(GameStateMode.weapon_selection);
         }

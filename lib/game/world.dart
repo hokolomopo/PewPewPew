@@ -21,6 +21,8 @@ class World{
 
   Offset gravity;
 
+  
+
   World({this.gravityForce=0.02}){
     gravity = Offset(0, gravityForce);
   }

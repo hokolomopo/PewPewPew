@@ -39,8 +39,6 @@ class ShopListState extends State<ShopList> {
   getShopInfo() async {
     prefs = await SharedPreferences.getInstance();
 
-    prefs.setInt(ShopList.moneySharedPrefKey, 100000000);
-
     if (prefs.containsKey(ShopList.moneySharedPrefKey))
       _money = prefs.getInt(ShopList.moneySharedPrefKey);
     else {
@@ -168,7 +166,7 @@ class ShopListState extends State<ShopList> {
                     name: items[index].weaponName,
                     price: sold ? "SOLD" : items[index].price.toString() + "\$",
                     damage: items[index].damage.toString(),
-                    radius: items[index].explosionSize.width.toString(),
+                    radius: items[index].range.toString(),
                     knockback: items[index].knockbackStrength.toString(),
                     onTap: () {
                       if(sold)
@@ -541,7 +539,7 @@ class WeaponDescription extends StatelessWidget {
                 maxLines: 1,
               ),
               AutoSizeText(
-                'RADIUS: $radius',
+                'BLAST RADIUS: $radius',
                 style: const TextStyle(
                   fontFamily: 'monospace',
                   color: Colors.black87,
