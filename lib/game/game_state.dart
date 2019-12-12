@@ -94,7 +94,7 @@ class GameState {
 
     painter.addElement(terrainStrokeDrawer);
     for (TerrainBlock block in level.terrain) {
-      this.addTerrainBlock(block);
+      addTerrainBlock(block);
     }
     terrainStrokeDrawer.computeStrokes();
 
@@ -776,11 +776,13 @@ class GameState {
   void addTerrainBlock(TerrainBlock block) {
     world.addTerrain(block);
     painter.addElement(block.drawer);
+    terrainStrokeDrawer.addTerrainBlock(block);
   }
 
   void removeTerrainBlock(TerrainBlock block) {
     world.removeTerrain(block);
     painter.removeElement(block.drawer);
+    terrainStrokeDrawer.removeTerrainBlock(block);
   }
 
   void removePlayer(int playerID) {
