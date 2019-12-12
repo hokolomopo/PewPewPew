@@ -147,31 +147,6 @@ class GameState {
       removeAnimation(anim);
     }
 
-    // Check if current projectile are still alive
-    List<Projectile> toRemoveProj = List();
-    for(Projectile p in projectiles){
-
-      // Check if out of bound
-      if (!level.isInsideBounds(p))
-        toRemoveProj.add(p);
-
-      // Checking if a collidable projectile has
-      // intersect a hitbox (terrain or character)
-      if (world.checkCollidableProj(getCurrentCharacter()) || p.checkTTL()){
-        Map<Character, double> damages= currentWeapon.applyImpact(p, players);
-        displayAndRecordDamage(damages);
-
-        MyAnimation endAnimation = p.returnAnimationInstance();
-        if(endAnimation == null)
-          addAnimation(endAnimation);
-        toRemoveProj.add(p);
-      }
-    }
-
-    for(Projectile p in toRemoveProj){
-      removeProjectile(p);
-    }
-
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -217,11 +192,40 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+      // Check if current projectile are still alive
+        List<Projectile> toRemoveProj = List();
+        for(Projectile p in projectiles){
+
+          // Check if out of bound
+          if (!level.isInsideBounds(p))
+            toRemoveProj.add(p);
+
+          // Checking if a collidable projectile has
+          // intersect a hitbox (terrain or character)
+          if (world.checkCollidableProj(getCurrentCharacter()) || p.checkTTL()){
+            Map<Character, double> damages= currentWeapon.applyImpact(p, players);
+            displayAndRecordDamage(damages);
+            p.stop();
+
+
+            MyAnimation endAnimation = p.returnAnimationInstance();
+            if(endAnimation != null)
+              addAnimation(endAnimation);
+            toRemoveProj.add(p);
+          }
+        }
+
+        for(Projectile p in toRemoveProj){
+          removeProjectile(p);
+        }
+
         // center camera on projectile
-        // TODO choose which projectile to follow
         if(cameraFocus != null)
           this.camera.centerOn(cameraFocus.getPosition());
         else
+          switchState(GameStateMode.cinematic);
+
+        if(projectiles.length == 0)
           switchState(GameStateMode.cinematic);
 
         break;
@@ -361,6 +365,7 @@ class GameState {
 
   // TODO put add and remove line for currentAnimations list
   void addAnimation(MyAnimation animation) {
+    print("AddAnimation");
     currentAnimations.add(animation);
     painter.addElement(animation.drawer);
   }
@@ -570,7 +575,7 @@ class GameState {
         break;
 
       case GameStateMode.moving:
-        if (characterJumping) {
+        if (characterJumping && jumpDragEndPosition != null && jumpDragStartPosition != null) {
           currentChar.jump((jumpDragStartPosition - jumpDragEndPosition) *
               JumpVectorNormalizer);
           characterJumping = false;
@@ -581,7 +586,7 @@ class GameState {
       case GameStateMode.attacking:
         uiManager.endJump();
         // If we ended the drag on the character, cancel the attack
-        if(currentChar != null && GameUtils.extendRect(currentChar.hitbox, 10)
+        if(currentChar != null && GameUtils.extendRect(currentChar.hitbox, 5)
             .containsPoint(GameUtils.toPoint(launchDragEndPosition))){
           switchState(GameStateMode.weapon_selection);
         }

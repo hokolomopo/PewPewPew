@@ -135,9 +135,14 @@ class _LevelPainterAux extends CustomPainter {
   if(fixedY != absoluteCameraPosition.dy)
     camera.stopY();
 
-  absoluteCameraPosition = Offset(fixedX, fixedY);
-  camera.position = GameUtils.absoluteToRelativeOffset(
-      absoluteCameraPosition, screenSize.height);
+  if(fixedX != absoluteCameraPosition.dx || fixedY != absoluteCameraPosition.dy) {
+    absoluteCameraPosition = Offset(fixedX, fixedY);
+
+    print("Camera absolute X : "+ absoluteCameraPosition.dx.toString() + " FixedX " + fixedX.toString());
+    print("Camera absolute Y : "+ absoluteCameraPosition.dy.toString() + " FixedY " + fixedY.toString());
+    camera.position = GameUtils.absoluteToRelativeOffset(
+        absoluteCameraPosition, screenSize.height);
+  }
 
   // Apply camera transformation to the canvas
   canvas.translate(-absoluteCameraPosition.dx, -absoluteCameraPosition.dy);

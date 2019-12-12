@@ -10,7 +10,7 @@ class Camera{
   static const double inertiaFactor = 2;
 
   /// Position of the top left corner of the camera
-  Offset position;
+  Offset _position;
 
   ///Offset used to define the zoom of the camera. When used, it will mess up all
   /// the inputs positions , as we didn't implement a method to transform the zoomed coordinates
@@ -21,11 +21,11 @@ class Camera{
   Offset inertia = Offset(0, 0);
   bool isTouching = true;
 
-  Camera(this.position, {this.zoom : const Offset(1,1)});
+  Camera(this._position, {this.zoom : const Offset(1,1)});
 
   void update(double elapsedTime){
     if(!isTouching) {
-      this.position += inertia * elapsedTime;
+      this._position += inertia * elapsedTime;
 
     }
     inertia *= 0.95;
@@ -49,19 +49,26 @@ class Camera{
     inertia = Offset(inertia.dx, 0);
   }
 
+  set position(Offset position){
+    this._position = position;
+  }
+
+  get position => this._position;
+
   ///Center the camera on the given position
   void centerOn(Offset center){
     Offset screenSize = GameUtils.absoluteToRelativeOffset(Offset(GameMain.size.width, GameMain.size.height),
         GameMain.size.height);
 
     position = Offset(center.dx - screenSize.dx / 2, center.dy - screenSize.dy / 2);
+    resetInertia();
   }
 
   bool isDisplayed(Rectangle rect){
     Offset screenSize = GameUtils.absoluteToRelativeOffset(Offset(GameMain.size.width, GameMain.size.height),
         GameMain.size.height);
 
-    Rectangle screen = Rectangle(position.dx, position.dy, screenSize.dx, screenSize.dy);
+    Rectangle screen = Rectangle(_position.dx, _position.dy, screenSize.dx, screenSize.dy);
 
     if(screen.containsRectangle(rect) || screen.intersects(rect))
       return true;

@@ -194,6 +194,8 @@ abstract class Weapon {
   // TODO Override these 2 functions to get multiple projectile behavior
   // Example ShortGun => 3 projectile same initial pos with offset in direction
   void prepareFiring(Offset position){
+    this.projectiles = List();
+
     WeaponStats stats = GameMain.availableWeapons[this.name];
     MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
         stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
