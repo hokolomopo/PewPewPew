@@ -187,7 +187,6 @@ abstract class Weapon {
     inSelection = false;
   }
 
-  // TODO Override these 2 functions to get multiple projectile behavior
   // Example ShortGun => 3 projectile same initial pos with offset in direction
   void prepareFiring(Character char){
     if(char == null)
@@ -224,7 +223,6 @@ abstract class Weapon {
         p.move(Offset((char.hitbox.width + 1), 0));
       }
 
-      print(char.hitbox.intersects(p.hitbox));
       p.velocity += direction;
     }
 
@@ -380,7 +378,6 @@ class ExplosiveProjectile extends Projectile{
 /// Mixin class for projectile which applyImpact when intersecting another
 /// hitbox or going out of bound
 /// (Arrow, Bombardement, ...)
-// TODO method in World check projectile collision, if not Collidable just return false,
 // else apply method
 class LinearProjectile extends Projectile {
   LinearProjectile(position, Rectangle hitbox): super(position, hitbox);
@@ -428,7 +425,6 @@ class LoopAnimation extends MyAnimation {
     // ...
     this.loopAudioPlayer = null;
   }
-  // TODO put if (audioplayer not null)
   void startLoopSoundEffect(){}
 }
 

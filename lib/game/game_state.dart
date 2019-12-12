@@ -761,8 +761,6 @@ class GameState {
   }
 
   void removeCharacter(int playerId, int charID) {
-    print("Character of player " + currentPlayer.toString() + " is dead");
-
     Character toRemove = players[playerId].getCharacter(charID);
     players[playerId].removeCharacter(toRemove);
 
@@ -786,7 +784,6 @@ class GameState {
   }
 
   void removePlayer(int playerID) {
-    print("Player " + playerID.toString() + " is dead");
     this.computeStats(players[playerID]);
 
     players.removeAt(playerID);
@@ -807,7 +804,6 @@ class GameState {
   }
 
   void addAnimation(MyAnimation animation) {
-    print("AddAnimation");
     currentAnimations.add(animation);
     painter.addElement(animation.drawer);
   }

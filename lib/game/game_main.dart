@@ -77,7 +77,6 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
   /// Function called at each frame.
   /// Update the GameState and re-draw the game on the screen
   void _update(Duration timestamp) {
-    //TODO pause timer when quitting the app
     int timeElapsed =
         lastTimeStamp == null ? 0 : (timestamp - lastTimeStamp).inMilliseconds;
     lastTimeStamp = timestamp;

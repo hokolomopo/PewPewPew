@@ -120,40 +120,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       );
     }
 
-    void _tutorialConfirm(String title, String mess, String neg, String pos) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: new Text(title),
-            content: new Text(mess),
-            actions: <Widget>[
-              new FlatButton(
-                // Negative choice button
-                child: new Text(
-                  neg,
-                  style: new TextStyle(fontWeight: FontWeight.normal),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              new FlatButton(
-                // Positive choice button
-                child: new Text(
-                  pos,
-                  style: new TextStyle(fontWeight: FontWeight.bold),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     void _parameters() {
       Home.sizeLocked = true;
       _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
