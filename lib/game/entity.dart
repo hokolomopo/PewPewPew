@@ -9,6 +9,8 @@ abstract class Entity{
   CustomDrawer drawer;
   Offset spritePositionOffset = Offset(0, 0);
 
+  Entity.empty();
+
   Entity(this._position, this.hitbox);
 
   void setPosition(Offset position){
@@ -44,6 +46,8 @@ abstract class MovingEntity extends Entity{
   Offset velocity = new Offset(0, 0);
   Offset acceleration = new Offset(0, 0);
   double weight = 1;
+
+  bool isDead = false;
 
   MovingEntity(Offset position, MutableRectangle<num> hitbox) : super(position, hitbox);
 

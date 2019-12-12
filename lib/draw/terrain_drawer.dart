@@ -11,7 +11,7 @@ class TerrainBlockDrawer extends CustomDrawer {
 
   TerrainBlockDrawer(this.terrainBlock)
       : super(
-            Size(terrainBlock.hitBox.width, terrainBlock.hitBox.height));
+            Size(terrainBlock.hitbox.width, terrainBlock.hitbox.height));
 
   /// Removes a set of blocks from their top-left positions.
   ///
@@ -57,9 +57,9 @@ class TerrainBlockDrawer extends CustomDrawer {
     // Remember the block sizes are taken in percentage of the screen size,
     // for more robustness.
     double left =
-        GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.left, size.height);
+        GameUtils.relativeToAbsoluteDist(terrainBlock.hitbox.left, size.height);
     double top =
-        GameUtils.relativeToAbsoluteDist(terrainBlock.hitBox.top, size.height);
+        GameUtils.relativeToAbsoluteDist(terrainBlock.hitbox.top, size.height);
 
     Rect toDraw = Rect.fromLTWH(left, top, actualSize.width, actualSize.height);
 

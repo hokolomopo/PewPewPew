@@ -75,28 +75,26 @@ class Level {
   }
 }
 
-class TerrainBlock {
-  Rectangle hitBox;
+class TerrainBlock extends Entity{
   // Note that even if [withStroke] is [false], the top stroke will still
   // be painted.
   bool withStroke = true;
-  TerrainBlockDrawer drawer;
   Color color = Colors.green;
 
-  TerrainBlock(double x, double y, double w, double h, {this.withStroke = true}){
-    hitBox = new Rectangle(x, y, w, h);
+  TerrainBlock(double x, double y, double w, double h, {this.withStroke = true})
+      : super(Offset(x,y), MutableRectangle(x, y, w, h)){
     drawer = TerrainBlockDrawer(this);
   }
 
-  TerrainBlock.fromJson(Map<String, dynamic> json)
-      : hitBox = SerializableRectangle.fromJson(json['hitBox']).toRectangle()
-  {
+  TerrainBlock.fromJson(Map<String, dynamic> json): super.empty(){
+    Rectangle tmp = SerializableRectangle.fromJson(json['hitBox']).toRectangle();
+    hitbox = MutableRectangle(tmp.left, tmp.top, tmp.width, tmp.height);
     drawer = TerrainBlockDrawer(this);
   }
 
   Map<String, dynamic> toJson() =>
       {
-        'hitBox': SerializableRectangle(hitBox),
+        'hitBox': SerializableRectangle(hitbox),
       };
 
 }
