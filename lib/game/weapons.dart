@@ -39,7 +39,7 @@ class Railgun extends Weapon {
   static const String weaponName = "Railgun";
 
   final Size relativeSize = Size(15, 7);
-  final Offset weaponCenterOffset = Offset(8, -4);
+  final Offset weaponCenterOffset = Offset(8, -3);
 
   Railgun(Character owner) : super(owner) {
     this.drawer =
