@@ -203,7 +203,6 @@ abstract class Weapon {
   List<Projectile> fireProjectile(Offset direction) {
 
     if(projectiles.length == 0){
-      print("projectile.fireProjectile has no projectile to throw");
       return null;
     }
 
@@ -214,27 +213,6 @@ abstract class Weapon {
 
     return projectiles;
   }
-
-  //TODO decide if methods better in Weapon or corresponding Projectile
-  // Should be an overridable function to get different behaviour for other weapon
-
-//  /// Function to proceed all the end logic of a projectile (explosion sprite,
-//  /// damage, painters, ...)
-//  /// TODO put end logic in weapon instead of gameState
-//  void proceedToEnd(GameState gameState){
-//
-//    // Next state
-//    gameState.switchState(GameStateMode.cinematic);
-//
-//
-//    // Remove projectile from word and painters
-//    //TODO callback to gameMain
-//    gameState.removeProjectile(this.projectile);
-//    gameState.painter.removeElement(gameState.currentWeapon.drawer);
-//    gameState.currentWeapon = null;
-//
-//
-//  }
 
   ///Function which apply Damage and knockback to characters according to
   /// its actual position and range.
@@ -437,7 +415,6 @@ class ExplosiveProjectile extends Projectile{
 // TODO method in World check projectile collision, if not Collidable just return false,
 // else apply method
 class BaseProjectile extends Projectile {
-
   BaseProjectile(position, Rectangle hitbox): super(position, hitbox);
 }
 

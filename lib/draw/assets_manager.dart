@@ -63,11 +63,8 @@ class AssetsManager {
   static final String _weaponAssetPrefix = "assets/graphics/arsenal/weapons/";
   static final String _explosionAssetPrefix = "assets/graphics/arsenal/explosions/";
 
-  //TODO fix cat death gif
-
   /// Default assets of the game
   final Map<AssetId, Asset> assets = {
-    //TODO put good sizes for weapons
     AssetId.background: Asset(AssetId.background, null),
     AssetId.projectile_boulet: Asset(AssetId.projectile_boulet,
         "assets/graphics/arsenal/projectiles/bullet4.png"),
@@ -150,8 +147,6 @@ class AssetsManager {
 
   /// Load a gif file (or a png, which we consider as a one frame gif)
   _loadGif(Asset asset) async {
-    print("Loading " + asset.path + " of size " + asset.size.toString());
-
     // Cannot load without a size
     if (asset.size == null) return;
 
@@ -162,7 +157,6 @@ class AssetsManager {
     // Check if asset is not already loading
     if (this._currentlyLoading.containsKey(asset.getStringId()) &&
         _currentlyLoading[asset.getStringId()] == asset.size) {
-      print("Asset already loading");
       return;
     }
 
