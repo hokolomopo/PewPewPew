@@ -46,7 +46,7 @@
     "explosionSizeY": 60.0,
     "projectileHitboxSizeX": 8.0,
     "projectileHitboxSizeY": 8.0,
-    "price": 2000
+    "price": 0
   },
   {
     "weaponName": "Shotgun",
@@ -71,7 +71,7 @@
     "explosionSizeY": 20.0,
     "projectileHitboxSizeX": 5.0,
     "projectileHitboxSizeY": 5.0,
-    "price": 2000
+    "price": 0
   },
   {
     "weaponName": "Colt",
@@ -96,7 +96,7 @@
     "explosionSizeY": 0.0,
     "projectileHitboxSizeX": 6.0,
     "projectileHitboxSizeY": 3.0,
-    "price": 2000
+    "price": 0
   },
   {
     "weaponName": "Sniper",
