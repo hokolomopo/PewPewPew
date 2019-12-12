@@ -75,7 +75,7 @@ class UiManager {
     this.marker = null;
   }
 
-  void beginJump(Offset origin) {
+  void beginJump(Offset origin, {double normalizingFactor:0.5}) {
     jumpArrowDrawer = JumpArrowDrawer(origin, origin);
     painter.addElement(jumpArrowDrawer);
   }

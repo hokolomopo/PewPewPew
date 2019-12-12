@@ -99,6 +99,18 @@ abstract class ImagedDrawer extends CustomDrawer {
 
     canvas.restore();
   }
+
+  void freezeAnimation({int frameNumber}) {
+    if(frameNumber == null)
+      gifInfo.freezeGif();
+    else
+      gifInfo.freezeGif(frameNumber: frameNumber);
+  }
+
+  void unfreezeAnimation() {
+    gifInfo.unfreezeGif();
+  }
+
 }
 
 abstract class CustomDrawer {
@@ -131,9 +143,6 @@ abstract class CustomDrawer {
 
   void changeRelativeSize(Size size) {}
 
-  void freezeAnimation({int frameNumber}) {}
-
-  void unfreezeAnimation() {}
 
   /// To know if the git info is available (during asset change) before processing it
   bool isGifInfoAvailable() {

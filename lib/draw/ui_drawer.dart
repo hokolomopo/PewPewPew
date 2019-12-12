@@ -55,12 +55,12 @@ class MarkerDrawer extends ImagedDrawer{
 }
 
 class JumpArrowDrawer extends CustomDrawer{
-  static double normalizingFactor = 0.5;
+  double normalizingFactor;
 
   Offset origin;
   Offset end;
 
-  JumpArrowDrawer(this.origin, this.end) : super(null);
+  JumpArrowDrawer(this.origin, this.end, {this.normalizingFactor:0.5}) : super(null);
 
   @override
   void paint(Canvas canvas, Size size, bool showHitBoxes, Offset cameraPosition) {

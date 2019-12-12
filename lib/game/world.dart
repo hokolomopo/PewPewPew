@@ -27,14 +27,6 @@ class World{
   }
 
   void updateWorld(double timeElapsed){
-    for(Character c in players){
-      c.updateAnimation();
-
-      c.addAcceleration(gravity);
-      c.accelerate();
-      moveEntity(c, timeElapsed);
-    }
-
     for(Projectile p in projectiles){
       if(p is ExplosiveProjectile && p.checkTTL())
         manageExplosion(p);
@@ -43,40 +35,15 @@ class World{
       p.accelerate();
       moveEntity(p, timeElapsed);
     }
+
+    for(Character c in players){
+      c.updateAnimation();
+
+      c.addAcceleration(gravity);
+      c.accelerate();
+      moveEntity(c, timeElapsed);
+    }
   }
-
-
-  //TODO delete dis
-//  // To be sure no problem at launch
-//  // Exception for actual character
-//  bool checkCollidableProj(Character actualCharacter) {
-//    for (Projectile p in projectiles) {
-//      if (!p.explodeOnImpact)
-//        return false;
-//
-//      // First check terrains
-//      // Careful to backtrack mecanism
-//      // Make hitbox wider
-//      for (TerrainBlock t in terrain){
-//        // 10% scale up is a good value
-//        double scale = 0.1;
-//        double left = p.hitbox.left - scale * p.hitbox.width / 2;
-//        double top =  p.hitbox.top - scale * p.hitbox.width / 2;
-//        double width = p.hitbox.width + scale * p.hitbox.width;
-//        double height = p.hitbox.height + scale * p.hitbox.height;
-//        Rectangle hitbox = Rectangle(left, top, width, height);
-//        if (t.hitbox.intersects(hitbox))
-//          return true;
-//      }
-//
-//      for (Character c in players)
-//        if(c != actualCharacter)
-//          if(c.hitbox.intersects(p.hitbox))
-//            return true;
-//    }
-//
-//    return false;
-//  }
 
 
 
@@ -138,13 +105,26 @@ class World{
       manageExplosion(projectile);
 
     // Projectile that do damage on hit
-    else if(projectile is LinearProjectile && collided is Character){
-      // Update stats
-      double damageDealt = min(projectile.damage.toDouble(), collided.hp);
-      collided.removeHp(damageDealt);
-      List l = List();
-      l.add(CharacterDamagePair(collided, damageDealt));
-      damageDealtCallback(l);
+    else if(projectile is LinearProjectile) {
+      if (collided is TerrainBlock) {
+        projectile.isDead = true;
+        return;
+      }
+      else if (collided is Character) {
+        // Update stats
+        double damageDealt = min(projectile.damage.toDouble(), collided.hp);
+        collided.removeHp(damageDealt);
+
+        double velocity = projectile.knockBackStrength.toDouble();
+        velocity *= projectile.velocity.dx.sign;
+        collided.addVelocity(Offset(velocity, -velocity.abs()));
+
+        List<CharacterDamagePair> l = List();
+        l.add(CharacterDamagePair(collided, damageDealt));
+        damageDealtCallback(l);
+
+        projectile.isDead = true;
+      }
     }
   }
 
@@ -185,6 +165,7 @@ class World{
       }
     }
 
+    projectile.isDead = true;
     this.damageDealtCallback(damageDealtList);
   }
 

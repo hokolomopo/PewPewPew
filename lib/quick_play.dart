@@ -115,7 +115,7 @@ class ParametersState extends State<Parameters> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(bottom: 10.0, top: 20.0),
+          padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
           child: Row(
               children: buildRadioList(
                   title: "Number\nPlayers",
@@ -165,11 +165,7 @@ class ParametersState extends State<Parameters> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(
-              left: 20.0,
-              right: 20.0,
-              top: 10.0,
-              bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 60.0),
           child: Container(
             child: RaisedButton(
               highlightElevation: 10.0,
@@ -205,6 +201,7 @@ class ParametersState extends State<Parameters> {
             width: MediaQuery.of(context).size.width,
           ),
         ),
+        Padding(padding: EdgeInsets.only(bottom: 3.0),)
       ],
     );
   }

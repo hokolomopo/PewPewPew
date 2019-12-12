@@ -189,27 +189,44 @@ abstract class Weapon {
 
   // TODO Override these 2 functions to get multiple projectile behavior
   // Example ShortGun => 3 projectile same initial pos with offset in direction
-  void prepareFiring(Offset position){
-    this.projectiles = List();
+  void prepareFiring(Character char){
+    if(char == null)
+      return;
 
+    this.projectiles = List();
     WeaponStats stats = GameMain.availableWeapons[this.name];
-    MutableRectangle hitbox = MutableRectangle(position.dx, position.dy,
+
+
+    double projectileX = char.hitbox.left;
+    double projectileY = char.hitbox.top;
+    MutableRectangle hitbox = MutableRectangle(projectileX, projectileY,
         stats.projectileHitboxSize.width, stats.projectileHitboxSize.height);
 
-    this.projectiles.add( Projectile.fromWeaponStats(Offset(position.dx, position.dy),
+    this.projectiles.add( Projectile.fromWeaponStats(Offset(projectileX, projectileY),
         hitbox, projectileAssetId, GameMain.availableWeapons[this.name]) );
   }
 
-  List<Projectile> fireProjectile(Offset direction) {
+  List<Projectile> fireProjectile(Offset direction, Character char) {
 
-    if(projectiles.length == 0){
+    if(projectiles.length == 0 || char == null){
       return null;
     }
+    WeaponStats stats = GameMain.availableWeapons[this.name];
 
     direction = projectiles.first.getLaunchSpeed(direction);
 
-    for (Projectile p in projectiles)
-    p.velocity += direction;
+    for (Projectile p in projectiles) {
+
+      if(char.directionFaced == Character.LEFT){
+        p.move(Offset(-(stats.projectileHitboxSize.width + 1), 0));
+      }
+      else{
+        p.move(Offset((char.hitbox.width + 1), 0));
+      }
+
+      print(char.hitbox.intersects(p.hitbox));
+      p.velocity += direction;
+    }
 
     return projectiles;
   }
@@ -273,7 +290,7 @@ abstract class Projectile extends MovingEntity {
 
     // To indicate canvas to stay on same frame
     if (frictionFactor == 1)
-      drawer.freezeAnimation();
+      (drawer as ImagedDrawer).freezeAnimation();
   }
 
   // Have to be override by children

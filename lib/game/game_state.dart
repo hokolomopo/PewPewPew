@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:info2051_2018/draw/drawer_abstracts.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
@@ -419,10 +420,10 @@ class GameState {
         if (currentWeapon == null)
           return;
 
-        currentWeapon.prepareFiring(currentChar.getPosition());
+        currentWeapon.prepareFiring(currentChar);
         launchDragStartPosition = GameUtils.getRectangleCenter(currentChar.hitbox);
 
-        uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox));
+        uiManager.beginJump(GameUtils.getRectangleCenter(currentChar.hitbox), normalizingFactor: 0.3);
         break;
 
       case GameStateMode.waiting:
@@ -516,7 +517,7 @@ class GameState {
 
             for(Projectile p in currentWeapon.fireProjectile(
                 (launchDragStartPosition - launchDragEndPosition) *
-                    LaunchVectorNormalizer)){
+                    LaunchVectorNormalizer, currentChar)){
 
 
               this.addProjectile(p);
@@ -624,6 +625,14 @@ class GameState {
 
         this.currentPlayer = (currentPlayer + 1) % players.length;
 
+        camera.resetInertia();
+        //Center the camera on a random player of the current team
+        if(players[currentPlayer].characters.length > 0) {
+          Random random = Random();
+          camera.centerOn(players[currentPlayer].characters[random.nextInt(
+              players[currentPlayer].characters.length)].getPosition());
+        }
+
         uiManager.removeStaminaDrawer();
         this.teamTurnText = uiManager.addText(
             players[currentPlayer].teamName + " team turn !", TextPositions.center, 50,
@@ -653,6 +662,8 @@ class GameState {
       case GameStateMode.attacking:
         if(currentWeapon != null)
           painter.addElement(currentWeapon.drawer);
+        if(getCurrentCharacter() != null)
+          (getCurrentCharacter().drawer as ImagedDrawer).freezeAnimation();
         break;
 
       case GameStateMode.projectile:
@@ -708,6 +719,8 @@ class GameState {
         break;
       case GameStateMode.attacking:
         painter.removeElement(currentWeapon.drawer);
+        if(getCurrentCharacter() != null)
+          (getCurrentCharacter().drawer as ImagedDrawer).unfreezeAnimation();
         break;
       case GameStateMode.projectile:
         for (Projectile p in currentWeapon.projectiles)

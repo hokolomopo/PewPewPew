@@ -37,7 +37,10 @@ class ShopListState extends State<ShopList> {
   }
 
   getShopInfo() async {
+
     prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt(ShopList.moneySharedPrefKey, 500000);
     if (prefs.containsKey(ShopList.moneySharedPrefKey))
       _money = prefs.getInt(ShopList.moneySharedPrefKey);
     else {
