@@ -45,6 +45,8 @@ class PewPewPewLevelCreator extends StatelessWidget {
 class RandomScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
+    GameMain.size = MediaQuery.of(context).size;
+
     return RaisedButton(
       child: Text("press"),
       onPressed: () {
@@ -113,23 +115,20 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
 
   void createLevel(){
     // Create terrain in cartesian coordinates (y from bot to top)
-    level.terrain.add(new TerrainBlock(40, 200, 50, 10));
-    level.terrain.add(new TerrainBlock(120, 250, 50, 10));
-    level.terrain.add(new TerrainBlock(70, 150, 70, 10));
-
-    level.terrain.add(new TerrainBlock(180, 165, 60, 10));
-    level.terrain.add(new TerrainBlock(200, 210, 25, 10));
-    level.terrain.add(new TerrainBlock(130, 120, 80, 10));
-
-    level.terrain.add(new TerrainBlock(260, 130, 50, 10));
-    level.terrain.add(new TerrainBlock(360, 130, 50, 10));
-    level.terrain.add(new TerrainBlock(430, 180, 70, 10));
-
-    level.terrain.add(new TerrainBlock(390, 90, 80, 10));
-    level.terrain.add(new TerrainBlock(460, 70, 30, 10));
-    level.terrain.add(new TerrainBlock(490, 100, 70, 10));
-
-    level.terrain.add(new TerrainBlock(530, 145, 40, 10));
+    level.terrain.add(new TerrainBlock(100, 160, 30, 160));
+    level.terrain.add(new TerrainBlock(130, 130, 30, 130));
+    level.terrain.add(new TerrainBlock(160, 100, 30, 100));
+    level.terrain.add(new TerrainBlock(190, 70, 30, 70));
+    level.terrain.add(new TerrainBlock(220, 40, 30, 40));
+    level.terrain.add(new TerrainBlock(250, 50, 30, 50));
+    level.terrain.add(new TerrainBlock(280, 70, 60, 70));
+    level.terrain.add(new TerrainBlock(340, 50, 30, 50));
+    level.terrain.add(new TerrainBlock(370, 40, 30, 40));
+    level.terrain.add(new TerrainBlock(400, 70, 30, 70));
+    level.terrain.add(new TerrainBlock(430, 100, 30, 100));
+    level.terrain.add(new TerrainBlock(460, 130, 30, 130));
+    level.terrain.add(new TerrainBlock(490, 160, 30, 160
+    ));
 
 
     // Invert Y axis
@@ -139,26 +138,22 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
   }
 
   void createSpawns(){
-    level.spawnPoints.add(Offset(65, 50));
+    level.spawnPoints.add(Offset(100, 20));
+    level.spawnPoints.add(Offset(120, 20));
     level.spawnPoints.add(Offset(145, 20));
-    level.spawnPoints.add(Offset(80, 70));
-    level.spawnPoints.add(Offset(120, 80));
-
-    level.spawnPoints.add(Offset(210, 120));
-    level.spawnPoints.add(Offset(210, 50));
-    level.spawnPoints.add(Offset(145, 100));
-    level.spawnPoints.add(Offset(160, 100));
-
-    level.spawnPoints.add(Offset(285, 100));
-    level.spawnPoints.add(Offset(385, 100));
-    level.spawnPoints.add(Offset(440, 100));
-    level.spawnPoints.add(Offset(465, 100));
-
-    level.spawnPoints.add(Offset(420, 100));
-    level.spawnPoints.add(Offset(500, 170));
-    level.spawnPoints.add(Offset(540, 170));
-
-    level.spawnPoints.add(Offset(550, 100));
+    level.spawnPoints.add(Offset(175, 20));
+    level.spawnPoints.add(Offset(205, 20));
+    level.spawnPoints.add(Offset(235, 20));
+    level.spawnPoints.add(Offset(265, 20));
+    level.spawnPoints.add(Offset(295, 20));
+    level.spawnPoints.add(Offset(325, 20));
+    level.spawnPoints.add(Offset(355, 20));
+    level.spawnPoints.add(Offset(385, 20));
+    level.spawnPoints.add(Offset(415, 20));
+    level.spawnPoints.add(Offset(445, 20));
+    level.spawnPoints.add(Offset(475, 20));
+    level.spawnPoints.add(Offset(490, 20));
+    level.spawnPoints.add(Offset(510, 20));
   }
 
   int _callbackId;
@@ -346,4 +341,53 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
 
 ///LEVEL 3 SPAAAACE
 /*
+  void createLevel(){
+    // Create terrain in cartesian coordinates (y from bot to top)
+    level.terrain.add(new TerrainBlock(40, 200, 50, 10));
+    level.terrain.add(new TerrainBlock(120, 250, 50, 10));
+    level.terrain.add(new TerrainBlock(70, 150, 70, 10));
+
+    level.terrain.add(new TerrainBlock(180, 165, 60, 10));
+    level.terrain.add(new TerrainBlock(200, 210, 25, 10));
+    level.terrain.add(new TerrainBlock(130, 120, 80, 10));
+
+    level.terrain.add(new TerrainBlock(260, 130, 50, 10));
+    level.terrain.add(new TerrainBlock(360, 130, 50, 10));
+    level.terrain.add(new TerrainBlock(430, 180, 70, 10));
+
+    level.terrain.add(new TerrainBlock(390, 90, 80, 10));
+    level.terrain.add(new TerrainBlock(460, 70, 30, 10));
+    level.terrain.add(new TerrainBlock(490, 100, 70, 10));
+
+    level.terrain.add(new TerrainBlock(530, 145, 40, 10));
+
+
+    // Invert Y axis
+    for(TerrainBlock block in level.terrain)
+      block.hitbox = MutableRectangle(block.hitbox.left, level.size.height - block.hitbox.top,
+          block.hitbox.width, block.hitbox.height);
+  }
+
+  void createSpawns(){
+    level.spawnPoints.add(Offset(65, 50));
+    level.spawnPoints.add(Offset(145, 20));
+    level.spawnPoints.add(Offset(80, 70));
+    level.spawnPoints.add(Offset(120, 80));
+
+    level.spawnPoints.add(Offset(210, 120));
+    level.spawnPoints.add(Offset(210, 50));
+    level.spawnPoints.add(Offset(145, 100));
+    level.spawnPoints.add(Offset(160, 100));
+
+    level.spawnPoints.add(Offset(285, 100));
+    level.spawnPoints.add(Offset(385, 100));
+    level.spawnPoints.add(Offset(440, 100));
+    level.spawnPoints.add(Offset(465, 100));
+
+    level.spawnPoints.add(Offset(420, 100));
+    level.spawnPoints.add(Offset(500, 170));
+    level.spawnPoints.add(Offset(540, 170));
+
+    level.spawnPoints.add(Offset(550, 100));
+  }
  */

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
@@ -185,6 +186,10 @@ class ParametersState extends State<Parameters> {
                         fontSize: 20.0)),
               ),
               onPressed: () {
+                Size screenSize = MediaQuery.of(context).size;
+                GameMain.size = Size(max(screenSize.width, screenSize.height), min(screenSize.width, screenSize.height));
+
+
                 SoundPlayer.getInstance().playLoopMusic(SoundPlayer.gameMusicName, volume: 0.5);
 
                 if (_terrain == null)
