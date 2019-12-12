@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,69 +58,47 @@ abstract class ImagedDrawer extends CustomDrawer {
     gifInfo = null;
   }
 
-  drawFlippedImage(Canvas canvas, ui.Image image, Offset pos, {Paint paint}) {
-    drawResizedImage(
-        canvas,
-        image,
-        Offset(pos.dx + image.width.toDouble(), pos.dy),
-        Size(-image.width.toDouble(), image.height.toDouble()),
-        paint: paint);
-  }
-
-  drawResizedImage(Canvas canvas, ui.Image image, Offset pos, Size target,
-      {Paint paint}) {
-    if (paint == null) paint = Paint();
+  drawImage(Canvas canvas, ui.Image image, Offset pos,
+      {Size target,
+      Offset rotationCenter,
+      double angle = 0,
+      flipped: false,
+      Paint paint}) {
+    if (target == null) {
+      target = Size(image.width.toDouble(), image.height.toDouble());
+    }
+    assert(target.width > 0);
+    assert(target.height > 0);
+    if (paint == null) {
+      paint = Paint();
+    }
 
     double widthRatio = target.width / image.width;
     double heightRatio = target.height / image.height;
 
     canvas.save();
+
+    if (angle != 0) {
+      assert(rotationCenter != null);
+      canvas.translate(rotationCenter.dx, rotationCenter.dy);
+      canvas.rotate(angle);
+      canvas.translate(-rotationCenter.dx, -rotationCenter.dy);
+    }
+
+    if (flipped) {
+      canvas.translate(pos.dx, pos.dy);
+      canvas.scale(-1, 1);
+      canvas.translate(-pos.dx - image.width, -pos.dy);
+    }
+
+    canvas.translate(pos.dx, pos.dy);
     canvas.scale(widthRatio, heightRatio);
+    canvas.translate(-pos.dx, -pos.dy);
 
     canvas.drawImage(
-        image, Offset(pos.dx / widthRatio, pos.dy / heightRatio), paint);
+        image, pos, paint);
 
     canvas.restore();
-  }
-
-  ///Draw a image after a rotation, at a given position and you may give
-  /// it an offset to add the the position of the rotated image
-  void drawRotatedImage(ui.Image image, Canvas canvas, Offset rotationCenter,
-      Offset position, double angle,
-      {Paint paint, Offset offset = const Offset(0, 0), flipped: false}) {
-    if (paint == null) paint = Paint();
-
-    if (angle == null) angle = 0;
-
-    canvas.save();
-    canvas.translate(rotationCenter.dx, rotationCenter.dy);
-
-    canvas.rotate(angle);
-
-    if (!flipped)
-      canvas.drawImage(
-          image,
-          Offset(position.dx - rotationCenter.dx + offset.dx,
-              position.dy - rotationCenter.dy + offset.dy),
-          Paint());
-    else
-      drawFlippedImage(
-          canvas,
-          image,
-          Offset(position.dx - rotationCenter.dx - offset.dx,
-              position.dy - rotationCenter.dy + offset.dy));
-
-    canvas.restore();
-  }
-
-  drawFlippedResizedImage(
-      Canvas canvas, ui.Image image, Offset pos, Size target,
-      {Paint paint}) {
-    drawResizedImage(
-        canvas,
-        image,
-        Offset(pos.dx + target.width.toDouble(), pos.dy),
-        Size(-target.width, target.height));
   }
 }
 

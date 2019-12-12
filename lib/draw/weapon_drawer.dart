@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import 'package:info2051_2018/draw/assets_manager.dart';
@@ -25,8 +27,9 @@ class WeaponDrawer extends ImagedDrawer {
     Character owner = weapon.owner;
     Color teamColor = owner.getTeamColor();
     Offset imgPos;
+    int dirFaced = weapon.owner.directionFaced;
 
-    if (angle == null) angle = 0;
+    angle ??= 0;
 
     // Draw weapon in weapon selection menu
     if (weapon.inSelection) {
@@ -44,65 +47,38 @@ class WeaponDrawer extends ImagedDrawer {
               Arsenal.selectionElementRadius, screenSize.height),
           Paint()..color = circleColor);
 
-      imgPos = weapon.topLeftPos;
+      imgPos = GameUtils.relativeToAbsoluteOffset(weapon.topLeftPos, screenSize.height);
+      drawImage(canvas, fetchNextFrame(), imgPos, flipped: dirFaced == Character.LEFT);
+      if (weapon.ammunition != double.infinity) {
+        Offset ammunitionCenterPos = weapon.centerPos +
+            Offset(0, Arsenal.selectionElementRadius - ammunitionRadius);
+
+        canvas.drawCircle(
+            GameUtils.relativeToAbsoluteOffset(
+                ammunitionCenterPos, screenSize.height),
+            GameUtils.relativeToAbsoluteDist(ammunitionRadius, screenSize.height),
+            Paint()..color = ammoColor);
+
+        TextDrawer(weapon.ammunition.toInt().toString(), TextPositions.custom,
+            ammoFontSize,
+            customPosition: ammunitionCenterPos + ammoTextOffset,
+            color: Colors.black)
+            .paint(canvas, screenSize, showHitBoxes, cameraPosition);
+      }
     } else {
       Offset characterTopLeftPos = Offset(owner.hitbox.left, owner.hitbox.top);
-      int dirFaced = weapon.owner.directionFaced;
-      imgPos = characterTopLeftPos +
-          Weapon.directionFacedToOffset[dirFaced](relativeSize);
-    }
+      imgPos = GameUtils.relativeToAbsoluteOffset(characterTopLeftPos +
+          weapon.directionFacedToOffset[dirFaced](relativeSize), screenSize.height);
+      Offset playerCenter = Offset(
+          weapon.owner.getSpritePosition().dx + Character.spriteSize.width / 2,
+          weapon.owner.getSpritePosition().dy + Character.spriteSize.height / 2);
 
-    Offset absoluteImgPos =
-        GameUtils.relativeToAbsoluteOffset(imgPos, screenSize.height);
-    Offset absoluteWeaponShift = GameUtils.relativeToAbsoluteOffset(
-        weapon.weaponCenterOffset, screenSize.height);
-    Offset playerCenter = Offset(
-        weapon.owner.getSpritePosition().dx + Character.spriteSize.width / 2,
-        weapon.owner.getSpritePosition().dy + Character.spriteSize.height / 2);
-
-    if (weapon.owner.directionFaced == Character.RIGHT) {
-      //Shift the weapon position to be in the hand of the character
-      if (!weapon.inSelection) {
-        drawRotatedImage(
-            fetchNextFrame(),
-            canvas,
-            GameUtils.relativeToAbsoluteOffset(playerCenter, screenSize.height),
-            absoluteImgPos,
-            angle,
-            offset: absoluteWeaponShift * -1);
-      } else
-        canvas.drawImage(fetchNextFrame(), absoluteImgPos, Paint());
-    } else {
-      //Shift the weapon position to be in the hand of the character
-      if (!weapon.inSelection) {
-        drawRotatedImage(
-            fetchNextFrame(),
-            canvas,
-            GameUtils.relativeToAbsoluteOffset(playerCenter, screenSize.height),
-            absoluteImgPos,
-            angle,
-            offset: absoluteWeaponShift * -1,
-            flipped: true);
-      } else
-        drawFlippedImage(canvas, fetchNextFrame(),
-            Offset(absoluteImgPos.dx, absoluteImgPos.dy));
-    }
-
-    if (weapon.inSelection && weapon.ammunition != double.infinity) {
-      Offset ammunitionCenterPos = weapon.centerPos +
-          Offset(0, Arsenal.selectionElementRadius - ammunitionRadius);
-
-      canvas.drawCircle(
-          GameUtils.relativeToAbsoluteOffset(
-              ammunitionCenterPos, screenSize.height),
-          GameUtils.relativeToAbsoluteDist(ammunitionRadius, screenSize.height),
-          Paint()..color = ammoColor);
-
-      TextDrawer(weapon.ammunition.toInt().toString(), TextPositions.custom,
-              ammoFontSize,
-              customPosition: ammunitionCenterPos + ammoTextOffset,
-              color: Colors.black)
-          .paint(canvas, screenSize, showHitBoxes, cameraPosition);
+      drawImage(canvas, fetchNextFrame(), imgPos,
+          rotationCenter: GameUtils.relativeToAbsoluteOffset(
+              playerCenter, screenSize.height),
+          angle: angle,
+          flipped: dirFaced == Character.LEFT,
+          target: GameUtils.relativeToAbsoluteSize(weapon.relativeSize, screenSize.height));
     }
   }
 }

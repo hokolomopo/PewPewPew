@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'assets_manager.dart';
@@ -43,9 +41,9 @@ class CharacterDrawer extends ImagedDrawer {
 
     // Flip the sprite depending on the character orientation
     if(character.directionFaced == Character.RIGHT)
-      canvas.drawImage(sprite, Offset(left, top), Paint());
+      drawImage(canvas, sprite, Offset(left, top));
     else
-      drawFlippedImage(canvas, sprite, Offset(left, top), paint: Paint());
+      drawImage(canvas, sprite, Offset(left, top), flipped: true);
 
 
     double lifeBarTop = top - distanceLifeBarCharacter * screenSize.height;

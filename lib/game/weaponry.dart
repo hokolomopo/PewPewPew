@@ -5,18 +5,13 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/drawer_abstracts.dart';
-import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/projectile_drawer.dart';
 import 'package:info2051_2018/draw/assets_manager.dart';
-import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/game_main.dart';
-import 'package:info2051_2018/game/game_state.dart';
-import 'package:info2051_2018/game/ui_manager.dart';
 import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weapons.dart';
-import 'package:info2051_2018/game/world.dart';
 import 'package:info2051_2018/sound_player.dart';
 
 import 'character.dart';
@@ -94,8 +89,6 @@ class Arsenal {
 
 
 abstract class Weapon {
-  static final Size relativeSize = Size(5, 3);
-
   AssetId projectileAssetId;
   ImagedDrawer drawer;
   Character owner;
@@ -117,28 +110,31 @@ abstract class Weapon {
 
   List<Projectile> projectiles = List();
 
-  Size weaponSize;
-  Offset weaponCenterOffset = Offset(0,0);
+  Offset get weaponCenterOffset;
 
-  Weapon(this.owner);
+  Size get relativeSize;
 
-  static Offset getOffsetRightOfChar(Size relativeSize) {
+  Offset getOffsetRightOfChar(Size relativeSize) {
     return Offset(Character.hitboxSize.width,
-        (Character.hitboxSize.height - relativeSize.height) / 2);
+        (Character.hitboxSize.height - relativeSize.height) / 2) - Offset(weaponCenterOffset.dx, weaponCenterOffset.dy);
   }
 
-  static Offset getOffsetLeftOfChar(Size relativeSize) {
+  Offset getOffsetLeftOfChar(Size relativeSize) {
     return Offset(-relativeSize.width,
-        (Character.hitboxSize.height - relativeSize.height) / 2);
+        (Character.hitboxSize.height - relativeSize.height) / 2) - Offset(-weaponCenterOffset.dx, weaponCenterOffset.dy);
   }
 
-  static final Map<int, Offset Function(Size)> directionFacedToOffset = Map()
-    ..putIfAbsent(Character.LEFT, () => getOffsetLeftOfChar)
-    ..putIfAbsent(Character.RIGHT, () => getOffsetRightOfChar);
+  Map<int, Offset Function(Size)> directionFacedToOffset;
 
   // This variable should be initialised properly in the children, however
   // we initialise it here because we can't define abstract variables.
   final AssetId selectionAsset = AssetId.background;
+
+  Weapon(this.owner) {
+    directionFacedToOffset = Map()
+      ..putIfAbsent(Character.LEFT, () => getOffsetLeftOfChar)
+      ..putIfAbsent(Character.RIGHT, () => getOffsetRightOfChar);
+  }
 
   factory Weapon.fromWeaponStats(Character owner, WeaponStats weaponStats){
     Weapon w;
@@ -180,9 +176,8 @@ abstract class Weapon {
     this.topLeftPos = topLeftPos;
     inSelection = true;
 
-
     // Center the weapon if it's not a square sprite
-    double heightRatio = weaponSize.height / weaponSize.width;
+    double heightRatio = relativeSize.height / relativeSize.width;
     drawer.relativeSize = Size(Arsenal.selectionElementSize.width,
         Arsenal.selectionElementSize.height * heightRatio);
     this.topLeftPos += Offset(0, Arsenal.selectionElementSize.height * ((1 - heightRatio) / 2));
@@ -190,7 +185,6 @@ abstract class Weapon {
 
   selected() {
     inSelection = false;
-    drawer.relativeSize = weaponSize;
   }
 
   // TODO Override these 2 functions to get multiple projectile behavior
