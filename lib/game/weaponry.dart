@@ -214,84 +214,16 @@ abstract class Weapon {
     return projectiles;
   }
 
-  ///Function which apply Damage and knockback to characters according to
-  /// its actual position and range.
-  /// Sends back a Map representing injured char and with which intensity
-  Map<Character, double> applyImpact(Projectile projectile, List<Team> characters) {
-    Map<Character, double> ret = Map();
-    Character curChar;
-    for (int i = 0; i < characters.length; i++) {
-      for (int j = 0; j < characters[i].length; j++) {
-        curChar = characters[i].getCharacter(j);
-
-        bool isCollided = false;
-        double dist;
-
-        if(isExplosive) {
-          // apply a circular HitBox
-
-          dist =
-              (projectile.getPosition() - curChar.getPosition()).distance;
-          isCollided = (dist <= range);
-        }
-        else
-          isCollided = curChar.hitbox.intersects(projectile.hitbox);
-
-
-        // If actual character was touched
-        if (isCollided) {
-          // Apply damage reduce according to dist [33% - 100%]
-          double effectiveDamage = damage.toDouble();
-          if(isExplosive)
-            effectiveDamage = effectiveDamage * (1.0 + 2.0 * (range - dist) / range) / 3.0;
-
-          // Update stats
-          double damageDealt = min(effectiveDamage, curChar.hp);
-          curChar.removeHp(damageDealt);
-
-          // Apply a vector field for knockback to know the direction
-          Offset projection = curChar.getPosition() - projectile.getPosition();
-
-          // Normalize offset
-          projection = Offset(projection.dx.sign, 1);
-
-          // The closer to the center of detonation the stronger the knockback
-          // Factor from 0% to 100%
-          if(this.isExplosive)
-            projection *= (range - dist) / range;
-
-          // Applied factor for knockback strenght
-          projection *= knockbackStrength.toDouble();
-
-          curChar.addVelocity(Offset(projection.dx, -projection.dx.abs()));
-
-          // Add to return value
-          ret[curChar] = damageDealt;
-        }
-      }
-    }
-
-    return ret;
-
-  }
-
 }
 
 abstract class Projectile extends MovingEntity {
-  AssetId explosionAssetId;
   AssetId assetId;
 
   double weight;
   int maxSpeed;
   double frictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
-
-  bool explodeOnImpact = false;
-  double detonationDelay = 1;
-
-  String explosionSound;
-  Size explosionSize;
-
-  Stopwatch timer = Stopwatch();
+  int damage;
+  int knockBackStrength;
 
   // For projectile which need orientation [Like arrows]
   // expressed in radian in a clockwise way
@@ -300,21 +232,25 @@ abstract class Projectile extends MovingEntity {
   factory Projectile.fromWeaponStats(Offset position, MutableRectangle<num> hitbox, AssetId projectileAsset, WeaponStats weaponStats){
     Projectile p;
     if(weaponStats.isExplosive)
-      p = ExplosiveProjectile(position, hitbox);
+      p = ExplosiveProjectile(position, hitbox,
+            explosionSound: weaponStats.explosionSound,
+            explosionAssetId: AssetIdMapper.map[weaponStats.explosionAsset],
+            explosionSize: weaponStats.explosionSize,
+            explodeOnImpact: weaponStats.explodeOnImpact,
+            detonationDelay: weaponStats.detonationDelay,
+            explosionRange: weaponStats.range,
+      );
     else
-      p = BaseProjectile(position, hitbox);
+      p = LinearProjectile(position, hitbox);
 
     p.assetId = projectileAsset;
     p.weight = weaponStats.projectileWeight;
     p.maxSpeed = weaponStats.projectileMaxSpeed;
     p.frictionFactor = weaponStats.projectileFrictionFactor;
-    p.explosionSound = weaponStats.explosionSound;
-    p.explosionAssetId = AssetIdMapper.map[weaponStats.explosionAsset];
-    p.explosionSize = weaponStats.explosionSize;
     p.drawer = ProjectileDrawer(projectileAsset, p, size:weaponStats.projectileHitboxSize);
     p.actualOrientation = weaponStats.projectileEnableOrientation.toDouble();
-    p.explodeOnImpact = weaponStats.explodeOnImpact;
-    p.detonationDelay = weaponStats.detonationDelay;
+    p.damage = weaponStats.damage;
+    p.knockBackStrength = weaponStats.knockbackStrength;
 
     return p;
   }
@@ -336,7 +272,8 @@ abstract class Projectile extends MovingEntity {
     this.addVelocity(Offset(0, 0) - this.velocity * frictionFactor);
 
     // To indicate canvas to stay on same frame
-    if (frictionFactor == 1) drawer.freezeAnimation();
+    if (frictionFactor == 1)
+      drawer.freezeAnimation();
   }
 
   // Have to be override by children
@@ -346,22 +283,6 @@ abstract class Projectile extends MovingEntity {
 
   ///Function to play a sound effect at the start of the launch
   void playStartSound(){}
-
-  /// Function to check if projectile has ended, or not
-  /// If it does, create explosion animation
-  bool checkTTL(){
-    return timer.elapsedMilliseconds > detonationDelay;
-  }
-
-  void resetStopWatch() {
-    timer.stop();
-    timer.reset();
-  }
-
-  void startTimer(){
-    timer.start();
-  }
-
 }
 
 /// Class to implement projectile which react a command (onTap for instance),
@@ -391,8 +312,37 @@ abstract class Controllable extends Projectile{
 /// Class to implement projectile which are explosives and have a detonation timer.
 /// (Bombs, ...)
 class ExplosiveProjectile extends Projectile{
-  // TODO change following constructor copied from previous test projectile
-  ExplosiveProjectile(position, Rectangle hitbox): super(position, hitbox);
+  AssetId explosionAssetId;
+
+  bool explodeOnImpact = false;
+  double detonationDelay = 1;
+
+  String explosionSound;
+  Size explosionSize;
+
+  int explosionRange;
+
+  Stopwatch timer = Stopwatch();
+
+  ExplosiveProjectile(position, Rectangle hitbox, {this.explodeOnImpact, this.detonationDelay,
+    this.explosionSound:"explosion.mp3", this.explosionSize, this.explosionAssetId:AssetId.explosion_dhs,
+    this.explosionRange}):
+        super(position, hitbox);
+
+  /// Function to check if projectile has ended, or not
+  /// If it does, create explosion animation
+  bool checkTTL(){
+    return timer.elapsedMilliseconds > detonationDelay;
+  }
+
+  void resetStopWatch() {
+    timer.stop();
+    timer.reset();
+  }
+
+  void startTimer(){
+    timer.start();
+  }
 
   @override
   MyAnimation returnAnimationInstance(){
@@ -407,6 +357,7 @@ class ExplosiveProjectile extends Projectile{
 
     return MyAnimation(pos, explosionAssetId, s, hitbox, explosionSound);
   }
+
 }
 
 /// Mixin class for projectile which applyImpact when intersecting another
@@ -414,8 +365,8 @@ class ExplosiveProjectile extends Projectile{
 /// (Arrow, Bombardement, ...)
 // TODO method in World check projectile collision, if not Collidable just return false,
 // else apply method
-class BaseProjectile extends Projectile {
-  BaseProjectile(position, Rectangle hitbox): super(position, hitbox);
+class LinearProjectile extends Projectile {
+  LinearProjectile(position, Rectangle hitbox): super(position, hitbox);
 }
 
 /// Animation (Gif) limited in Time (counted in total frames)
@@ -439,7 +390,6 @@ class MyAnimation extends Entity {
   bool hasEnded() {
     return animationEnded;
   }
-
 }
 
 /// Specification of MyAnimation for loop Animation along side simple sound effect

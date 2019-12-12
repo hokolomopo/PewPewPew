@@ -134,8 +134,8 @@ class _LevelCreatorState extends State<LevelCreatorMain> {
 
     // Invert Y axis
     for(TerrainBlock block in level.terrain)
-      block.hitBox = Rectangle(block.hitBox.left, level.size.height - block.hitBox.top,
-          block.hitBox.width, block.hitBox.height);
+      block.hitbox = MutableRectangle(block.hitbox.left, level.size.height - block.hitbox.top,
+          block.hitbox.width, block.hitbox.height);
   }
 
   void createSpawns(){
