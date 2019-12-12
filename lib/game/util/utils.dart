@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:info2051_2018/game/character.dart';
+
 class GameUtils {
   static Offset absoluteToRelativeOffset(Offset offset, double screenHeight) {
     return offset * 100 / screenHeight;
@@ -82,4 +84,11 @@ class HexColor extends Color {
   }
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
+
+class CharacterDamagePair{
+  Character c;
+  double dmg;
+
+  CharacterDamagePair(this.c, this.dmg);
 }

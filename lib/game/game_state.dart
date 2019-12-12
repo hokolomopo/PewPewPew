@@ -87,6 +87,7 @@ class GameState {
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
     uiManager = UiManager(painter);
+    world.registerDamageDealtCallback(this.displayAndRecordDamage);
 
     level.spawnPoints.shuffle();
 
@@ -112,29 +113,6 @@ class GameState {
 
     switchState(GameStateMode.char_selection);
   }
-
-  void displayAndRecordDamage(Map<Character, double> damages){
-
-    for (Character curChar in damages.keys) {
-
-      double damageDealt = damages[curChar];
-
-      uiManager.addText(
-          "-" + damageDealt.ceil().toString(), TextPositions.custom, 25,
-          customPosition: curChar.getPosition() + Character.dmgTextOffset,
-          duration: 3,
-          fadeDuration: 2,
-          color: Colors.red);
-
-      players[currentPlayer].updateStats(TeamStat.damage_dealt, damageDealt, teamTakingAttack: curChar.team);
-
-      if (curChar.hp == 0)
-        players[currentPlayer].updateStats(TeamStat.killed, 1, teamTakingAttack: curChar.team);
-    }
-
-  }
-
-
 
 
   void update(double timeElapsed) {
@@ -209,10 +187,7 @@ class GameState {
 
           // Checking if a collidable projectile has
           // intersect a hitbox (terrain or character)
-          if (world.checkCollidableProj(getCurrentCharacter()) || p.checkTTL()){
-            Map<Character, double> damages= currentWeapon.applyImpact(p, players);
-            displayAndRecordDamage(damages);
-
+          if (p.isDead){
             MyAnimation endAnimation = p.returnAnimationInstance();
             if(endAnimation != null)
               addAnimation(endAnimation);
@@ -313,70 +288,23 @@ class GameState {
     currentCharIsDead = false;
   }
 
-  void addCharacter(int playerId, Character character) {
-    players[playerId].addCharacter(character);
+  void displayAndRecordDamage(List<CharacterDamagePair> list){
+    for (CharacterDamagePair pair in list) {
+      Character currChar = pair.c;
+      double damageDealt = pair.dmg;
 
-    world.addCharacter(character);
-    painter.addElement(character.drawer);
-  }
+      uiManager.addText(
+      "-" + damageDealt.ceil().toString(), TextPositions.custom, 25,
+      customPosition: currChar.getPosition() + Character.dmgTextOffset,
+      duration: 3,
+      fadeDuration: 2,
+      color: Colors.red);
 
-  void removeCharacter(int playerId, int charID) {
-    Character toRemove = players[playerId].getCharacter(charID);
-    players[playerId].removeCharacter(toRemove);
+      players[currentPlayer].updateStats(TeamStat.damage_dealt, damageDealt, teamTakingAttack: currChar.team);
 
-    world.removeCharacter(toRemove);
-    painter.removeElement(toRemove.drawer);
-
-    if (playerId == currentPlayer && charID == currentCharacter)
-      currentCharIsDead = true;
-  }
-
-  addTerrainBlock(TerrainBlock block) {
-    world.addTerrain(block);
-    painter.addElement(block.drawer);
-    terrainStrokeDrawer.addTerrainBlock(block);
-  }
-
-  removeTerrainBlock(TerrainBlock block) {
-    world.removeTerrain(block);
-    painter.removeElement(block.drawer);
-    terrainStrokeDrawer.removeTerrainBlock(block);
-  }
-
-  removePlayer(int playerID) {
-    this.computeStats(players[playerID]);
-
-    players.removeAt(playerID);
-    if (currentPlayer > playerID) currentPlayer--;
-  }
-
-  Character getCurrentCharacter() {
-    if (currentCharIsDead ||
-        players.length <= currentPlayer ||
-        players[currentPlayer].length <= currentCharacter) return null;
-    return players[currentPlayer].getCharacter(currentCharacter);
-  }
-
-  void addProjectile(Projectile projectile) {
-    projectiles.add(projectile);
-    world.addProjectile(projectile);
-    painter.addElement(projectile.drawer);
-  }
-
-  void removeProjectile(Projectile projectile) {
-    projectiles.remove(projectile);
-    world.removeProjectile(projectile);
-    painter.removeElement(projectile.drawer);
-  }
-
-  void addAnimation(MyAnimation animation) {
-    currentAnimations.add(animation);
-    painter.addElement(animation.drawer);
-  }
-
-  void removeAnimation(MyAnimation animation) {
-    currentAnimations.remove(animation);
-    painter.removeElement(animation.drawer);
+      if (currChar.hp == 0)
+        players[currentPlayer].updateStats(TeamStat.killed, 1, teamTakingAttack: currChar.team);
+    }
   }
 
   void onTap(TapUpDetails details) {
@@ -810,6 +738,75 @@ class GameState {
   void computeStats(Team t) {
     Map<TeamStat, double> teamStats = t.computeStats();
     gameStats.statistics.putIfAbsent(t.teamName, () => teamStats);
+  }
+
+  void addCharacter(int playerId, Character character) {
+    players[playerId].addCharacter(character);
+
+    world.addCharacter(character);
+    painter.addElement(character.drawer);
+  }
+
+  void removeCharacter(int playerId, int charID) {
+    print("Character of player " + currentPlayer.toString() + " is dead");
+
+    Character toRemove = players[playerId].getCharacter(charID);
+    players[playerId].removeCharacter(toRemove);
+
+    world.removeCharacter(toRemove);
+    painter.removeElement(toRemove.drawer);
+
+    if (playerId == currentPlayer && charID == currentCharacter)
+      currentCharIsDead = true;
+  }
+
+  void addTerrainBlock(TerrainBlock block) {
+    world.addTerrain(block);
+    painter.addElement(block.drawer);
+  }
+
+  void removeTerrainBlock(TerrainBlock block) {
+    world.removeTerrain(block);
+    painter.removeElement(block.drawer);
+  }
+
+  void removePlayer(int playerID) {
+    print("Player " + playerID.toString() + " is dead");
+    this.computeStats(players[playerID]);
+
+    players.removeAt(playerID);
+    if (currentPlayer > playerID) currentPlayer--;
+  }
+
+
+  void addProjectile(Projectile projectile) {
+    projectiles.add(projectile);
+    world.addProjectile(projectile);
+    painter.addElement(projectile.drawer);
+  }
+
+  void removeProjectile(Projectile projectile) {
+    projectiles.remove(projectile);
+    world.removeProjectile(projectile);
+    painter.removeElement(projectile.drawer);
+  }
+
+  void addAnimation(MyAnimation animation) {
+    print("AddAnimation");
+    currentAnimations.add(animation);
+    painter.addElement(animation.drawer);
+  }
+
+  void removeAnimation(MyAnimation animation) {
+    currentAnimations.remove(animation);
+    painter.removeElement(animation.drawer);
+  }
+
+  Character getCurrentCharacter() {
+    if (currentCharIsDead ||
+        players.length <= currentPlayer ||
+        players[currentPlayer].length <= currentCharacter) return null;
+    return players[currentPlayer].getCharacter(currentCharacter);
   }
 
 

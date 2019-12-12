@@ -6,7 +6,6 @@ import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
-import 'package:info2051_2018/quickplay_widgets.dart';
 
 import 'level.dart';
 
@@ -21,7 +20,7 @@ class World{
 
   Offset gravity;
 
-
+  void Function(List<CharacterDamagePair>) damageDealtCallback;
 
   World({this.gravityForce=0.02}){
     gravity = Offset(0, gravityForce);
@@ -37,42 +36,48 @@ class World{
     }
 
     for(Projectile p in projectiles){
+      if(p is ExplosiveProjectile && p.checkTTL())
+        manageExplosion(p);
+
       p.addAcceleration(gravity);
       p.accelerate();
       moveEntity(p, timeElapsed);
     }
   }
 
-  // To be sure no problem at launch
-  // Exception for actual caracter
-  bool checkCollidableProj(Character actualCharacter) {
-    for (Projectile p in projectiles) {
-      if (!p.explodeOnImpact)
-        return false;
+  //TODO delete dis
+//  // To be sure no problem at launch
+//  // Exception for actual character
+//  bool checkCollidableProj(Character actualCharacter) {
+//    for (Projectile p in projectiles) {
+//      if (!p.explodeOnImpact)
+//        return false;
+//
+//      // First check terrains
+//      // Careful to backtrack mecanism
+//      // Make hitbox wider
+//      for (TerrainBlock t in terrain){
+//        // 10% scale up is a good value
+//        double scale = 0.1;
+//        double left = p.hitbox.left - scale * p.hitbox.width / 2;
+//        double top =  p.hitbox.top - scale * p.hitbox.width / 2;
+//        double width = p.hitbox.width + scale * p.hitbox.width;
+//        double height = p.hitbox.height + scale * p.hitbox.height;
+//        Rectangle hitbox = Rectangle(left, top, width, height);
+//        if (t.hitbox.intersects(hitbox))
+//          return true;
+//      }
+//
+//      for (Character c in players)
+//        if(c != actualCharacter)
+//          if(c.hitbox.intersects(p.hitbox))
+//            return true;
+//    }
+//
+//    return false;
+//  }
 
-      // First check terrains
-      // Careful to backtrack mecanism
-      // Make hitbox wider
-      for (TerrainBlock t in terrain){
-        // 10% scale up is a good value
-        double scale = 0.1;
-        double left = p.hitbox.left - scale * p.hitbox.width / 2;
-        double top =  p.hitbox.top - scale * p.hitbox.width / 2;
-        double width = p.hitbox.width + scale * p.hitbox.width;
-        double height = p.hitbox.height + scale * p.hitbox.height;
-        Rectangle hitbox = Rectangle(left, top, width, height);
-        if (t.hitbox.intersects(hitbox))
-          return true;
-      }
 
-      for (Character c in players)
-        if(c != actualCharacter)
-          if(c.hitbox.intersects(p.hitbox))
-            return true;
-    }
-
-    return false;
-  }
 
   void moveEntity(MovingEntity entity, double timeElapsed){
 
@@ -82,6 +87,9 @@ class World{
 
     for(TerrainBlock t in terrain){
       if(entity.hitbox.intersects(t.hitbox)){
+        if(entity is Projectile)
+          manageProjectileCollision(entity, t);
+
         backTrackX(entity, t.hitbox, vector.dx);
         entity.stopX();
       }
@@ -93,8 +101,13 @@ class World{
 
     for(TerrainBlock t in terrain){
       if(entity.hitbox.intersects(t.hitbox)){
+
+        if(entity is Projectile)
+          manageProjectileCollision(entity, t);
+
         backTrackY(entity, t.hitbox, vector.dy);
         entity.stopY();
+
 
         //If vector.dy == gravity, it means that there was only 1 frame of falling.
         //This will happens because the character is always slightly above the ground,
@@ -109,6 +122,69 @@ class World{
         }
       }
     }
+
+    if(entity is Projectile)
+      for (Character c in players)
+          if(c.hitbox.intersects(entity.hitbox))
+            manageProjectileCollision(entity, c);
+
+  }
+
+  void manageProjectileCollision(Projectile projectile, Entity collided){
+
+    // Projectiles that explode on hit
+    if(projectile is ExplosiveProjectile && projectile.explodeOnImpact)
+      manageExplosion(projectile);
+
+    // Projectile that do damage on hit
+    else if(projectile is LinearProjectile && collided is Character){
+      // Update stats
+      double damageDealt = min(projectile.damage.toDouble(), collided.hp);
+      collided.removeHp(damageDealt);
+      List l = List();
+      l.add(CharacterDamagePair(collided, damageDealt));
+      damageDealtCallback(l);
+    }
+  }
+
+  void manageExplosion(ExplosiveProjectile projectile) {
+    List<CharacterDamagePair> damageDealtList = List();
+
+    for (Character char in this.players) {
+      // apply a circular HitBox
+      double dist = (projectile.getPosition() - char.getPosition()).distance;
+
+      // The character is in the explosion radius
+      if (dist <= projectile.explosionRange) {
+
+        // Apply damage reduce according to dist [33% - 100%]
+        double effectiveDamage = projectile.damage.toDouble();
+        effectiveDamage *= (1.0 + 2.0 * (projectile.explosionRange - dist) / projectile.explosionRange) / 3.0;
+
+
+        // Apply a vector field for knockback to know the direction
+        Offset projection = char.getPosition() - projectile.getPosition();
+
+        // Normalize offset
+        projection = Offset(projection.dx.sign, 1);
+
+        // The closer to the center of detonation the stronger the knockback
+        // Factor from 0% to 100%
+        projection *= (projectile.explosionRange - dist) / projectile.explosionRange;
+
+        // Applied factor for knockback strenght
+        projection *= projectile.knockBackStrength.toDouble();
+
+        char.addVelocity(Offset(projection.dx, -projection.dx.abs()));
+
+        // Update stats
+        double damageDealt = min(effectiveDamage, char.hp);
+        char.removeHp(damageDealt);
+        damageDealtList.add(CharacterDamagePair(char, damageDealt));
+      }
+    }
+
+    this.damageDealtCallback(damageDealtList);
   }
 
   //Used when a collision occurs in the X axis.
@@ -129,6 +205,9 @@ class World{
       backtracked.setYPosition(collided.top + collided.height + epsilon);
   }
 
+  void registerDamageDealtCallback(void Function(List<CharacterDamagePair>) callback){
+    this.damageDealtCallback = callback;
+  }
 
   void addCharacter(Character c){
     players.add(c);

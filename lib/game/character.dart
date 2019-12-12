@@ -43,7 +43,6 @@ class Character extends MovingEntity {
 
   bool _isAirborne = false;
   bool isDying = false;
-  bool isDead = false;
   bool isLanding = false;
   bool _isWalking = false;
   bool isIdle = true;
