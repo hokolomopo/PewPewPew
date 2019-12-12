@@ -45,7 +45,6 @@ class ParametersState extends State<Parameters> {
   }
 
   void _selectTerrain(Terrain value) {
-    print("selectTerrain");
     setState(() {
       _terrain = value;
     });

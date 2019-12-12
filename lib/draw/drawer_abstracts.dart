@@ -49,7 +49,6 @@ abstract class ImagedDrawer extends CustomDrawer {
 
   /// Fetch the next frame of the gif
   ui.Image fetchNextFrame() {
-    if (gifInfo == null) print(assetId.toString() + " " + team.toString());
     return gifInfo.fetchNextFrame();
   }
 

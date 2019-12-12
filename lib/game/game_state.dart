@@ -314,8 +314,6 @@ class GameState {
   }
 
   void removeCharacter(int playerId, int charID) {
-    print("Character of player " + currentPlayer.toString() + " is dead");
-
     Character toRemove = players[playerId].getCharacter(charID);
     players[playerId].removeCharacter(toRemove);
 
@@ -337,7 +335,6 @@ class GameState {
   }
 
   void removePlayer(int playerID) {
-    print("Player " + playerID.toString() + " is dead");
     this.computeStats(players[playerID]);
 
     players.removeAt(playerID);
@@ -363,9 +360,7 @@ class GameState {
     painter.removeElement(projectile.drawer);
   }
 
-  // TODO put add and remove line for currentAnimations list
   void addAnimation(MyAnimation animation) {
-    print("AddAnimation");
     currentAnimations.add(animation);
     painter.addElement(animation.drawer);
   }
@@ -381,8 +376,6 @@ class GameState {
 
     //Take camera into account
     tapPosition += camera.position;
-
-    print("OnTap : " + tapPosition.toString());
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -468,8 +461,6 @@ class GameState {
     Offset dragPosition = GameUtils.absoluteToRelativeOffset(
         details.globalPosition, GameMain.size.height);
     Offset dragPositionCamera = dragPosition + camera.position;
-
-    print("PanStart : " + dragPosition.toString());
 
     switch (currentState) {
       case GameStateMode.char_selection:
@@ -630,10 +621,6 @@ class GameState {
         details.globalPosition, GameMain.size.height);
     longPressPosition += camera.position;
 
-    print("OnLongPress : " + longPressPosition.toString());
-
-    print(currentState.toString());
-
     switch (currentState) {
       case GameStateMode.char_selection:
         this.camera.resetInertia();
@@ -709,7 +696,7 @@ class GameState {
 
         uiManager.removeStaminaDrawer();
         this.teamTurnText = uiManager.addText(
-            teamNames[currentPlayer] + " team turn !", TextPositions.center, 50,
+            players[currentPlayer].teamName + " team turn !", TextPositions.center, 50,
             duration: 3, fadeDuration: 3, ignoreCamera: true);
         break;
 
@@ -803,7 +790,6 @@ class GameState {
       case GameStateMode.cinematic:
         if (currentWeapon != null) painter.removeElement(currentWeapon.drawer);
         currentWeapon = null;
-        print("Set currentWeapon to null");
         break;
       case GameStateMode.over:
         break;
