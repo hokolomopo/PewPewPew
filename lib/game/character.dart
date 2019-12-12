@@ -173,13 +173,14 @@ class Character extends MovingEntity {
 
     // Give priority to death animation
     if (isDying || isDead) {
+      this.stop();
       _isWalking = false;
       _isAirborne = false;
       isIdle = false;
     }
 
     // Check if we need to change the animation
-    if (this.isWalking() && drawer.assetId != AssetId.char_running)
+    if (isWalking() && drawer.assetId != AssetId.char_running)
       drawer.gif = AssetId.char_running;
     else if (isAirborne() && drawer.assetId != AssetId.char_jumping)
       drawer.gif = AssetId.char_jumping;

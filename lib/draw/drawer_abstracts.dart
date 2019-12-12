@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/paint_constants.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'assets_manager.dart';
 

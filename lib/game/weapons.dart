@@ -1,13 +1,8 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:info2051_2018/draw/assets_manager.dart';
-import 'package:info2051_2018/draw/level_painter.dart';
 import 'package:info2051_2018/draw/weapon_drawer.dart';
-import 'package:info2051_2018/game/ui_manager.dart';
-import 'package:info2051_2018/game/util/team.dart';
 import 'package:info2051_2018/game/weaponry.dart';
-import 'package:info2051_2018/game/world.dart';
 
 import 'character.dart';
 
@@ -26,7 +21,6 @@ class Fist extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_fist, this, relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
   }
 
 }
@@ -44,7 +38,6 @@ class Colt extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_colt, this, Weapon.relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
   }
 
 }
@@ -63,7 +56,6 @@ class Railgun extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_railgun, this, Weapon.relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
   }
 
 
@@ -84,7 +76,6 @@ class Grenade extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_grenade, this, Weapon.relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
   }
 
 
@@ -105,7 +96,7 @@ class Shotgun extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_shotgun, this, Weapon.relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
+    this.projectileAssetId = AssetId.projectile_big_bullet;
   }
 }
 
@@ -124,7 +115,7 @@ class Sniper extends Weapon {
     this.drawer =
         WeaponDrawer(AssetId.weapon_sniper, this, Weapon.relativeSize);
     this.name = weaponName;
-    this.projectileAssetId = AssetId.projectile_dhs;
+    this.projectileAssetId = AssetId.projectile_bullet;
   }
 
 

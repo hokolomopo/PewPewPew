@@ -103,14 +103,15 @@ abstract class Weapon {
   Offset topLeftPos;
   bool inSelection;
 
+
   String name;
 
   int damage;
   int range;
 
   double detonationDelay;
-
   double ammunition;
+  bool isExplosive;
 
   int knockbackStrength = 0;
 
@@ -167,6 +168,7 @@ abstract class Weapon {
     w.ammunition = weaponStats.ammunition;
     w.knockbackStrength = weaponStats.knockbackStrength;
     w.projectileAssetId = AssetIdMapper.map[weaponStats.projectileAsset];
+    w.isExplosive = weaponStats.isExplosive && w.range > 0;
 
     return w;
   }
@@ -249,36 +251,47 @@ abstract class Weapon {
     for (int i = 0; i < characters.length; i++) {
       for (int j = 0; j < characters[i].length; j++) {
         curChar = characters[i].getCharacter(j);
-        // apply a circular HitBox
 
-        double dist =
-            (projectile.getPosition() - curChar.getPosition()).distance;
+        bool isCollided = false;
+        double dist;
+
+        if(isExplosive) {
+          // apply a circular HitBox
+
+          dist =
+              (projectile.getPosition() - curChar.getPosition()).distance;
+          isCollided = (dist <= range);
+        }
+        else
+          isCollided = curChar.hitbox.intersects(projectile.hitbox);
+
 
         // If actual character was touched
-        if (dist <= range) {
+        if (isCollided) {
           // Apply damage reduce according to dist [33% - 100%]
-          double effectiveDamage =
-              damage.toDouble() * (1.0 + 2.0 * (range - dist) / range) / 3.0;
+          double effectiveDamage = damage.toDouble();
+          if(isExplosive)
+            effectiveDamage = effectiveDamage * (1.0 + 2.0 * (range - dist) / range) / 3.0;
 
           // Update stats
           double damageDealt = min(effectiveDamage, curChar.hp);
           curChar.removeHp(damageDealt);
 
-          // Apply a vector field for knockback
+          // Apply a vector field for knockback to know the direction
           Offset projection = curChar.getPosition() - projectile.getPosition();
 
-          //Make sure the jump is not totally horizontal for ease of collision detection
-          if (projection.dy == 0) projection += Offset(0, 0.1);
-
           // Normalize offset
-          projection /= projection.dx + projection.dy;
+          projection = Offset(projection.dx.sign, 1);
 
           // The closer to the center of detonation the stronger the knockback
           // Factor from 0% to 100%
-          projection *= (range - dist) / range;
-          // Applied factor for knockback strengh
+          if(this.isExplosive)
+            projection *= (range - dist) / range;
+
+          // Applied factor for knockback strenght
           projection *= knockbackStrength.toDouble();
-          curChar.addVelocity(projection);
+
+          curChar.addVelocity(Offset(projection.dx, -projection.dx.abs()));
 
           // Add to return value
           ret[curChar] = damageDealt;

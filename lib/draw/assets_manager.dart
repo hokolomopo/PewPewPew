@@ -17,6 +17,9 @@ enum AssetId {
   background,
   projectile_boulet,
   projectile_dhs,
+  projectile_laser,
+  projectile_bullet,
+  projectile_big_bullet,
   explosion_dhs,
   ui_arrow,
   weapon_fist,
@@ -37,7 +40,12 @@ class AssetIdMapper{
 
   static final Map<String, AssetId> map = {
   "explosion.gif": AssetId.explosion_dhs,
-  "hand-spinner.gif": AssetId.projectile_dhs
+  "bullet_future": AssetId.projectile_laser,
+  "bullet1": AssetId.projectile_bullet,
+  "bullet3": AssetId.projectile_big_bullet,
+  "bullet4": AssetId.projectile_boulet,
+  "grenade": AssetId.weapon_grenade,
+  "fist": AssetId.weapon_fist,
   };
 }
 
@@ -69,48 +77,48 @@ class AssetsManager {
     //TODO put good sizes for weapons
     AssetId.background: Asset(AssetId.background, null),
     AssetId.projectile_boulet: Asset(AssetId.projectile_boulet,
-        "assets/graphics/arsenal/projectiles/red_arc.gif"),
+        "assets/graphics/arsenal/projectiles/bullet4.png"),
+    AssetId.projectile_laser: Asset(AssetId.projectile_laser,
+        "assets/graphics/arsenal/projectiles/bullet_future.png"),
+    AssetId.projectile_bullet: Asset(AssetId.projectile_bullet,
+        "assets/graphics/arsenal/projectiles/bullet1.png"),
+    AssetId.projectile_big_bullet: Asset(AssetId.projectile_big_bullet,
+        "assets/graphics/arsenal/projectiles/bullet3.png"),
     AssetId.projectile_dhs: Asset(AssetId.projectile_dhs,
         "assets/graphics/arsenal/projectiles/hand-spinner.gif"),
     AssetId.ui_arrow: Asset(
         AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif",
         size: MarkerDrawer.markerArrowSize),
-
     AssetId.weapon_fist: Asset(
         AssetId.weapon_fist, _weaponAssetPrefix + "fist.png",
         size: Fist.relativeSize),
     AssetId.weapon_fist_sel: Asset(
         AssetId.weapon_fist_sel, _weaponAssetPrefix + "fist.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
-
     AssetId.weapon_colt: Asset(
         AssetId.weapon_colt, _weaponAssetPrefix + "colt_45.png",
         size: Colt.relativeSize),
     AssetId.weapon_colt_sel: Asset(
         AssetId.weapon_colt_sel, _weaponAssetPrefix + "colt_45.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
-
     AssetId.weapon_grenade: Asset(
         AssetId.weapon_grenade, _weaponAssetPrefix + "grenade2_nopin.png",
         size: Grenade.relativeSize),
     AssetId.weapon_grenade_sel: Asset(
         AssetId.weapon_grenade_sel, _weaponAssetPrefix + "grenade2_nopin.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
-
     AssetId.weapon_railgun: Asset(
         AssetId.weapon_railgun, _weaponAssetPrefix + "future_gun.png",
         size: Railgun.relativeSize),
     AssetId.weapon_railgun_sel: Asset(
         AssetId.weapon_railgun_sel, _weaponAssetPrefix + "future_gun.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
-
     AssetId.weapon_shotgun: Asset(
         AssetId.weapon_shotgun, _weaponAssetPrefix + "shotgun.png",
         size: Shotgun.relativeSize),
     AssetId.weapon_shotgun_sel: Asset(
         AssetId.weapon_shotgun_sel, _weaponAssetPrefix + "shotgun.png",
         size: Size(Arsenal.selectionElementSize.width, Arsenal.selectionElementSize.height)),
-
     AssetId.weapon_sniper: Asset(
         AssetId.weapon_sniper, _weaponAssetPrefix + "sniper.png",
         size: Sniper.relativeSize),

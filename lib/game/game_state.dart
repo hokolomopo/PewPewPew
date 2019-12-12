@@ -217,6 +217,8 @@ class GameState {
 
         for(Projectile p in toRemoveProj){
           removeProjectile(p);
+          if(cameraFocus == p)
+            cameraFocus = null;
         }
 
         // center camera on projectile
