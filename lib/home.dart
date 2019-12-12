@@ -263,9 +263,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             callSlider();
                           },
                           icon: Icon(
-                            Icons.queue_music,
+                            Icons.volume_up,
                             size: 30.0,
-                            color: Colors.white70,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -342,74 +342,69 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
 
   Widget callSlider() {
-//    showDialog(context: context, builder: (_) => volumeSlider(isMusic: true,));
-
-    _scaffoldKey.currentState.showBottomSheet<void>((BuildContext context) {
-
-      return DecoratedBox(
-        decoration: BoxDecoration(color: Theme.of(context).canvasColor),
-        child: ClipRect(
-          child: Container(child:
-          Padding(
-            padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  flex: 15,
+    showDialog(
+        context: context,
+        builder: (_) =>
+            Scaffold(
+                body: Center(child: DecoratedBox(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                  ),
                   child: Container(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(
-                        Icons.keyboard_return,
-                        color: Theme.of(context).primaryColor,
-                      ),
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 10.0, top: 10.0, bottom: 10.0),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: BackButton(
+                              color: Theme
+                                  .of(context)
+                                  .primaryColor,
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        ),
+
+                        Expanded(
+                          flex: 50,
+                          child: Column(children: <Widget>[
+                            AutoSizeText("Musique Volume"),
+                            volumeSlider(isMusic: true),
+
+                          ],),
+                        ),
+                        Expanded(
+                          flex: 50,
+                          child: Column(
+                            children: <Widget>[
+                              AutoSizeText("SFX Volume"),
+                              volumeSlider(isMusic: false),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.4,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.8,
+                    color: Colors.white,
                   ),
-                ),
-                Expanded(
-                  flex: 50,
-                  child: Column(children: <Widget>[
-                    Expanded(
-                      child: AutoSizeText("Musique Volume"),
-                    ),
-                    Expanded(
-                      child: volumeSlider(isMusic: true),
-                    )
-                  ],),
-                ),
-                Expanded(
-                  flex: 50,
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: AutoSizeText("SFX Volume"),
-                      ),
-                      Expanded(
-                        child: volumeSlider(isMusic: false),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),),
-            height: MediaQuery
-                .of(context)
-                .size
-                .height / 1.5,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-            color: Colors.white,
-          ),
-        ),
-      );
+                ),)
+
+            ));
 
 
-    });
+
+
 
   }
 
