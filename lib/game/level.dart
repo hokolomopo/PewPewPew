@@ -78,10 +78,9 @@ class Level {
 class TerrainBlock extends Entity{
   // Note that even if [withStroke] is [false], the top stroke will still
   // be painted.
-  bool withStroke = true;
   Color color = Colors.green;
 
-  TerrainBlock(double x, double y, double w, double h, {this.withStroke = true})
+  TerrainBlock(double x, double y, double w, double h)
       : super(Offset(x,y), MutableRectangle(x, y, w, h)){
     drawer = TerrainBlockDrawer(this);
   }

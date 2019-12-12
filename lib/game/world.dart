@@ -46,7 +46,6 @@ class World{
   }
 
 
-
   void moveEntity(MovingEntity entity, double timeElapsed){
 
     //Move in X axis
