@@ -55,7 +55,7 @@ class _GameMainState extends State<GameMain> with WidgetsBindingObserver {
     AssetsManager assetManager =
         AssetsManager(level.size, terrain.backgroundPath, nbPlayers);
     this.levelPainter =
-        LevelPainter(camera, level.size, assetManager, showHitBoxes: false);
+        LevelPainter(camera, level.size, assetManager);
     levelPainter.addElement(BackgroundDrawer(level.size, AssetId.background));
 
     state = GameState(nbPlayers, nbCharacters, levelPainter, level, camera,

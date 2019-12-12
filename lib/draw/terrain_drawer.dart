@@ -3,7 +3,6 @@ import 'package:info2051_2018/game/level.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 
 import 'drawer_abstracts.dart';
-import 'paint_constants.dart';
 import 'math.dart';
 
 class TerrainBlockDrawer extends CustomDrawer {
@@ -65,15 +64,8 @@ class TerrainBlockDrawer extends CustomDrawer {
 
     Paint terrainFillPaint = Paint()
       ..color = terrainBlock.color
-    ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill;
 
     canvas.drawRect(toDraw, terrainFillPaint);
-    if (terrainBlock.withStroke) {
-      canvas.drawRect(toDraw, terrainStrokePaint);
-    } else {
-      // We never paint no strokes at all : we at least paint the top one.
-      canvas.drawLine(
-          Offset(left, top), Offset(left + actualSize.width, top), terrainStrokePaint);
-    }
   }
 }

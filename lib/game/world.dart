@@ -61,7 +61,7 @@ class World{
         double width = p.hitbox.width + scale * p.hitbox.width;
         double height = p.hitbox.height + scale * p.hitbox.height;
         Rectangle hitbox = Rectangle(left, top, width, height);
-        if (t.hitBox.intersects(hitbox))
+        if (t.hitbox.intersects(hitbox))
           return true;
       }
 
@@ -81,8 +81,8 @@ class World{
     entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){
-      if(entity.hitbox.intersects(t.hitBox)){
-        backTrackX(entity, t.hitBox, vector.dx);
+      if(entity.hitbox.intersects(t.hitbox)){
+        backTrackX(entity, t.hitbox, vector.dx);
         entity.stopX();
       }
     }
@@ -92,8 +92,8 @@ class World{
     entity.move(vector * timeElapsed);
 
     for(TerrainBlock t in terrain){
-      if(entity.hitbox.intersects(t.hitBox)){
-        backTrackY(entity, t.hitBox, vector.dy);
+      if(entity.hitbox.intersects(t.hitbox)){
+        backTrackY(entity, t.hitbox, vector.dy);
         entity.stopY();
 
         //If vector.dy == gravity, it means that there was only 1 frame of falling.
@@ -160,17 +160,17 @@ class World{
     double minDist;
 
     for(TerrainBlock block in terrain){
-      if(block.hitBox.left > o.dx || block.hitBox.left + block.hitBox.width < o.dx)
+      if(block.hitbox.left > o.dx || block.hitbox.left + block.hitbox.width < o.dx)
         continue;
 
-      else if(block.hitBox.containsPoint(GameUtils.toPoint(o)))
+      else if(block.hitbox.containsPoint(GameUtils.toPoint(o)))
         return block;
 
-      else if(block.hitBox.top < o.dy)
+      else if(block.hitbox.top < o.dy)
         continue;
 
       else{
-        double dist = (block.hitBox.top - o.dy).abs();
+        double dist = (block.hitbox.top - o.dy).abs();
         if(minDist == null || dist < minDist)
           minBlock = block;
           minDist = dist;

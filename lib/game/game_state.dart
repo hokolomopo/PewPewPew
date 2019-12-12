@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/draw/level_painter.dart';
+import 'package:info2051_2018/draw/terrain_stroke_drawer.dart';
 import 'package:info2051_2018/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
@@ -81,13 +82,19 @@ class GameState {
 
   List<MyAnimation> currentAnimations = List();
 
+  TerrainStrokeDrawer terrainStrokeDrawer = TerrainStrokeDrawer();
+
   GameState(int numberOfPlayers, int numberOfCharacters, this.painter,
       this.level, this.camera, this.world) {
     uiManager = UiManager(painter);
 
     level.spawnPoints.shuffle();
 
-    for (TerrainBlock block in level.terrain) this.addTerrainBlock(block);
+    painter.addElement(terrainStrokeDrawer);
+    for (TerrainBlock block in level.terrain) {
+      this.addTerrainBlock(block);
+    }
+    terrainStrokeDrawer.computeStrokes();
 
     for (int i = 0; i < numberOfPlayers; i++) {
       Team t = Team(i, teamNames[i], numberOfCharacters);
@@ -324,17 +331,19 @@ class GameState {
       currentCharIsDead = true;
   }
 
-  void addTerrainBlock(TerrainBlock block) {
+  addTerrainBlock(TerrainBlock block) {
     world.addTerrain(block);
     painter.addElement(block.drawer);
+    terrainStrokeDrawer.addTerrainBlock(block);
   }
 
-  void removeTerrainBlock(TerrainBlock block) {
+  removeTerrainBlock(TerrainBlock block) {
     world.removeTerrain(block);
     painter.removeElement(block.drawer);
+    terrainStrokeDrawer.removeTerrainBlock(block);
   }
 
-  void removePlayer(int playerID) {
+  removePlayer(int playerID) {
     this.computeStats(players[playerID]);
 
     players.removeAt(playerID);
@@ -669,8 +678,8 @@ class GameState {
     Offset markerPosition = destination;
 
     TerrainBlock closest = world.getClosestTerrainUnder(destination);
-    if (closest != null && camera.isDisplayed(closest.hitBox))
-      markerPosition = Offset(destination.dx, closest.hitBox.top);
+    if (closest != null && camera.isDisplayed(closest.hitbox))
+      markerPosition = Offset(destination.dx, closest.hitbox.top);
 
     this.moveDestination = markerPosition;
     this.uiManager.addMarker(markerPosition);
