@@ -166,7 +166,7 @@ abstract class Weapon {
     w.detonationDelay = weaponStats.detonationDelay;
     w.ammunition = weaponStats.ammunition;
     w.knockbackStrength = weaponStats.knockbackStrength;
-    w.projectileAssetId = AssetId.projectile_dhs;
+    w.projectileAssetId = AssetIdMapper.map[weaponStats.projectileAsset];
 
     return w;
   }
@@ -324,7 +324,7 @@ abstract class Projectile extends MovingEntity {
     p.maxSpeed = weaponStats.projectileMaxSpeed;
     p.frictionFactor = weaponStats.projectileFrictionFactor;
     p.explosionSound = weaponStats.explosionSound;
-    p.explosionAssetId = AssetId.explosion_dhs;//weaponStats.explosionAsset; //TODO String to enum type
+    p.explosionAssetId = AssetIdMapper.map[weaponStats.explosionAsset];
     p.explosionSize = weaponStats.explosionSize;
     p.drawer = ProjectileDrawer(projectileAsset, p, size:weaponStats.projectileHitboxSize);
     p.actualOrientation = weaponStats.projectileEnableOrientation.toDouble();
@@ -368,9 +368,13 @@ abstract class Projectile extends MovingEntity {
     return timer.elapsedMilliseconds > detonationDelay;
   }
 
-  resetStopWatch() {
+  void resetStopWatch() {
     timer.stop();
     timer.reset();
+  }
+
+  void startTimer(){
+    timer.start();
   }
 
 }
@@ -500,6 +504,7 @@ class WeaponStats{
   double projectileFrictionFactor; // Percentage of the velocity to remove at each frame [0, 1]
 
   String weaponAsset;
+  String projectileAsset;
   String explosionAsset;
   String explosionSound;
   Size explosionSize;
@@ -527,6 +532,7 @@ class WeaponStats{
     this.projectileFrictionFactor = json['projectileFrictionFactor'] as double;
     this.weaponAsset = json['weaponAsset'] as String;
     this.explosionAsset = json['explosionAsset'] as String;
+    this.projectileAsset = json['projectileAsset'] as String;
     this.explosionSound = json['explosionSound'] as String;
     this.explosionSize = Size(json['explosionSizeX'] as double, json['explosionSizeY'] as double);
     this.price = json['price'] as int;
