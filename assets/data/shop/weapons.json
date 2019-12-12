@@ -81,7 +81,7 @@
     "explodeOnImpact": true,
     "detonationDelay": 5000.0,
     "range": 0,
-    "ammunition": 10,
+    "ammunition": 9,
     "hasKnockback": false,
     "knockbackStrength": 0,
     "projectileWeight": 10.0,

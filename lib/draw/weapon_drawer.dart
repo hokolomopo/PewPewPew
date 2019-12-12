@@ -1,5 +1,3 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 
 import 'package:info2051_2018/draw/assets_manager.dart';
@@ -9,11 +7,18 @@ import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 
+import 'dart:math';
+
 class WeaponDrawer extends ImagedDrawer {
   static final double ammunitionRadius = 2.5;
   static final Color outOfAmmoColor = Colors.grey;
   static final Color ammoColor = Colors.white;
-  static final Offset ammoTextOffset = Offset(-1.5, -1.5);
+
+  static final Offset ammoTextOffset = Offset(-0.5, -2);
+  static final double ammoCircleShift =
+      0.8 * (Arsenal.selectionElementRadius - ammunitionRadius) / sqrt(2);
+  static final Offset ammoCircleOffset =
+      Offset(ammoCircleShift, ammoCircleShift);
   static final double ammoFontSize = 15;
 
   Weapon weapon;
@@ -47,38 +52,44 @@ class WeaponDrawer extends ImagedDrawer {
               Arsenal.selectionElementRadius, screenSize.height),
           Paint()..color = circleColor);
 
-      imgPos = GameUtils.relativeToAbsoluteOffset(weapon.topLeftPos, screenSize.height);
-      drawImage(canvas, fetchNextFrame(), imgPos, flipped: dirFaced == Character.LEFT);
+      imgPos = GameUtils.relativeToAbsoluteOffset(
+          weapon.topLeftPos, screenSize.height);
+      drawImage(canvas, fetchNextFrame(), imgPos,
+          flipped: dirFaced == Character.LEFT);
       if (weapon.ammunition != double.infinity) {
-        Offset ammunitionCenterPos = weapon.centerPos +
-            Offset(0, Arsenal.selectionElementRadius - ammunitionRadius);
+        Offset ammunitionCenterPos = weapon.centerPos + ammoCircleOffset;
 
         canvas.drawCircle(
             GameUtils.relativeToAbsoluteOffset(
                 ammunitionCenterPos, screenSize.height),
-            GameUtils.relativeToAbsoluteDist(ammunitionRadius, screenSize.height),
+            GameUtils.relativeToAbsoluteDist(
+                ammunitionRadius, screenSize.height),
             Paint()..color = ammoColor);
 
         TextDrawer(weapon.ammunition.toInt().toString(), TextPositions.custom,
-            ammoFontSize,
-            customPosition: ammunitionCenterPos + ammoTextOffset,
-            color: Colors.black)
+                ammoFontSize,
+                customPosition: ammunitionCenterPos + ammoTextOffset,
+                color: Colors.black)
             .paint(canvas, screenSize, showHitBoxes, cameraPosition);
       }
     } else {
       Offset characterTopLeftPos = Offset(owner.hitbox.left, owner.hitbox.top);
-      imgPos = GameUtils.relativeToAbsoluteOffset(characterTopLeftPos +
-          weapon.directionFacedToOffset[dirFaced](relativeSize), screenSize.height);
+      imgPos = GameUtils.relativeToAbsoluteOffset(
+          characterTopLeftPos +
+              weapon.directionFacedToOffset[dirFaced](relativeSize),
+          screenSize.height);
       Offset playerCenter = Offset(
           weapon.owner.getSpritePosition().dx + Character.spriteSize.width / 2,
-          weapon.owner.getSpritePosition().dy + Character.spriteSize.height / 2);
+          weapon.owner.getSpritePosition().dy +
+              Character.spriteSize.height / 2);
 
       drawImage(canvas, fetchNextFrame(), imgPos,
           rotationCenter: GameUtils.relativeToAbsoluteOffset(
               playerCenter, screenSize.height),
           angle: angle,
           flipped: dirFaced == Character.LEFT,
-          target: GameUtils.relativeToAbsoluteSize(weapon.relativeSize, screenSize.height));
+          target: GameUtils.relativeToAbsoluteSize(
+              weapon.relativeSize, screenSize.height));
     }
   }
 }
