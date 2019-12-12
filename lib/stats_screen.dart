@@ -32,6 +32,11 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
   int totalMoneyGain;
 
   _StatsScreenState(GameStats stats) {
+
+    // If no one wins, a random team wins :
+    if(stats.statistics[stats.winningTeam] == null)
+      stats.winningTeam = stats.statistics.keys.toList()[0];
+
     totalMoneyGain = 0;
     for (TeamStat stat in TeamStat.values)
       totalMoneyGain +=
