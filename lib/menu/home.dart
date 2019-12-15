@@ -341,7 +341,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   }
 
 
-  Widget callSlider() {
+  void callSlider() {
     showDialog(
         context: context,
         builder: (_) =>
@@ -373,7 +373,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           flex: 50,
                           child: Column(children: <Widget>[
                             AutoSizeText("Musique Volume"),
-                            volumeSlider(isMusic: true),
+                            VolumeSlider(isMusic: true),
 
                           ],),
                         ),
@@ -382,7 +382,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                           child: Column(
                             children: <Widget>[
                               AutoSizeText("SFX Volume"),
-                              volumeSlider(isMusic: false),
+                              VolumeSlider(isMusic: false),
                             ],
                           ),
                         )
@@ -410,22 +410,22 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
 }
 
-class volumeSlider extends StatefulWidget{
+class VolumeSlider extends StatefulWidget{
 
   final bool isMusic;
 
-  const volumeSlider({Key key, this.isMusic}): super(key : key);
+  const VolumeSlider({Key key, this.isMusic}): super(key : key);
 
   @override
-  volumeSliderState createState() => volumeSliderState();
+  VolumeSliderState createState() => VolumeSliderState();
 }
 
-class volumeSliderState extends State<volumeSlider>{
+class VolumeSliderState extends State<VolumeSlider>{
 
   double value;
 
   @override
-  Widget build(BuildContext){
+  Widget build(BuildContext context){
 
     if(widget.isMusic)
       value = Home._musicVolume;

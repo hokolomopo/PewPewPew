@@ -1,6 +1,7 @@
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:info2051_2018/home.dart';
+
+import 'menu/home.dart';
 
 class SoundPlayer {
   static SoundPlayer soundPlayer;
