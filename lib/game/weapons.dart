@@ -92,3 +92,19 @@ class Sniper extends Weapon {
 
 
 }
+
+class Bow extends Weapon {
+  static const String weaponName = "Draconic Bow";
+
+  final Size relativeSize = Size(10, 8);
+  final Offset weaponCenterOffset = Offset(4, -2);
+
+  Bow(Character owner) : super(owner) {
+    this.drawer =
+        WeaponDrawer(AssetId.weapon_bow, this, Arsenal.selectionElementSize);
+    this.name = weaponName;
+    this.projectileAssetId = AssetId.projectile_arrow;
+  }
+
+
+}

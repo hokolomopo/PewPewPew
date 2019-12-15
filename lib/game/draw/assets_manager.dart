@@ -19,6 +19,7 @@ enum AssetId {
   projectile_laser,
   projectile_bullet,
   projectile_big_bullet,
+  projectile_arrow,
   explosion_dhs,
   ui_arrow,
   weapon_fist,
@@ -26,7 +27,8 @@ enum AssetId {
   weapon_grenade,
   weapon_railgun,
   weapon_sniper,
-  weapon_shotgun
+  weapon_shotgun,
+  weapon_bow
 }
 
 class AssetIdMapper{
@@ -39,6 +41,7 @@ class AssetIdMapper{
   "bullet4": AssetId.projectile_boulet,
   "grenade": AssetId.weapon_grenade,
   "fist": AssetId.weapon_fist,
+  "arrow" : AssetId.projectile_arrow,
   };
 }
 
@@ -76,6 +79,9 @@ class AssetsManager {
         "assets/graphics/arsenal/projectiles/bullet3.png"),
     AssetId.projectile_dhs: Asset(AssetId.projectile_dhs,
         "assets/graphics/arsenal/projectiles/hand-spinner.gif"),
+    AssetId.projectile_arrow: Asset(AssetId.projectile_arrow,
+        "assets/graphics/arsenal/projectiles/Arrow.png"),
+
     AssetId.ui_arrow: Asset(
         AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif",
         size: MarkerDrawer.markerArrowSize),
@@ -97,6 +103,9 @@ class AssetsManager {
         size: Arsenal.selectionElementSize),
     AssetId.weapon_sniper: Asset(
         AssetId.weapon_sniper, _weaponAssetPrefix + "sniper.png",
+        size: Arsenal.selectionElementSize),
+    AssetId.weapon_bow: Asset(
+        AssetId.weapon_bow, _weaponAssetPrefix + "Bow.png",
         size: Arsenal.selectionElementSize),
 
     AssetId.explosion_dhs:
