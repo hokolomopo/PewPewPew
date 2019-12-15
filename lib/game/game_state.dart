@@ -364,6 +364,9 @@ class GameState {
         break;
 
       case GameStateMode.projectile:
+        for(Projectile p in projectiles)
+          if(p is Controllable && p.onTapListener)
+            p.onTap(tapPosition);
         break;
 
       case GameStateMode.weapon_selection:
