@@ -260,7 +260,7 @@ abstract class Projectile extends MovingEntity {
       else if(weaponStats.projectileName == 'FlappyBird')
         p = FlappyBird(position, hitbox);
       else
-        p = DeafaultProjectile(position, hitbox);
+        p = DefaultProjectile(position, hitbox);
 
     p.assetId = projectileAsset;
     p.weight = weaponStats.projectileWeight;
@@ -420,8 +420,8 @@ class ExplosiveProjectile extends Projectile{
 }
 
 /// Default implementation class for Projectile.
-class DeafaultProjectile extends Projectile {
-  DeafaultProjectile(position, Rectangle hitbox): super(position, hitbox);
+class DefaultProjectile extends Projectile {
+  DefaultProjectile(position, Rectangle hitbox): super(position, hitbox);
 }
 
 /// Animation (Gif) limited in Time (counted in total frames)
