@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/services.dart';
-import 'package:info2051_2018/draw/ui_drawer.dart';
+import 'package:info2051_2018/game/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';

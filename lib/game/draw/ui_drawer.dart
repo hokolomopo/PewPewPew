@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/paint_constants.dart';
+import 'package:info2051_2018/game/draw/paint_constants.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 

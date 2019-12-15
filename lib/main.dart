@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/game/weaponry.dart';
-import 'package:info2051_2018/home.dart';
-import 'package:info2051_2018/stats_screen.dart';
+import 'package:info2051_2018/menu/home.dart';
+import 'package:info2051_2018/menu/stats_screen.dart';
 
 import 'dart:async';
 
-import 'route_arguments.dart';
+import 'menu/route_arguments.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized(); // To counter Flutter update inconvenient

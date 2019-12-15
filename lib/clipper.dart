@@ -1,1 +1,0 @@
-// Deprecated file but remains to not contract error in gradle dependecies resolution

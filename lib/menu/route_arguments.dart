@@ -1,7 +1,7 @@
 
-import 'package:info2051_2018/quickplay_widgets.dart';
+import 'package:info2051_2018/menu/quickplay_widgets.dart';
 
-import 'game/weaponry.dart';
+import '../game/weaponry.dart';
 
 class MainGameArguments{
   final int nbPlayers;

@@ -2,10 +2,10 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/drawer_abstracts.dart';
-import 'package:info2051_2018/draw/level_painter.dart';
-import 'package:info2051_2018/draw/terrain_stroke_drawer.dart';
-import 'package:info2051_2018/draw/text_drawer.dart';
+import 'package:info2051_2018/game/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/game/draw/level_painter.dart';
+import 'package:info2051_2018/game/draw/terrain_stroke_drawer.dart';
+import 'package:info2051_2018/game/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/team.dart';

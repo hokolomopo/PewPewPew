@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:info2051_2018/draw/drawer_abstracts.dart';
-import 'package:info2051_2018/draw/paint_constants.dart';
+import 'package:info2051_2018/game/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/game/draw/paint_constants.dart';
 import 'package:info2051_2018/game/level.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 

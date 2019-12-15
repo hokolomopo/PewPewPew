@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/assets_manager.dart';
+import 'package:info2051_2018/game/draw/assets_manager.dart';
 
 import 'drawer_abstracts.dart';
 

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/terrain_drawer.dart';
+import 'package:info2051_2018/game/draw/terrain_drawer.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/util/json_utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';

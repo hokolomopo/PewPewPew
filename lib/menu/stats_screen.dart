@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
-import 'package:info2051_2018/home.dart';
+import 'package:info2051_2018/menu/home.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'game/util/team.dart';
+import '../game/util/team.dart';
 import 'shop.dart';
 
 import 'dart:math';

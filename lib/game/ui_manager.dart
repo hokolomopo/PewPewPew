@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/cupertino.dart';
-import 'package:info2051_2018/draw/level_painter.dart';
-import 'package:info2051_2018/draw/text_drawer.dart';
-import 'package:info2051_2018/draw/ui_drawer.dart';
+import 'package:info2051_2018/game/draw/level_painter.dart';
+import 'package:info2051_2018/game/draw/text_drawer.dart';
+import 'package:info2051_2018/game/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 
 class UiManager {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/main.dart';
 import 'package:info2051_2018/sound_player.dart';
-import 'package:info2051_2018/quick_play.dart';
-import 'package:info2051_2018/tutoriel.dart';
+import 'package:info2051_2018/menu/quick_play.dart';
+import 'package:info2051_2018/menu/tutoriel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'shop.dart';
 

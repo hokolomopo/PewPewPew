@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/ui_drawer.dart';
+import 'package:info2051_2018/game/draw/ui_drawer.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 

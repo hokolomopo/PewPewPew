@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:info2051_2018/draw/assets_manager.dart';
-import 'package:info2051_2018/draw/drawer_abstracts.dart';
-import 'package:info2051_2018/draw/text_drawer.dart';
+import 'package:info2051_2018/game/draw/assets_manager.dart';
+import 'package:info2051_2018/game/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/game/draw/text_drawer.dart';
 import 'package:info2051_2018/game/character.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';

@@ -5,18 +5,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:info2051_2018/draw/assets_manager.dart';
-import 'package:info2051_2018/draw/background.dart';
-import 'package:info2051_2018/draw/level_painter.dart';
+import 'package:info2051_2018/game/draw/assets_manager.dart';
+import 'package:info2051_2018/game/draw/background.dart';
+import 'package:info2051_2018/game/draw/level_painter.dart';
 import 'package:info2051_2018/game/camera.dart';
 import 'package:info2051_2018/game/game_state.dart';
 import 'package:info2051_2018/game/util/utils.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/game/world.dart';
-import 'package:info2051_2018/home.dart';
-import 'package:info2051_2018/stats_screen.dart';
+import 'package:info2051_2018/menu/home.dart';
+import 'package:info2051_2018/menu/stats_screen.dart';
 
-import '../quickplay_widgets.dart';
+import '../menu/quickplay_widgets.dart';
 import '../sound_player.dart';
 import 'level.dart';
 

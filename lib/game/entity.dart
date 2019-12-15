@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:info2051_2018/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/game/draw/drawer_abstracts.dart';
 
 abstract class Entity{
   Offset _position;

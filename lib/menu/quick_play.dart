@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/main.dart';
 import 'dart:convert'; // json codec
-import 'package:info2051_2018/quickplay_widgets.dart';
+import 'package:info2051_2018/menu/quickplay_widgets.dart';
 import 'package:info2051_2018/sound_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'game/game_main.dart';
+import '../game/game_main.dart';
 import 'route_arguments.dart';
 
 class Parameters extends StatefulWidget {

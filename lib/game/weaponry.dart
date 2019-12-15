@@ -4,9 +4,9 @@ import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:info2051_2018/draw/drawer_abstracts.dart';
-import 'package:info2051_2018/draw/projectile_drawer.dart';
-import 'package:info2051_2018/draw/assets_manager.dart';
+import 'package:info2051_2018/game/draw/drawer_abstracts.dart';
+import 'package:info2051_2018/game/draw/projectile_drawer.dart';
+import 'package:info2051_2018/game/draw/assets_manager.dart';
 import 'package:info2051_2018/game/entity.dart';
 import 'package:info2051_2018/game/game_main.dart';
 import 'package:info2051_2018/game/util/utils.dart';
