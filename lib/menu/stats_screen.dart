@@ -270,7 +270,7 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
+      case AppLifecycleState.suspending:
         SoundPlayer.getInstance().pauseLoopMusic();
         break;
     }

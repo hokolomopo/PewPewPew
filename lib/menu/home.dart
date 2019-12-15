@@ -334,7 +334,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
+      case AppLifecycleState.suspending:
         SoundPlayer.getInstance().pauseLoopMusic();
         break;
         break;
