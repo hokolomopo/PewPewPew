@@ -1,5 +1,6 @@
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:info2051_2018/home.dart';
 
 class SoundPlayer {
   static SoundPlayer soundPlayer;
@@ -12,6 +13,10 @@ class SoundPlayer {
 
   static const menuMusicName = "sample.mp3";
   static const gameMusicName = "sample2.mp3";
+
+  static double musicVolume = Home.musicVolume; // [0.0, 1.0]
+  static double currentMusicVolume; //[0.0, 1.0]
+  static double sfxVolume = Home.sfxVolume; // [0.0, 1.0]
 
   AudioPlayer musicPlayer; // Use for loop music (one at a time)
   AudioCache musicCache; // Use for loop music
@@ -30,7 +35,7 @@ class SoundPlayer {
   }
 
   void playSoundEffect(String fileName, {double volume = 1.0}) {
-    this.audioCache.play(fileName, volume: volume);
+    this.audioCache.play(fileName, volume: volume * sfxVolume);
   }
 
   void playLoopMusic(String fileName, {double volume = 1.0}) {
@@ -38,7 +43,8 @@ class SoundPlayer {
       this.musicCache.clearCache();
       this.musicCache.load(fileName);
     }
-    this.musicCache.loop(fileName, volume: volume);
+    currentMusicVolume = volume;
+    this.musicCache.loop(fileName, volume: volume * musicVolume);
   }
 
   void pauseLoopMusic() {
@@ -51,6 +57,23 @@ class SoundPlayer {
 
   release() {
     this.musicPlayer.release();
+  }
+
+  set musicVolumeScale(double newVolume){
+    if(newVolume < 0.0 || newVolume > 1.0)
+      musicVolume = 1.0;
+    else
+      musicVolume = newVolume;
+
+    if(musicPlayer != null && currentMusicVolume != null)
+      musicPlayer.setVolume(musicVolume * currentMusicVolume);
+  }
+
+  set sfxVolumeScale(double newVolume){
+    if(newVolume < 0.0 || newVolume > 1.0)
+      sfxVolume = 1.0;
+    else
+      sfxVolume = newVolume;
   }
 
 }

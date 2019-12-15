@@ -255,7 +255,12 @@ abstract class Projectile extends MovingEntity {
             explosionRange: weaponStats.range,
       );
     else
-      p = LinearProjectile(position, hitbox);
+      if(weaponStats.projectileName == "L_Arrow")
+        p = L_Arrow(position, hitbox);
+      else if(weaponStats.projectileName == 'FlappyBird')
+        p = FlappyBird(position, hitbox);
+      else
+        p = DeafaultProjectile(position, hitbox);
 
     p.assetId = projectileAsset;
     p.weight = weaponStats.projectileWeight;
@@ -318,9 +323,49 @@ abstract class Controllable extends Projectile{
   bool onPressListener = false;
   bool onPanListener = false;
 
-  void onTap(){}
+  void onTap(Offset tapPosition){}
   void onPress(){}
   void onPan(){}
+}
+
+class L_Arrow extends Controllable{
+  static const String projectileName = "L_Arrow";
+
+  L_Arrow(Offset position, Rectangle hitbox): super(position, hitbox){
+    onTapListener = true;
+    weight = 0;
+  }
+
+  @override
+  void onTap(Offset tapPosition) {
+    Offset direction = tapPosition - getPosition();
+    direction /= direction.distance;
+
+    velocity = direction * velocity.distance;
+
+    onTapListener = false;
+  }
+
+}
+
+class FlappyBird extends Controllable{
+  static const String projectileName = "FlappyBird";
+
+  FlappyBird(Offset position, Rectangle hitbox): super(position, hitbox){
+    onTapListener = true;
+  }
+
+  @override
+  void onTap(Offset tapPosition) {
+    Offset direction = tapPosition - getPosition();
+    direction /= direction.distance;
+    direction *= 10.0;
+    stop();
+    setXSpeed(direction.dx);
+    setYSpeed(direction.dy);
+
+  }
+
 }
 
 /// Class to implement projectile which are explosives and have a detonation timer.
@@ -374,12 +419,9 @@ class ExplosiveProjectile extends Projectile{
 
 }
 
-/// Mixin class for projectile which applyImpact when intersecting another
-/// hitbox or going out of bound
-/// (Arrow, Bombardement, ...)
-// else apply method
-class LinearProjectile extends Projectile {
-  LinearProjectile(position, Rectangle hitbox): super(position, hitbox);
+/// Default implementation class for Projectile.
+class DeafaultProjectile extends Projectile {
+  DeafaultProjectile(position, Rectangle hitbox): super(position, hitbox);
 }
 
 /// Animation (Gif) limited in Time (counted in total frames)
@@ -430,6 +472,7 @@ class LoopAnimation extends MyAnimation {
 /// Class to load parameters of the weapons from a json
 class WeaponStats{
   String weaponName;
+  String projectileName;
 
   int damage;
   int range;
@@ -464,6 +507,7 @@ class WeaponStats{
 
   WeaponStats.fromJson(Map<String, dynamic> json) {
     this.weaponName = json['weaponName'] as String;
+    this.projectileName = json['projectileName'] as String;
     this.damage = json['damage'] as int;
     this.useProjectile = json['useProjectile'] as bool;
     this.isExplosive = json['isExplosive'] as bool;

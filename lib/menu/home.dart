@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/weaponry.dart';
 import 'package:info2051_2018/main.dart';
@@ -12,6 +13,17 @@ class Home extends StatefulWidget {
 
   static Size _screenSize;
   static bool sizeLocked = false;
+
+  static double _musicVolume = 1.0;
+  static double _SFXVolume = 1.0;
+
+  static double get musicVolume {
+    return _musicVolume;
+  }
+
+  static double get sfxVolume {
+    return _SFXVolume;
+  }
 
   static set screenSize(Size newSize) {
     if (!sizeLocked) _screenSize = newSize;
@@ -241,6 +253,26 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             backgroundColor: Colors.transparent,
             body: Column(
               children: <Widget>[
+
+                Padding(
+                    padding: EdgeInsets.only(top: 20.0 ,bottom: 20.0),
+                    child : Container(
+                        alignment: Alignment.centerRight,
+                        child: IconButton(
+                          onPressed: () {
+                            callSlider();
+                          },
+                          icon: Icon(
+                            Icons.volume_up,
+                            size: 30.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ),
+
+
+
                 logo(),
                 Padding(
                   child: Container(
@@ -307,4 +339,120 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         break;
     }
   }
+
+
+  Widget callSlider() {
+    showDialog(
+        context: context,
+        builder: (_) =>
+            Scaffold(
+                body: Center(child: DecoratedBox(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                  ),
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: 10.0, top: 10.0, bottom: 10.0),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: BackButton(
+                              color: Theme
+                                  .of(context)
+                                  .primaryColor,
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ),
+                        ),
+
+                        Expanded(
+                          flex: 50,
+                          child: Column(children: <Widget>[
+                            AutoSizeText("Musique Volume"),
+                            volumeSlider(isMusic: true),
+
+                          ],),
+                        ),
+                        Expanded(
+                          flex: 50,
+                          child: Column(
+                            children: <Widget>[
+                              AutoSizeText("SFX Volume"),
+                              volumeSlider(isMusic: false),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.4,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width * 0.8,
+                    color: Colors.white,
+                  ),
+                ),)
+
+            ));
+
+
+
+
+
+  }
+
+}
+
+class volumeSlider extends StatefulWidget{
+
+  final bool isMusic;
+
+  const volumeSlider({Key key, this.isMusic}): super(key : key);
+
+  @override
+  volumeSliderState createState() => volumeSliderState();
+}
+
+class volumeSliderState extends State<volumeSlider>{
+
+  double value;
+
+  @override
+  Widget build(BuildContext){
+
+    if(widget.isMusic)
+      value = Home._musicVolume;
+    else
+      value = Home._SFXVolume;
+
+    return Slider(
+      min: 0.0,
+      max: 1.0,
+      value: value,
+      onChanged:
+      (d){
+        setState(() {
+          value = d;
+          SoundPlayer soundPlayer = SoundPlayer.getInstance();
+          if(widget.isMusic) {
+            Home._musicVolume = d;
+            soundPlayer.musicVolumeScale = value;
+          }
+          else{
+            Home._SFXVolume = d;
+            soundPlayer.sfxVolumeScale = value;
+          }
+        });
+      }
+      ,
+    );
+  }
+
 }

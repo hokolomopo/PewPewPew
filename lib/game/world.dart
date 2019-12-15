@@ -103,27 +103,24 @@ class World{
     if(projectile is ExplosiveProjectile && projectile.explodeOnImpact)
       manageExplosion(projectile);
 
-    // Projectile that do damage on hit
-    else if(projectile is LinearProjectile) {
-      if (collided is TerrainBlock) {
-        projectile.isDead = true;
-        return;
-      }
-      else if (collided is Character) {
-        // Update stats
-        double damageDealt = min(projectile.damage.toDouble(), collided.hp);
-        collided.removeHp(damageDealt);
+    if (collided is TerrainBlock) {
+      projectile.isDead = true;
+      return;
+    }
+    else if (collided is Character) {
+      // Update stats
+      double damageDealt = min(projectile.damage.toDouble(), collided.hp);
+      collided.removeHp(damageDealt);
 
-        double velocity = projectile.knockBackStrength.toDouble();
-        velocity *= projectile.velocity.dx.sign;
-        collided.addVelocity(Offset(velocity, -velocity.abs()));
+      double velocity = projectile.knockBackStrength.toDouble();
+      velocity *= projectile.velocity.dx.sign;
+      collided.addVelocity(Offset(velocity, -velocity.abs()));
 
-        List<CharacterDamagePair> l = List();
-        l.add(CharacterDamagePair(collided, damageDealt));
-        damageDealtCallback(l);
+      List<CharacterDamagePair> l = List();
+      l.add(CharacterDamagePair(collided, damageDealt));
+      damageDealtCallback(l);
 
-        projectile.isDead = true;
-      }
+      projectile.isDead = true;
     }
   }
 
