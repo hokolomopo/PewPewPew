@@ -189,12 +189,10 @@ class ParametersState extends State<Parameters> {
                 Size screenSize = MediaQuery.of(context).size;
                 GameMain.size = Size(max(screenSize.width, screenSize.height), min(screenSize.width, screenSize.height));
 
-
-                SoundPlayer.getInstance().playLoopMusic(SoundPlayer.gameMusicName, volume: 0.5);
-
                 if (_terrain == null)
                   _simpleAlertDialog("Please select a level", context);
                 else {
+                  SoundPlayer.getInstance().playLoopMusic(SoundPlayer.gameMusicName, volume: 0.5);
                   Navigator.pushNamedAndRemoveUntil(context, GameMain.routeName,
                       (Route<dynamic> route) => false,
                       arguments: MainGameArguments(_terrain, _nbPlayer,

@@ -156,6 +156,9 @@ abstract class Weapon {
       case Shotgun.weaponName:
         w = Shotgun(owner);
         break;
+      case Bow.weaponName:
+        w = Bow(owner);
+        break;
     }
     w.damage = weaponStats.damage;
     w.range = weaponStats.range;
