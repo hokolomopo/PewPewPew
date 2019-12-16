@@ -190,8 +190,10 @@ class GameState {
           // intersect a hitbox (terrain or character)
           if (p.isDead){
             MyAnimation endAnimation = p.returnAnimationInstance();
-            if(endAnimation != null)
+            if(endAnimation != null){
+              endAnimation.playSound();
               addAnimation(endAnimation);
+            }
             toRemoveProj.add(p);
           }
         }
@@ -205,8 +207,6 @@ class GameState {
         // center camera on projectile
         if(cameraFocus != null)
           this.camera.centerOn(cameraFocus.getPosition());
-        else
-          switchState(GameStateMode.cinematic);
 
         if(projectiles.length == 0)
           switchState(GameStateMode.cinematic);
@@ -525,9 +525,14 @@ class GameState {
         else {
             if (currentWeapon == null || currentWeapon.projectiles == null) return;
 
-            for(Projectile p in currentWeapon.fireProjectile(
+            List<Projectile> tmp = currentWeapon.fireProjectile(
                 (launchDragStartPosition - launchDragEndPosition) *
-                    LaunchVectorNormalizer, currentChar)){
+                    LaunchVectorNormalizer, currentChar);
+
+            // Decide that 1st proj will be the camera focus
+            cameraFocus = tmp.first;
+
+            for(Projectile p in tmp){
 
 
               this.addProjectile(p);
@@ -537,9 +542,6 @@ class GameState {
             }
 
             currentWeapon.ammunition -= 1;
-
-            // Decide that 1st proj will be the camera focus
-            cameraFocus = projectiles.first;
 
             switchState(GameStateMode.projectile);
             }

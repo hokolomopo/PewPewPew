@@ -20,7 +20,9 @@ enum AssetId {
   projectile_bullet,
   projectile_big_bullet,
   projectile_arrow,
+  projectile_blood_magic,
   explosion_dhs,
+  explosion_arcane,
   ui_arrow,
   weapon_fist,
   weapon_colt,
@@ -28,13 +30,15 @@ enum AssetId {
   weapon_railgun,
   weapon_sniper,
   weapon_shotgun,
-  weapon_bow
+  weapon_bow,
+  weapon_blood_magic
 }
 
 class AssetIdMapper{
 
   static final Map<String, AssetId> map = {
   "explosion.gif": AssetId.explosion_dhs,
+  "arcane_explosion": AssetId.explosion_arcane,
   "bullet_future": AssetId.projectile_laser,
   "bullet1": AssetId.projectile_bullet,
   "bullet3": AssetId.projectile_big_bullet,
@@ -42,6 +46,7 @@ class AssetIdMapper{
   "grenade": AssetId.weapon_grenade,
   "fist": AssetId.weapon_fist,
   "arrow" : AssetId.projectile_arrow,
+  "blood_magic" : AssetId.projectile_blood_magic,
   };
 }
 
@@ -81,6 +86,8 @@ class AssetsManager {
         "assets/graphics/arsenal/projectiles/hand-spinner.gif"),
     AssetId.projectile_arrow: Asset(AssetId.projectile_arrow,
         "assets/graphics/arsenal/projectiles/Arrow.png"),
+    AssetId.projectile_blood_magic: Asset(AssetId.projectile_blood_magic,
+        "assets/graphics/arsenal/projectiles/blood_projectile.gif"),
 
     AssetId.ui_arrow: Asset(
         AssetId.ui_arrow, "assets/graphics/user_interface/arrow.gif",
@@ -107,9 +114,14 @@ class AssetsManager {
     AssetId.weapon_bow: Asset(
         AssetId.weapon_bow, _weaponAssetPrefix + "Bow.png",
         size: Arsenal.selectionElementSize),
+    AssetId.weapon_blood_magic: Asset(
+        AssetId.weapon_blood_magic, _weaponAssetPrefix + "blood_magic.png",
+        size: Arsenal.selectionElementSize),
 
     AssetId.explosion_dhs:
         Asset(AssetId.explosion_dhs, _explosionAssetPrefix + "explosion.gif"),
+    AssetId.explosion_arcane:
+    Asset(AssetId.explosion_arcane, _explosionAssetPrefix + "arcane_explosion.gif"),
   };
 
   Map<String, Size> _currentlyLoading = Map();

@@ -159,6 +159,9 @@ abstract class Weapon {
       case Bow.weaponName:
         w = Bow(owner);
         break;
+      case BloodMagic.weaponName:
+        w = BloodMagic(owner);
+        break;
     }
     w.damage = weaponStats.damage;
     w.range = weaponStats.range;
@@ -225,7 +228,7 @@ abstract class Weapon {
         p.move(Offset((char.hitbox.width + 1), 0));
       }
 
-      p.velocity += direction;
+      p.velocity += Offset(direction.dx, direction.dy);
     }
 
     return projectiles;
@@ -305,6 +308,9 @@ abstract class Projectile extends MovingEntity {
 
   ///Function to play a sound effect at the start of the launch
   void playStartSound(){}
+
+  ///Function to add detonation delay for ExplosiveProjectile
+  void addDetonationDelay(int additionalDelayMs){}
 }
 
 /// Class to implement projectile which react a command (onTap for instance),
@@ -329,46 +335,6 @@ abstract class Controllable extends Projectile{
   void onTap(Offset tapPosition){}
   void onPress(){}
   void onPan(){}
-}
-
-class L_Arrow extends Controllable{
-  static const String projectileName = "L_Arrow";
-
-  L_Arrow(Offset position, Rectangle hitbox): super(position, hitbox){
-    onTapListener = true;
-    weight = 0;
-  }
-
-  @override
-  void onTap(Offset tapPosition) {
-    Offset direction = tapPosition - getPosition();
-    direction /= direction.distance;
-
-    velocity = direction * velocity.distance;
-
-    onTapListener = false;
-  }
-
-}
-
-class FlappyBird extends Controllable{
-  static const String projectileName = "FlappyBird";
-
-  FlappyBird(Offset position, Rectangle hitbox): super(position, hitbox){
-    onTapListener = true;
-  }
-
-  @override
-  void onTap(Offset tapPosition) {
-    Offset direction = tapPosition - getPosition();
-    direction /= direction.distance;
-    direction *= 10.0;
-    stop();
-    setXSpeed(direction.dx);
-    setYSpeed(direction.dy);
-
-  }
-
 }
 
 /// Class to implement projectile which are explosives and have a detonation timer.
@@ -404,6 +370,11 @@ class ExplosiveProjectile extends Projectile{
 
   void startTimer(){
     timer.start();
+  }
+
+  @override
+  void addDetonationDelay(int additionalDelayMs){
+    this.detonationDelay += additionalDelayMs;
   }
 
   @override

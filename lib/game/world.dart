@@ -101,8 +101,10 @@ class World{
 
     // Projectiles that explode on hit
     if(projectile is ExplosiveProjectile){
-      if(projectile.explodeOnImpact)
+      if(projectile.explodeOnImpact){
         manageExplosion(projectile);
+        projectile.isDead = true;
+      }
     }
     else{
       if (collided is TerrainBlock) {

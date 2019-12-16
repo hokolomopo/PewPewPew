@@ -24,7 +24,7 @@ class SoundPlayer {
   AudioCache audioCache; // Use for sound effect, multiple play possible
 
   // final list for to pre load time sensitive files
-  final List<String> noiseFileNames = ['hurtSound.mp3', 'explosion.mp3'];
+  final List<String> noiseFileNames = ['hurtSound.mp3', 'explosion.mp3', 'spell.mp3'];
 
   SoundPlayer._() {
     this.audioCache = AudioCache(prefix: "sounds/noise/");
