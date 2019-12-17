@@ -159,35 +159,40 @@ class ShopListState extends State<ShopList> {
 
                 itemBuilder: (context, index) {
 
-                  bool sold = prefs.containsKey(items[index].weaponName);
+                bool sold = prefs.containsKey(items[index].weaponName);
 
-                  return CustomListItem(
-                    sprite: Image(
-                        image: AssetImage(items[index].weaponAsset)),
-                    name: items[index].weaponName,
-                    price: sold ? "SOLD" : items[index].price.toString() + "\$",
-                    damage: items[index].damage.toString(),
-                    radius: items[index].range.toString(),
-                    knockback: items[index].knockbackStrength.toString(),
-                    onTap: () {
-                      if(sold)
+                return CustomListItem(
+                  sprite: Image(
+                      image: AssetImage(items[index].weaponAsset)),
+                  name: items[index].weaponName,
+                  price: sold ? "SOLD" : items[index].price.toString() + "\$",
+                  damage: items[index].damage.toString(),
+                  radius: items[index].range.toString(),
+                  knockback: items[index].knockbackStrength.toString(),
+                  onTap: () {
+                    if(sold) {
+                      if(items[index].info != null)
+                        _simpleAlertDialog(items[index].info, context);
+                      else
                         _simpleAlertDialog("Item Already Sold", context);
-                      else if(_money < items[index].price)
-                        _simpleAlertDialog("Not Enough Money !", context);
-                      else{
-                        _confirmSaleAlertBox(
-                          "Buy Item?",
-                          "Do you want to buy \"" + items[index].weaponName + "\" for " +
-                              items[index].price.toString() + "\$?",
-                          context,
-                              () {
-                            _sellItem(
-                                items[index].price, items[index].weaponName);
-                          },
-                        );
-                      }
-                    },
-                  );
+                    }
+                    else if(_money < items[index].price)
+                      _simpleAlertDialog("Not Enough Money !", context);
+                    else{
+                      _confirmSaleAlertBox(
+                        "Buy Item?",
+                        "Do you want to buy \"" + items[index].weaponName + "\" for " +
+                            items[index].price.toString() + "\$?",
+                        context,
+                        items[index],
+                            () {
+                          _sellItem(
+                              items[index].price, items[index].weaponName);
+                        },
+                      );
+                    }
+                  },
+                );
                 },
               ),
             ));
@@ -255,7 +260,7 @@ class ShopListState extends State<ShopList> {
 
   /// Alert dialog to confirm a sale
   void _confirmSaleAlertBox(
-      String title, String mess, BuildContext context, void function()) {
+      String title, String mess, BuildContext context, WeaponStats item, void function()) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -295,6 +300,9 @@ class ShopListState extends State<ShopList> {
               onPressed: () {
                 function();
                 Navigator.of(context).pop();
+
+                if(item.info != null)
+                  _simpleAlertDialog(item.info, context);
               },
             ),
           ],

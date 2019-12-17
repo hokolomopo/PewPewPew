@@ -53,14 +53,21 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    Home.screenSize = MediaQuery.of(context).size;
+    final mediaQueryData = MediaQuery.of(context);
+
+    //Wait for the app to be in portrait mode
+    if (mediaQueryData.orientation == Orientation.landscape)
+      return Container();
+    Home.screenSize = mediaQueryData.size;
     Color primary = Theme.of(context).primaryColor;
+
+
 
     // logo widget
     Widget logo() {
       return Padding(
         padding:
-            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.15),
+            EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: 220.0,

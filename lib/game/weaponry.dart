@@ -477,6 +477,8 @@ class WeaponStats{
 
   int price;
 
+  String info;
+
   WeaponStats();
 
   WeaponStats.fromJson(Map<String, dynamic> json) {
@@ -503,6 +505,7 @@ class WeaponStats{
     this.projectileHitboxSize = Size(json['projectileHitboxSizeX'] as double, json['projectileHitboxSizeY'] as double);
     this.projectileEnableOrientation = json['projectileOrientationEnable'] as int;
     this.explodeOnImpact = json['explodeOnImpact'] as bool;
+    this.info = json['info'] as String;
   }
 
   Map<String, dynamic> toJson() {
@@ -526,6 +529,7 @@ class WeaponStats{
       'price': price,
       'projectileHitboxSizeX': projectileHitboxSize.width,
       'projectileHitboxSizeY': projectileHitboxSize.height,
+      'info': info,
     };
   }
 

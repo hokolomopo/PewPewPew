@@ -22,7 +22,7 @@
     "explosionSizeY": 0.0,
     "projectileHitboxSizeX": 5.0,
     "projectileHitboxSizeY": 5.0,
-    "price": 10000
+    "price": 6000
   },
   {
     "weaponName": "Grenade",
@@ -126,7 +126,7 @@
     "explosionSizeY": 10.0,
     "projectileHitboxSizeX": 6.0,
     "projectileHitboxSizeY": 3.0,
-    "price": 6000
+    "price": 3000
   },
   {
     "weaponName": "Fist",
@@ -156,7 +156,7 @@
   },
   {
     "weaponName": "Draconic Bow",
-    "damage": 10,
+    "damage": 20,
     "useProjectile": true,
     "isExplosive": false,
     "explodeOnImpact": true,
@@ -164,7 +164,7 @@
     "range": 20,
     "ammunition": 3,
     "hasKnockback": true,
-    "knockbackStrength": 20,
+    "knockbackStrength": 35,
     "projectileName": "L_Arrow",
     "projectileWeight": 0.0,
     "projectileMaxSpeed": 200,
@@ -178,6 +178,7 @@
     "explosionSizeY": 60.0,
     "projectileHitboxSizeX": 6.0,
     "projectileHitboxSizeY": 6.0,
-    "price": 0
+    "price": 4000,
+    "info":"Tap the screen to change the direction of the arrow of the Draconic Bow"
   }
 ]

@@ -397,3 +397,4 @@ Thumbs.db
 build/
 
 .flutter-plugins
+key.jks

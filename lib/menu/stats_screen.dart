@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:info2051_2018/game/util/game_statistics.dart';
 import 'package:info2051_2018/menu/home.dart';
@@ -20,12 +22,12 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
-  static const Map<TeamStat, int> _moneyByStat = {
+  static const Map<TeamStat, double> _moneyByStat = {
     TeamStat.damage_dealt: 10,
-    TeamStat.damage_taken: -1,
-    TeamStat.alive: 100,
-    TeamStat.killed: 200,
-    TeamStat.self_killed: -350,
+    TeamStat.damage_taken: -0.5,
+    TeamStat.alive: 300,
+    TeamStat.killed: 500,
+    TeamStat.self_killed: -200,
     TeamStat.damage_self_dealt: -1,
   };
 
@@ -40,7 +42,7 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
     totalMoneyGain = 0;
     for (TeamStat stat in TeamStat.values)
       totalMoneyGain +=
-          (_moneyByStat[stat] * stats.statistics[stats.winningTeam][stat].floor());
+          (_moneyByStat[stat] * stats.statistics[stats.winningTeam][stat]).floor();
     totalMoneyGain = max(0, totalMoneyGain);
 
     saveMoney();
@@ -65,6 +67,13 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQueryData = MediaQuery.of(context);
+
+    //Wait for the app to be in portrait mode
+    if (mediaQueryData.orientation == Orientation.landscape)
+      return Container();
+
+
     //button widget
     Widget continueButton() {
       return RaisedButton(
@@ -139,8 +148,8 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
                   ),
                   Text(
                     (_moneyByStat[stat] *
-                                curStat)
-                            .toString() +
+                                curStat).toStringAsFixed(0)
+                            +
                         "\$",
                     style: TextStyle(fontSize: 12, color: Colors.black),
                   )
@@ -158,101 +167,110 @@ class _StatsScreenState extends State<StatsScreen> with WidgetsBindingObserver {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Stack(
-      children: <Widget>[
-        Image.asset(
-          "assets/graphics/backgrounds/menu-background3.jpg",
-          height: screenHeight,
-          width: screenWidth,
-          fit: BoxFit.cover,
-        ),
-        Scaffold(
-          body: Padding(
-              padding: EdgeInsets.only(
-                  top: screenHeight / 15, left: 30.0, right: 30.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  SizedBox(
-                    height: screenHeight * 0.7,
-                    child: DecoratedBox(
-                        decoration: ShapeDecoration(
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
+    return WillPopScope(
+      onWillPop: _exit,
+      child: Stack(
+          children: <Widget>[
+            Image.asset(
+              "assets/graphics/backgrounds/menu-background3.jpg",
+              height: screenHeight,
+              width: screenWidth,
+              fit: BoxFit.cover,
+            ),
+            Scaffold(
+              body: Padding(
+                  padding: EdgeInsets.only(
+                      top: screenHeight / 15, left: 30.0, right: 30.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      SizedBox(
+                        height: screenHeight * 0.7,
+                        child: DecoratedBox(
+                            decoration: ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
                                 BorderRadius.all(Radius.circular(10.0)),
-                            side: BorderSide(
-                              width: 1.0,
-                              color: Colors.black.withOpacity(0.5),
+                                side: BorderSide(
+                                  width: 1.0,
+                                  color: Colors.black.withOpacity(0.5),
+                                ),
+                              ),
+                              gradient: RadialGradient(
+                                  colors: [Colors.blue[200], Colors.blue[300]]),
+                              shadows: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  spreadRadius: 2,
+                                  blurRadius: 3,
+                                  offset: Offset(2, 4),
+                                )
+                              ],
                             ),
-                          ),
-                          gradient: RadialGradient(
-                              colors: [Colors.blue[200], Colors.blue[300]]),
-                          shadows: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.4),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                              offset: Offset(2, 4),
-                            )
-                          ],
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 1.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Text(
-                                "Winning Team : \n Team " +
-                                    widget.gameStats.winningTeam,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    height: 1.5),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 1.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Text(
+                                    "Winning Team : \n Team " +
+                                        widget.gameStats.winningTeam,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        height: 1.5),
+                                  ),
+                                  Divider(
+                                    color: Colors.black.withOpacity(0.6),
+                                    height: 30.0,
+                                    thickness: 3.0,
+                                  ),
+                                  buildTextRow(stat: TeamStat.damage_dealt),
+                                  buildTextRow(stat: TeamStat.damage_self_dealt),
+                                  buildTextRow(stat: TeamStat.damage_taken),
+                                  buildTextRow(stat: TeamStat.killed),
+                                  buildTextRow(stat: TeamStat.self_killed),
+                                  buildTextRow(
+                                      stat: TeamStat.alive, divider: false),
+                                  Divider(
+                                    color: Colors.black.withOpacity(0.5),
+                                    height: 20.0,
+                                    thickness: 3.0,
+                                  ),
+                                  Padding(
+                                      padding: EdgeInsets.only(bottom: 10.0),
+                                      child: Center(
+                                        child: Text(
+                                          "Total : " +
+                                              totalMoneyGain.toString() +
+                                              "\$",
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 15,
+                                              height: 1.5),
+                                        ),
+                                      ))
+                                ],
                               ),
-                              Divider(
-                                color: Colors.black.withOpacity(0.6),
-                                height: 30.0,
-                                thickness: 3.0,
-                              ),
-                              buildTextRow(stat: TeamStat.damage_dealt),
-                              buildTextRow(stat: TeamStat.damage_self_dealt),
-                              buildTextRow(stat: TeamStat.damage_taken),
-                              buildTextRow(stat: TeamStat.killed),
-                              buildTextRow(stat: TeamStat.self_killed),
-                              buildTextRow(
-                                  stat: TeamStat.alive, divider: false),
-                              Divider(
-                                color: Colors.black.withOpacity(0.5),
-                                height: 20.0,
-                                thickness: 3.0,
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.only(bottom: 10.0),
-                                  child: Center(
-                                    child: Text(
-                                      "Total : " +
-                                          totalMoneyGain.toString() +
-                                          "\$",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
-                                          height: 1.5),
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        )),
-                  ),
-                  continueButton(),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 5.0),
-                  )
-                ],
-              )),
-        )
-      ],
+                            )),
+                      ),
+                      continueButton(),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5.0),
+                      )
+                    ],
+                  )),
+            )
+          ],
+        ),
     );
+  }
+
+  Future<bool> _exit() async{
+    Navigator.pushNamedAndRemoveUntil(
+        context, Home.routeName, (Route<dynamic> route) => false);
+    return false;
   }
 
   @override
