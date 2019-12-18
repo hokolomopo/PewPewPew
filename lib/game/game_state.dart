@@ -39,6 +39,8 @@ class GameState {
   /// Ratio between the size of a drag event and the length of the resulting jump
   static const double LaunchVectorNormalizer = 4;
 
+  static const double maxCinematicDuration = 5000;//in millis
+
   GameStateMode currentState = GameStateMode.char_selection;
 
   List<Team> players = new List();
@@ -77,7 +79,7 @@ class GameState {
   Stopwatch stopWatch = Stopwatch();
   Projectile cameraFocus;
 
-  /// GameStateMode.waiting variables
+  /// GameStateMode.waiting & GameStateMode.cinematic variables
   DateTime startWaitingTime;
   double waitDuration = 0;//in millis
 
@@ -243,6 +245,11 @@ class GameState {
           this.waitDuration = 1000;
           switchState(GameStateMode.waiting);
         }
+
+        //End cinematic if it last too long
+        DateTime currentTime = DateTime.now();
+        if(currentTime.difference(this.startWaitingTime).inMilliseconds > maxCinematicDuration)
+          switchState(GameStateMode.waiting);
 
         break;
       case GameStateMode.over:
@@ -686,6 +693,7 @@ class GameState {
         this.startWaitingTime = DateTime.now();
         break;
       case GameStateMode.cinematic:
+        this.startWaitingTime = DateTime.now();
         break;
       case GameStateMode.over:
         // Compute stats for last team
@@ -745,6 +753,7 @@ class GameState {
       case GameStateMode.cinematic:
         if (currentWeapon != null) painter.removeElement(currentWeapon.drawer);
         currentWeapon = null;
+        startWaitingTime = null;
         break;
       case GameStateMode.over:
         break;

@@ -112,6 +112,9 @@ class World{
         return;
       }
       else if (collided is Character) {
+        if(projectile.isDead)
+          return;
+
         // Update stats
         double damageDealt = min(projectile.damage.toDouble(), collided.hp);
         collided.removeHp(damageDealt);
