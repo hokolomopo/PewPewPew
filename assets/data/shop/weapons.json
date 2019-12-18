@@ -180,5 +180,31 @@
     "projectileHitboxSizeY": 6.0,
     "price": 4000,
     "info":"Tap the screen to change the direction of the arrow of the Draconic Bow"
+  },
+  {
+    "weaponName": "Blood Magic",
+    "damage": 25,
+    "useProjectile": true,
+    "isExplosive": true,
+    "explodeOnImpact": false,
+    "detonationDelay": 5000.0,
+    "range": 40,
+    "ammunition": 2,
+    "hasKnockback": true,
+    "knockbackStrength": 50,
+    "projectileName": "blood_magic",
+    "projectileWeight": 5.0,
+    "projectileMaxSpeed": 200,
+    "projectileFrictionFactor": 0.99,
+    "projectileOrientationEnable": -1,
+    "weaponAsset": "assets/graphics/arsenal/weapons/blood_magic.png",
+    "projectileAsset": "blood_magic",
+    "explosionAsset": "arcane_explosion",
+    "explosionSound": "spell.mp3",
+    "explosionSizeX": 60.0,
+    "explosionSizeY": 60.0,
+    "projectileHitboxSizeX": 6.0,
+    "projectileHitboxSizeY": 6.0,
+    "price": 8000
   }
 ]
