@@ -12,8 +12,8 @@ class SoundPlayer {
     return soundPlayer;
   }
 
-  static const menuMusicName = "sample.mp3";
-  static const gameMusicName = "sample2.mp3";
+  static const menuMusicName = "sample.ogg";
+  static const gameMusicName = "sample2.ogg";
 
   static double musicVolume = Home.musicVolume; // [0.0, 1.0]
   static double currentMusicVolume; //[0.0, 1.0]
